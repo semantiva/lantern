@@ -27,11 +27,35 @@ EXPECTED_WORKBENCH_IDS = (
 )
 
 
+def _load_registry_payload() -> dict:
+    return copy.deepcopy(yaml.safe_load(DEFAULT_REGISTRY_PATH.read_text(encoding="utf-8")))
+
+
 def _write_registry(tmp_dir: Path, payload: dict) -> Path:
     tmp_dir.mkdir(parents=True, exist_ok=True)
     path = tmp_dir / "workbench_registry.yaml"
     path.write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
     return path
+
+
+def _load_registry_from_payload(tmp_name: str, payload: dict):
+    registry_path = _write_registry(Path.cwd() / ".pytest_cache" / tmp_name, payload)
+    return load_workbench_registry(
+        registry_path=registry_path,
+        schema_yaml_path=DEFAULT_SCHEMA_YAML_PATH,
+        schema_json_path=DEFAULT_SCHEMA_JSON_PATH,
+    )
+
+
+def _assert_payload_fails(payload: dict, tmp_name: str, *fragments: str) -> None:
+    try:
+        _load_registry_from_payload(tmp_name, payload)
+    except ValueError as exc:
+        message = str(exc)
+        for fragment in fragments:
+            assert fragment in message
+    else:
+        raise AssertionError("Expected validation failure")
 
 
 def test_registry_loads_and_contains_all_built_in_workbenches() -> None:
@@ -42,23 +66,11 @@ def test_registry_loads_and_contains_all_built_in_workbenches() -> None:
 
 
 def test_missing_required_gate_is_fatal() -> None:
-    payload = copy.deepcopy(yaml.safe_load(DEFAULT_REGISTRY_PATH.read_text(encoding="utf-8")))
+    payload = _load_registry_payload()
     for workbench in payload["workbenches"]:
         if workbench["workbench_id"] == "design_selection":
             workbench["lifecycle_placement"]["covered_gates"] = ["GT-999"]
-    registry_path = _write_registry(Path.cwd() / ".pytest_cache" / "ch0001_gt115_missing", payload)
-    try:
-        load_workbench_registry(
-            registry_path=registry_path,
-            schema_yaml_path=DEFAULT_SCHEMA_YAML_PATH,
-            schema_json_path=DEFAULT_SCHEMA_JSON_PATH,
-        )
-    except ValueError as exc:
-        message = str(exc)
-        assert "GT-115" in message
-        assert "uncovered" in message
-    else:
-        raise AssertionError("Expected uncovered GT-115 validation failure")
+    _assert_payload_fails(payload, "ch0001_gt115_missing", "GT-115", "uncovered")
 
 
 def test_content_hashes_are_sha256_hex_strings() -> None:
@@ -74,21 +86,51 @@ def test_content_hashes_are_deterministic_across_loads() -> None:
 
 
 def test_missing_required_field_is_fatal() -> None:
-    payload = copy.deepcopy(yaml.safe_load(DEFAULT_REGISTRY_PATH.read_text(encoding="utf-8")))
+    payload = _load_registry_payload()
     del payload["workbenches"][0]["workbench_id"]
-    registry_path = _write_registry(Path.cwd() / ".pytest_cache" / "ch0001_missing_field", payload)
-    try:
-        load_workbench_registry(
-            registry_path=registry_path,
-            schema_yaml_path=DEFAULT_SCHEMA_YAML_PATH,
-            schema_json_path=DEFAULT_SCHEMA_JSON_PATH,
-        )
-    except ValueError as exc:
-        message = str(exc)
-        assert "workbench_id" in message
-        assert "required" in message.lower()
-    else:
-        raise AssertionError("Expected required-field validation failure")
+    _assert_payload_fails(payload, "ch0001_missing_field", "workbench_id", "required")
+
+
+def test_invalid_instruction_resource_path_is_fatal() -> None:
+    payload = _load_registry_payload()
+    payload["workbenches"][0]["instruction_resource"] = "../outside.md"
+    _assert_payload_fails(
+        payload,
+        "ch0008_invalid_instruction_resource",
+        "instruction_resource",
+        "upstream_intake_and_baselines",
+    )
+
+
+def test_invalid_authoritative_guide_path_is_fatal() -> None:
+    payload = _load_registry_payload()
+    payload["workbenches"][0]["authoritative_guides"] = ["guides/outside.md"]
+    _assert_payload_fails(
+        payload,
+        "ch0008_invalid_authoritative_guide",
+        "authoritative_guides[0]",
+        "upstream_intake_and_baselines",
+    )
+
+
+def test_invalid_contract_ref_is_fatal() -> None:
+    payload = _load_registry_payload()
+    payload["workbenches"][0]["workflow_surface"]["contract_refs"] = ["bad-ref"]
+    _assert_payload_fails(
+        payload,
+        "ch0008_invalid_contract_ref",
+        "contract_refs[0]",
+        "upstream_intake_and_baselines",
+    )
+
+
+def test_structurally_valid_nonexistent_guide_path_is_allowed() -> None:
+    payload = _load_registry_payload()
+    payload["workbenches"][0]["authoritative_guides"] = [
+        "lantern/resources/guides/not-yet-delivered.md"
+    ]
+    registry = _load_registry_from_payload("ch0008_valid_nonexistent_guide", payload)
+    assert registry.ids() == EXPECTED_WORKBENCH_IDS
 
 
 def test_lifecycle_placement_variants_parse_correctly() -> None:

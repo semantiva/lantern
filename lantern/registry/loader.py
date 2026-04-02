@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, Iterable, Mapping, Sequence
 
 import yaml
@@ -29,6 +29,7 @@ _TEXT_EXTENSIONS = {
 }
 _SKIP_DIRS = {".git", ".pytest_cache", "__pycache__", ".mypy_cache", ".ruff_cache", ".venv", "venv"}
 _FORBIDDEN_NAME_PATTERN = re.compile("(?i)(?:" + "tier" + r"[-_ ]?" + "h|_" + "tier" + "_" + "h)")
+_CONTRACT_REF_PATTERN = re.compile(r"^contract\.[a-z0-9_]+(?:\.[a-z0-9_]+)*\.v\d+$")
 
 
 def load_workbench_registry(
@@ -47,6 +48,7 @@ def load_workbench_registry(
 
     _validate_against_schema(registry_payload, schema_payload)
     _validate_schema_metadata(registry_payload, schema_metadata)
+    _validate_workflow_references(registry_payload)
     validate_gate_coverage(registry_payload, required_gates=schema_metadata["required_full_governed_gates"])
 
     workbenches = tuple(_build_workbench(entry) for entry in registry_payload["workbenches"])
@@ -69,6 +71,63 @@ def validate_gate_coverage(payload: Mapping[str, Any], *, required_gates: Sequen
     missing = [gate for gate in required_gates if gate not in covered]
     if missing:
         raise ValueError("full_governed_surface has uncovered required gates: " + ", ".join(missing))
+
+
+def _validate_workflow_references(payload: Mapping[str, Any]) -> None:
+    errors: list[str] = []
+    for entry in payload.get("workbenches", []):
+        workbench_id = str(entry.get("workbench_id", "<unknown-workbench>"))
+        _append_resource_ref_error(errors, workbench_id, "instruction_resource", entry.get("instruction_resource"))
+        _append_resource_ref_list_errors(errors, workbench_id, "authoritative_guides", entry.get("authoritative_guides", []))
+        _append_resource_ref_list_errors(errors, workbench_id, "administration_guides", entry.get("administration_guides", []))
+        workflow_surface = entry.get("workflow_surface", {})
+        _append_contract_ref_errors(errors, workbench_id, workflow_surface.get("contract_refs", []))
+    if errors:
+        raise ValueError("; ".join(errors))
+
+
+def _append_resource_ref_list_errors(
+    errors: list[str],
+    workbench_id: str,
+    field: str,
+    values: Sequence[Any],
+) -> None:
+    for index, value in enumerate(values):
+        _append_resource_ref_error(errors, workbench_id, f"{field}[{index}]", value)
+
+
+def _append_resource_ref_error(
+    errors: list[str],
+    workbench_id: str,
+    field: str,
+    value: Any,
+) -> None:
+    if not isinstance(value, str) or not value.strip():
+        errors.append(f"{workbench_id}.{field} must be a non-empty Lantern-local markdown path")
+        return
+    candidate = PurePosixPath(value.strip())
+    if (
+        candidate.is_absolute()
+        or not candidate.parts
+        or candidate.parts[0] != "lantern"
+        or ".." in candidate.parts
+        or candidate.suffix != ".md"
+    ):
+        errors.append(
+            f"{workbench_id}.{field} must be a Lantern-local markdown path under 'lantern/': {value!r}"
+        )
+
+
+def _append_contract_ref_errors(
+    errors: list[str],
+    workbench_id: str,
+    values: Sequence[Any],
+) -> None:
+    for index, value in enumerate(values):
+        if not isinstance(value, str) or not _CONTRACT_REF_PATTERN.match(value):
+            errors.append(
+                f"{workbench_id}.workflow_surface.contract_refs[{index}] must match 'contract.<name>.vN': {value!r}"
+            )
 
 
 def scan_forbidden_names(root: str | Path) -> list[NameViolation]:
