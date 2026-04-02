@@ -1,0 +1,21 @@
+from __future__ import annotations
+
+from pathlib import Path
+
+from lantern.registry.name_isolation import assert_name_isolation, scan_forbidden_names
+
+
+def test_name_isolation_passes_for_repo_contents() -> None:
+    repo_root = Path(__file__).resolve().parents[1]
+    assert_name_isolation(repo_root)
+
+
+def test_name_isolation_catches_a_violation(tmp_path: Path) -> None:
+    tmp_root = tmp_path / "name_violation"
+    tmp_root.mkdir(parents=True, exist_ok=True)
+    bad_file = tmp_root / "bad.md"
+    bad_file.write_text("legacy name: " + "Tier" + "-" + "H" + "\n", encoding="utf-8")
+    violations = scan_forbidden_names(tmp_root)
+    assert violations
+    assert violations[0].path == "bad.md"
+    assert violations[0].line_number == 1

@@ -1,0 +1,154 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Lantern Workbench Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "runtime_surface_classification",
+    "workbenches"
+  ],
+  "properties": {
+    "runtime_surface_classification": {
+      "type": "string",
+      "enum": [
+        "full_governed_surface",
+        "partial_governed_surface",
+        "intervention_surface"
+      ]
+    },
+    "workbenches": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/workbench"
+      }
+    }
+  },
+  "definitions": {
+    "workflow_surface": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "allowed_transaction_kinds",
+        "draftable_artifact_families",
+        "contract_refs",
+        "inspect_views"
+      ],
+      "properties": {
+        "allowed_transaction_kinds": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "draftable_artifact_families": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "contract_refs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "inspect_views": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "lifecycle_placement": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "covered_gates"],
+          "properties": {
+            "kind": { "const": "covered_gates" },
+            "covered_gates": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "type": "string" }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "start_gate", "end_gate"],
+          "properties": {
+            "kind": { "const": "lifecycle_span" },
+            "start_gate": { "type": "string", "minLength": 1 },
+            "end_gate": { "type": "string", "minLength": 1 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind"],
+          "properties": {
+            "kind": { "const": "lifecycle-independent" }
+          }
+        }
+      ]
+    },
+    "workbench": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "workbench_id",
+        "display_name",
+        "lifecycle_placement",
+        "artifacts_in_scope",
+        "intent_classes",
+        "posture_constraints",
+        "workflow_surface",
+        "instruction_resource",
+        "authoritative_guides",
+        "administration_guides",
+        "entry_conditions",
+        "exit_conditions",
+        "source",
+        "enabled",
+        "governance_mode"
+      ],
+      "properties": {
+        "workbench_id": { "type": "string", "minLength": 1 },
+        "display_name": { "type": "string", "minLength": 1 },
+        "lifecycle_placement": { "$ref": "#/definitions/lifecycle_placement" },
+        "artifacts_in_scope": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "intent_classes": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "posture_constraints": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "workflow_surface": { "$ref": "#/definitions/workflow_surface" },
+        "instruction_resource": { "type": "string", "minLength": 1 },
+        "authoritative_guides": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "administration_guides": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "entry_conditions": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "exit_conditions": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "source": { "type": "string", "minLength": 1 },
+        "enabled": { "type": "boolean" },
+        "governance_mode": {
+          "type": "string",
+          "enum": ["full", "intervention"]
+        }
+      }
+    }
+  }
+}
