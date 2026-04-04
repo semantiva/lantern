@@ -1,0 +1,1016 @@
+manifest_version: '1.0'
+bridge_baseline: 7f6c763598e0e18a89dd81ece081af54af6cbda4
+allowed_target_roots:
+- lantern/authoring_contracts/
+- lantern/administration_procedures/
+- lantern/resources/instructions/
+- lantern/templates/
+- lantern/preservation/
+entries:
+- entry_id: AC-001
+  entry_class: bridge_copy
+  source: authoring_contracts/change_increment_authoring_guide_v0.2.1.md
+  target: lantern/authoring_contracts/change_increment_authoring_guide_v0.2.1.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - "# Change Increment authoring guide \u2014 v0.2.1"
+    - '## 1. Definitions (normative)'
+    - '## 2. CI lifecycle semantics (normative)'
+    - '## 3. Non-negotiable boundaries'
+    - '## 4. SSOT storage locations and registry (normative)'
+    - '## 5. Required CI header (normative)'
+    - '## 6. Required CI body sections (normative)'
+    - '## 7. CI authoring contract (execution-grade)'
+    - '## 8. Drop-In sufficiency standard (normative)'
+    - '## 9. Commit Message (normative)'
+    - '## 10. Verification requirements (normative)'
+    - '## 11. Gate-driven lifecycle implications'
+    - '## 12. Common failure modes (avoid)'
+    required_header_keys: []
+- entry_id: AC-002
+  entry_class: bridge_copy
+  source: authoring_contracts/change_increment_selection_guide_v0.2.1.md
+  target: lantern/authoring_contracts/change_increment_selection_guide_v0.2.1.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - '# Change Increment Selection Guide (v0.2.1)'
+    - '## SSOT (must use; do not substitute)'
+    - '## Hard anti-drift rules (apply regardless of stage)'
+    - "## Goal (what \u201Cbest CI\u201D means at GT-120)"
+    - '## Inputs I will provide'
+    - '## Mode selection (small vs many-candidate)'
+    - '## Method (must follow exactly)'
+    - '## Output (use the matching structure exactly)'
+    - '## Evidence requirements'
+    - '## Close-out requirements'
+    required_header_keys: []
+- entry_id: AC-003
+  entry_class: bridge_copy
+  source: authoring_contracts/change_intention_refinement_guide_v0.2.1.md
+  target: lantern/authoring_contracts/change_intention_refinement_guide_v0.2.1.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - "# Change Intent refinement guide \u2014 GT-110 (Proposed \u2192 Ready) \u2014 v0.2.1"
+    - '## Purpose'
+    - '## Normative anchors'
+    - '## Scope'
+    - '## Outputs (definition of done)'
+    - '## Procedure (deterministic)'
+    - '## Common failure modes (avoid)'
+    required_header_keys: []
+- entry_id: AC-004
+  entry_class: bridge_copy
+  source: authoring_contracts/design_baseline_authoring_guide_v0.1.0.md
+  target: lantern/authoring_contracts/design_baseline_authoring_guide_v0.1.0.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - "# Design Baseline authoring guide \u2014 v0.1.0"
+    - '## 1. Definitions (normative)'
+    - '## 2. DB lifecycle semantics (normative)'
+    - '## 3. Non-negotiable boundaries'
+    - '## 4. SSOT storage locations and registry (normative)'
+    - '## 5. Required DB header (normative)'
+    - '## 6. Required DB body sections (normative)'
+    - '## 7. DB authoring contract (design-baseline-grade)'
+    - '## 8. Supersession protocol (normative)'
+    - '## 9. Gate-driven lifecycle implications'
+    - '## 10. Common failure modes (avoid)'
+    required_header_keys: []
+- entry_id: AC-005
+  entry_class: bridge_copy
+  source: authoring_contracts/design_candidate_authoring_guide_v0.1.0.md
+  target: lantern/authoring_contracts/design_candidate_authoring_guide_v0.1.0.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - "# Design Candidate authoring guide \u2014 v0.1.0"
+    - '## 1. Definitions (normative)'
+    - '## 2. DC lifecycle semantics (normative)'
+    - '## 3. Non-negotiable boundaries'
+    - '## 4. SSOT storage locations and registry (normative)'
+    - '## 5. Required DC header (normative)'
+    - '## 6. Required DC body sections (normative)'
+    - '## 7. DC authoring contract (design-grade)'
+    - '## 8. Implementation latitude contract (normative)'
+    - '## 9. Gate-driven lifecycle implications'
+    - '## 10. Common failure modes (avoid)'
+    required_header_keys: []
+- entry_id: AC-006
+  entry_class: bridge_copy
+  source: authoring_contracts/design_candidate_selection_guide_v0.1.0.md
+  target: lantern/authoring_contracts/design_candidate_selection_guide_v0.1.0.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - '# Design Candidate Selection Guide (v0.1.0)'
+    - '## SSOT (must use; do not substitute)'
+    - '## Hard anti-drift rules (apply regardless of stage)'
+    - '## Goal (what "best DC" means at GT-115)'
+    - '## Inputs I will provide'
+    - '## Mode selection (small vs many-candidate)'
+    - '## Method (must follow exactly)'
+    - '## Output (use the matching structure exactly)'
+    - '## Evidence requirements'
+    - '## Close-out requirements'
+    required_header_keys: []
+- entry_id: AC-007
+  entry_class: bridge_copy
+  source: authoring_contracts/dip_authoring_guide_v0.1.0.md
+  target: lantern/authoring_contracts/dip_authoring_guide_v0.1.0.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - "# DIP authoring guide \u2014 v0.1.0"
+    - '## 1. Definitions (normative)'
+    - '## 2. DIP lifecycle semantics (normative)'
+    - '## 3. Non-negotiable boundaries'
+    - '## 4. SSOT storage locations and registry (normative)'
+    - '## 5. Required DIP header (normative)'
+    - '## 6. Required DIP body sections (normative)'
+    - '## 7. DIP authoring contract (intake-grade)'
+    - '## 8. Supersession authoring rules (normative)'
+    - '## 9. Gate-driven lifecycle implications'
+    - '## 10. Common failure modes (avoid)'
+    required_header_keys: []
+- entry_id: AC-008
+  entry_class: bridge_copy
+  source: authoring_contracts/test_definition_authoring_guide_v0.1.0.md
+  target: lantern/authoring_contracts/test_definition_authoring_guide_v0.1.0.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - "# Test Definition authoring guide \u2014 v0.1.0"
+    - '## 1. Definitions (normative)'
+    - '## 2. TD lifecycle semantics (normative)'
+    - '## 3. Non-negotiable boundaries'
+    - '## 4. SSOT storage locations and registry (normative)'
+    - '## 5. Required TD header (normative)'
+    - '## 6. Required TD body sections (normative)'
+    - '## 7. TD authoring contract (behavioral-grade)'
+    - '## 8. Coverage requirement contract (normative)'
+    - '## 9. Coverage Matrix format (normative)'
+    - '## 10. Evidence Expectations section (normative)'
+    - '## 11. Gate-driven lifecycle implications'
+    - '## 12. Common failure modes (avoid)'
+    required_header_keys: []
+- entry_id: AP-001
+  entry_class: bridge_copy
+  source: administration_procedures/AI_OPERATOR_INVOCATION_TEMPLATES_v0.2.0.md
+  target: lantern/administration_procedures/AI_OPERATOR_INVOCATION_TEMPLATES_v0.2.0.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - "# AI operator invocation templates \u2014 v0.2.0"
+    - '## Global invocation rules (normative)'
+    - "## Template 0 \u2014 Create Initiative + initial DIP draft"
+    - "## Template 0A \u2014 Advance Initiative to `Ready`"
+    - "## Template 0B \u2014 Derive first CH from a Ready Initiative"
+    - "## Template A \u2014 Execute GT-110 (CH refinement to Ready)"
+    - "## Template B \u2014 Execute GT-120 selection (analysis only; no administration)"
+    - "## Template C \u2014 Execute GT-120 selection + administration (full gate completion)"
+    - "## Template D \u2014 Execute GT-030 (DIP lock)"
+    - "## Template E \u2014 Prepare SPEC/ARCH derivation packet for GT-050 and GT-060"
+    - "## Template F \u2014 Review DIP/SPEC/ARCH coherence for GT-050 and GT-060"
+    - "## Template G \u2014 Execute GT-050 and GT-060 (baseline readiness)"
+    required_header_keys: []
+- entry_id: AP-002
+  entry_class: bridge_copy
+  source: administration_procedures/AI_OPERATOR_INVOCATION_TEMPLATES_v0.2.1.md
+  target: lantern/administration_procedures/AI_OPERATOR_INVOCATION_TEMPLATES_v0.2.1.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - "# AI operator invocation templates \u2014 v0.2.1"
+    - '## Global invocation rules (normative)'
+    - "## Template 0 \u2014 Create Initiative + initial DIP draft"
+    - "## Template 0A \u2014 Advance Initiative to `Ready`"
+    - "## Template 0B \u2014 Derive first CH from a Ready Initiative"
+    - "## Template A \u2014 Execute GT-110 (CH + TD refinement to Ready)"
+    - "## Template A1 \u2014 Author DC candidates for a Ready CH (no GT-115 administration)"
+    - "## Template A2 \u2014 Execute GT-115 selection (analysis only; no administration)"
+    - "## Template A3 \u2014 Execute GT-115 selection + administration (full gate completion)"
+    - "## Template B \u2014 Execute GT-120 selection (analysis only; no administration)"
+    - "## Template C \u2014 Execute GT-120 selection + administration (full gate completion)"
+    - "## Template D \u2014 Execute GT-030 (DIP lock)"
+    - "## Template E \u2014 Prepare SPEC/ARCH derivation packet for GT-050 and GT-060"
+    - "## Template F \u2014 Review DIP/SPEC/ARCH coherence for GT-050 and GT-060"
+    - "## Template G \u2014 Execute GT-050 and GT-060 (baseline readiness)"
+    - "## Template H \u2014 Execute GT-130 (integration verification + administration)"
+    required_header_keys: []
+- entry_id: AP-003
+  entry_class: bridge_copy
+  source: administration_procedures/GT-030__DIP_LOCK_ADMINISTRATION_v0.1.0.md
+  target: lantern/administration_procedures/GT-030__DIP_LOCK_ADMINISTRATION_v0.1.0.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - "# GT-030 Administration Guide \u2014 v0.1.0"
+    - '## Definitions (for this procedure)'
+    - '## Inputs (required)'
+    - '## Outputs (what "done" means)'
+    - '## Procedure (deterministic)'
+    - '## Back-pressure notes'
+    - "## After GT-030 PASS \u2014 what comes next"
+    required_header_keys: []
+- entry_id: AP-004
+  entry_class: bridge_copy
+  source: administration_procedures/GT-050_GT-060__BASELINE_READINESS_ADMINISTRATION_v0.1.0.md
+  target: lantern/administration_procedures/GT-050_GT-060__BASELINE_READINESS_ADMINISTRATION_v0.1.0.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - "# GT-050/GT-060 Administration Guide \u2014 v0.1.0"
+    - '## Definitions (for this procedure)'
+    - '## Inputs (required)'
+    - '## Outputs (what "done" means)'
+    - "## Procedure \u2014 GT-050 (ARCH Baseline Readiness)"
+    - "## Procedure \u2014 GT-060 (SPEC Baseline Readiness)"
+    - "## Joint Step \u2014 Consistency checks (required; apply after both gates)"
+    - '## Back-pressure notes'
+    - "## After GT-050/GT-060 PASS \u2014 what comes next"
+    required_header_keys: []
+- entry_id: AP-005
+  entry_class: bridge_copy
+  source: administration_procedures/GT-115__DESIGN_BASELINE_SELECTION_v0.1.0.md
+  target: lantern/administration_procedures/GT-115__DESIGN_BASELINE_SELECTION_v0.1.0.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - "# GT-115 Administration Guide \u2014 v0.1.0"
+    - '## Definitions (for this procedure)'
+    - '## Inputs (required)'
+    - '## Outputs (what "done" means)'
+    - '## Procedure (deterministic)'
+    - '## AI assistant administrative prompt (optional; paste-ready)'
+    required_header_keys: []
+- entry_id: AP-006
+  entry_class: bridge_copy
+  source: administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION_v0.2.1.md
+  target: lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION_v0.2.1.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - "# GT-120 Administration Guide \u2014 v0.2.1"
+    - '## Definitions (for this procedure)'
+    - '## Inputs (required)'
+    - "## Outputs (what \u201Cdone\u201D means)"
+    - '## Procedure (deterministic)'
+    - '## AI assistant administrative prompt (optional; paste-ready)'
+    required_header_keys: []
+- entry_id: AP-007
+  entry_class: bridge_copy
+  source: administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION_v0.1.0.md
+  target: lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION_v0.1.0.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - "# GT-130 Administration Guide \u2014 v0.1.0"
+    - '## Definitions (for this procedure)'
+    - '## Inputs (required)'
+    - '## Outputs (what "done" means)'
+    - '## Procedure (deterministic)'
+    - "## FAIL disposition \u2014 back-pressure to upstream gates"
+    - '## AI assistant administrative prompt (optional; paste-ready)'
+    required_header_keys: []
+- entry_id: AP-008
+  entry_class: bridge_copy
+  source: administration_procedures/INITIATIVE__AUTHORING_AND_READYING_v0.1.0.md
+  target: lantern/administration_procedures/INITIATIVE__AUTHORING_AND_READYING_v0.1.0.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - "# Initiative authoring and readying \u2014 v0.1.0"
+    - '## Scope'
+    - '## Canonical storage and identifiers'
+    - '## Initiative readiness posture'
+    - '## Self-contained upstream artifact rule'
+    - '## Procedure'
+    - '## CH sizing compromise'
+    - '## Relationship to CH execution'
+    required_header_keys: []
+- entry_id: AP-009
+  entry_class: bridge_copy
+  source: administration_procedures/INITIATIVE__DECOMPOSITION_AND_CH_SIZING_v0.1.0.md
+  target: lantern/administration_procedures/INITIATIVE__DECOMPOSITION_AND_CH_SIZING_v0.1.0.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - "# Initiative decomposition and CH sizing \u2014 v0.1.0"
+    - '## Initiative posture'
+    - '## Core rules'
+    - '## Minimum Initiative content'
+    - '## Decomposition intent'
+    - '## Deterministic sizing checks'
+    - '## Tests and documentation posture'
+    - '## Common split patterns'
+    - '## Failure modes'
+    required_header_keys: []
+- entry_id: AP-010
+  entry_class: bridge_copy
+  source: administration_procedures/ISSUE__INTAKE_TRIAGE_RESOLUTION_v0.2.0.md
+  target: lantern/administration_procedures/ISSUE__INTAKE_TRIAGE_RESOLUTION_v0.2.0.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - "# ISSUE workflow (Intake \u2192 Triage \u2192 Resolution/Rejection) v0.2.0"
+    - '## Core principle'
+    - '## Artifacts'
+    - '## Status model'
+    - "## Step 1 \u2014 Intake"
+    - "## Step 2 \u2014 Triage"
+    - "## Step 3 \u2014 Resolution / Closure"
+    - '## Quality guardrails'
+    required_header_keys: []
+- entry_id: AP-011
+  entry_class: bridge_copy
+  source: administration_procedures/SSOT_BLOB_INGESTION_v0.2.0.md
+  target: lantern/administration_procedures/SSOT_BLOB_INGESTION_v0.2.0.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - "# SSOT blob ingestion workflow \u2014 SSOT bundle \u2192 DIP \u2192 SPEC/ARCH (privacy boundary hardened) \u2014 v0.2.0"
+    - '## Scope'
+    - '## Inputs'
+    - '## Outputs'
+    - '## Authoritative artifact rule'
+    - '## Procedure'
+    - '## Privacy boundary posture'
+    - '## Non-goals'
+    required_header_keys: []
+- entry_id: TM-001
+  entry_class: bridge_copy
+  source: templates/CH_TEMPLATE.md
+  target: lantern/templates/CH_TEMPLATE.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - "# CH-#### \u2014 <short title>"
+    - '## 0. GT-110 Input Sufficiency Assessment'
+    - '## 1. Problem statement'
+    - '## 2. Scope'
+    - '## 3. Inputs required to reach `Ready`'
+    - '## 4. Gate expectations'
+    required_header_keys:
+    - ch_id
+    - status
+    - title
+    - origin
+    - inputs
+    - gates
+    - assessment_criteria
+    - validation_target
+    - constraints
+    - depends_on_ch
+    - required_evidence_for_gt110
+    - required_decisions
+    - related_cis
+    - test_definition_refs
+    - design_candidate_refs
+    - design_baseline_ref
+- entry_id: TM-002
+  entry_class: bridge_copy
+  source: templates/DEC_TEMPLATE.md
+  target: lantern/templates/DEC_TEMPLATE.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - '## Decision'
+    required_header_keys:
+    - dec_id
+    - applies_to_ch
+    - date_utc
+    - decision_type
+    - status
+    - supersedes
+    - references
+- entry_id: TM-003
+  entry_class: bridge_copy
+  source: templates/DEC_TEMPLATE__GT115_SELECTION.md
+  target: lantern/templates/DEC_TEMPLATE__GT115_SELECTION.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - '# GT-115 Decision'
+    required_header_keys:
+    - dec_id
+    - applies_to_ch
+    - date_utc
+    - decision_type
+    - status
+    - references
+- entry_id: TM-004
+  entry_class: bridge_copy
+  source: templates/DEC_TEMPLATE__GT120_SELECTION.md
+  target: lantern/templates/DEC_TEMPLATE__GT120_SELECTION.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - '## Decision'
+    required_header_keys:
+    - dec_id
+    - applies_to_ch
+    - date_utc
+    - decision_type
+    - status
+    - supersedes
+    - references
+- entry_id: TM-005
+  entry_class: bridge_copy
+  source: templates/DEC_TEMPLATE__GT130_VERIFICATION.md
+  target: lantern/templates/DEC_TEMPLATE__GT130_VERIFICATION.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - '# GT-130 Decision'
+    required_header_keys:
+    - dec_id
+    - applies_to_ch
+    - date_utc
+    - decision_type
+    - status
+    - references
+- entry_id: TM-006
+  entry_class: bridge_copy
+  source: templates/EV_TEMPLATE.md
+  target: lantern/templates/EV_TEMPLATE.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - '## Evidence coverage summary'
+    required_header_keys:
+    - ev_id
+    - applies_to_ch
+    - date_utc
+    - evidence_type
+    - references
+    - artifacts
+- entry_id: TM-007
+  entry_class: bridge_copy
+  source: templates/EV_TEMPLATE__GT115_SELECTION_REPORT.md
+  target: lantern/templates/EV_TEMPLATE__GT115_SELECTION_REPORT.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - '## Selection report (verbatim)'
+    - '## Human approval'
+    required_header_keys:
+    - ev_id
+    - applies_to_ch
+    - date_utc
+    - evidence_type
+    - references
+    - artifacts
+- entry_id: TM-008
+  entry_class: bridge_copy
+  source: templates/EV_TEMPLATE__GT120_SELECTION_REPORT.md
+  target: lantern/templates/EV_TEMPLATE__GT120_SELECTION_REPORT.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - '## Selection report (verbatim)'
+    - '## Human approval'
+    required_header_keys:
+    - ev_id
+    - applies_to_ch
+    - date_utc
+    - evidence_type
+    - references
+    - artifacts
+- entry_id: TM-009
+  entry_class: bridge_copy
+  source: templates/EV_TEMPLATE__GT130_VERIFICATION_REPORT.md
+  target: lantern/templates/EV_TEMPLATE__GT130_VERIFICATION_REPORT.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - '## Verification run'
+    - '## TD case coverage'
+    - '## Human approval'
+    required_header_keys:
+    - ev_id
+    - applies_to_ch
+    - date_utc
+    - evidence_type
+    - references
+    - artifacts
+- entry_id: TM-010
+  entry_class: bridge_copy
+  source: templates/TEMPLATE__ARCH.md
+  target: lantern/templates/TEMPLATE__ARCH.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - "# ARCH-[[TEMPLATE:ARCH_ID]] \u2014 [[TEMPLATE:TITLE]]"
+    - '## Summary'
+    - '## Architecture scope and intent'
+    - '## Key decisions (required)'
+    - '## Constraints and boundaries (required)'
+    - '## Questions referenced (required; may be empty)'
+    - '## Pinning pointers (optional; informative)'
+    - '## Notes'
+    required_header_keys: []
+- entry_id: TM-011
+  entry_class: bridge_copy
+  source: templates/TEMPLATE__CI.md
+  target: lantern/templates/TEMPLATE__CI.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - "# CI-<CH_NUM>-<UUID> \u2014 <short title>"
+    - '## Intent'
+    - '## Assessment Criteria Alignment (verbatim from CH)'
+    - '## Constraints (verbatim from CH)'
+    - '## Design Baseline Alignment'
+    - '## Test Definition Alignment'
+    - '## Allowed Change Surface'
+    - '## Drop-In Pack (REQUIRED)'
+    - '## Commit Message (REQUIRED)'
+    - '## Verification Plan'
+    - '## Definition of Done (binary)'
+    required_header_keys:
+    - ch_id
+    - ci_id
+    - status
+    - title
+    - design_baseline_ref
+    - test_definition_refs
+    - ssot
+    - baseline
+    - allowed_change_surface
+    - verification
+    - blocked_by
+- entry_id: TM-012
+  entry_class: bridge_copy
+  source: templates/TEMPLATE__DB.md
+  target: lantern/templates/TEMPLATE__DB.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - "# DB-#### \u2014 <short title>"
+    - '## Selected Design'
+    - '## Selection Rationale'
+    - '## Governed Scope'
+    - '## Supersession Posture'
+    - '## Implementation Latitude'
+    required_header_keys:
+    - db_id
+    - status
+    - title
+    - source_dc_id
+    - applies_to_ch
+    - test_definition_refs
+    - governed_scope
+    - supersedes
+    - superseded_by
+- entry_id: TM-013
+  entry_class: bridge_copy
+  source: templates/TEMPLATE__DC.md
+  target: lantern/templates/TEMPLATE__DC.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - "# DC-<CH_NUM>-<UUID> \u2014 <short title>"
+    - '## Problem Framing'
+    - '## Assessment Criteria Alignment (verbatim from CH)'
+    - '## Constraints (verbatim from CH)'
+    - '## Upstream Baseline Alignment'
+    - '## Proposed Design'
+    - '## Tradeoffs and Rejected Local Alternatives'
+    - '## Compatibility Posture'
+    - '## Governed Scope'
+    - '## Interfaces / Public Surface Impact'
+    - '## Implementation Latitude'
+    - '## Comparison Notes for GT-115'
+    - '## Blocking Items'
+    required_header_keys:
+    - dc_id
+    - ch_id
+    - status
+    - title
+    - spec_refs
+    - arch_refs
+    - test_definition_refs
+    - origin
+    - governed_scope
+    - compatibility_posture
+    - blocked_by
+- entry_id: TM-014
+  entry_class: bridge_copy
+  source: templates/TEMPLATE__DIP.md
+  target: lantern/templates/TEMPLATE__DIP.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - "# DIP-[[TEMPLATE:DIP_ID]] \u2014 [[TEMPLATE:TITLE]]"
+    - '## Summary'
+    - '## Source inventory (required)'
+    - '## Constraints and non-goals (required)'
+    - '## Questions referenced (required; may be empty)'
+    - '## Pinning pointers (optional; informative)'
+    - '## Notes'
+    required_header_keys: []
+- entry_id: TM-015
+  entry_class: bridge_copy
+  source: templates/TEMPLATE__INITIATIVE.md
+  target: lantern/templates/TEMPLATE__INITIATIVE.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - "# INI-#### \u2014 <short, specific title>"
+    - '## Objective'
+    - '## Scope'
+    - '## Decomposition notes'
+    - '## Candidate Change Intents'
+    - '## Sizing rationale'
+    - '## Readiness conditions'
+    - '## Inputs / evidence'
+    - '## Notes'
+    required_header_keys:
+    - initiative_id
+    - status
+    - title
+    - owner
+    - created
+    - last_updated
+    - inputs
+    - candidate_ch_refs
+- entry_id: TM-016
+  entry_class: bridge_copy
+  source: templates/TEMPLATE__INTENT_BUNDLE_SUMMARY.md
+  target: lantern/templates/TEMPLATE__INTENT_BUNDLE_SUMMARY.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - "# Intent Bundle Summary \u2014 <short request title>"
+    - '## 1. Workspace posture'
+    - '## 2. Request in plain language'
+    - '## 3. Proposed governed slice'
+    - '## 4. Acceptance and verification intent'
+    - '## 5. Blocking questions only'
+    - '## 6. Approval checkpoint'
+    required_header_keys: []
+- entry_id: TM-017
+  entry_class: bridge_copy
+  source: templates/TEMPLATE__IS.md
+  target: lantern/templates/TEMPLATE__IS.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - '# IS-0000: <short, specific title>'
+    - '## Summary'
+    - '## Observation'
+    - '## Expected'
+    - '## Impact / Risk'
+    - '## Evidence'
+    - '## Triage'
+    - '## Resolution (fill only when Status=RESOLVED)'
+    - '## Change log'
+    required_header_keys: []
+- entry_id: TM-018
+  entry_class: bridge_copy
+  source: templates/TEMPLATE__PRODUCT_REPO_AGENTS.md
+  target: lantern/templates/TEMPLATE__PRODUCT_REPO_AGENTS.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - "# AGENTS.md \u2014 Lantern governed product workspace"
+    - '## Workspace boundary'
+    - '## Default operating posture'
+    - '## Bootstrap and intake'
+    - '## Differential change posture'
+    - '## Closure integrity'
+    - '## Non-negotiables'
+    - '## Project-specific notes'
+    required_header_keys: []
+- entry_id: TM-019
+  entry_class: bridge_copy
+  source: templates/TEMPLATE__SPEC.md
+  target: lantern/templates/TEMPLATE__SPEC.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - "# SPEC-[[TEMPLATE:SPEC_ID]] \u2014 [[TEMPLATE:TITLE]]"
+    - '## Summary'
+    - '## Scope'
+    - '## Acceptance criteria (required)'
+    - '## Validation target signal definition (recommended; gate-evaluated)'
+    - '## Questions referenced (required; may be empty)'
+    - '## Pinning pointers (optional; informative)'
+    - '## Notes'
+    required_header_keys: []
+- entry_id: TM-020
+  entry_class: bridge_copy
+  source: templates/TEMPLATE__TD.md
+  target: lantern/templates/TEMPLATE__TD.md
+  adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
+    normalized to Lantern.
+  preservation_signature:
+    required_headings:
+    - "# TD-#### \u2014 <short title>"
+    - '## Purpose'
+    - '## Coverage Matrix'
+    - '## Evidence Expectations'
+    required_header_keys:
+    - td_id
+    - status
+    - title
+    - applies_to_ch
+    - origin
+    - governed_scope
+    - supersedes
+    - superseded_by
+- entry_id: PS-001
+  entry_class: product_owned
+  source: preservation_reference/ARTIFACT_ID_ALLOCATION.md
+  target: lantern/preservation/ARTIFACT_ID_ALLOCATION.md
+  adaptation_notes: Lantern-local preservation reference with all prior-product markers normalized and file names kept Lantern-safe.
+  preservation_signature:
+    required_headings:
+    - '# Artifact ID allocation'
+    - '## Sequential families'
+    - '## CH-anchored families'
+    - '## Allocator rule'
+    required_header_keys: []
+- entry_id: PS-002
+  entry_class: product_owned
+  source: preservation_reference/EPISTEMIC_FRAME.md
+  target: lantern/preservation/EPISTEMIC_FRAME.md
+  adaptation_notes: Lantern-local preservation reference with all prior-product markers normalized and file names kept Lantern-safe.
+  preservation_signature:
+    required_headings:
+    - '# Lantern workflow epistemic frame'
+    - '## Core rule'
+    - '## Artifact families'
+    - '## Invariants'
+    required_header_keys: []
+- entry_id: PS-003
+  entry_class: product_owned
+  source: preservation_reference/GATES.md
+  target: lantern/preservation/GATES.md
+  adaptation_notes: Lantern-local preservation reference with all prior-product markers normalized and file names kept Lantern-safe.
+  preservation_signature:
+    required_headings:
+    - '# Lantern workflow gate definitions'
+    - "## GT-030 \u2014 Design Input Pack Lock"
+    - "## GT-050 \u2014 Architecture Definition Readiness"
+    - "## GT-060 \u2014 Requirements Specification Readiness"
+    - "## GT-110 \u2014 Input Kit Readiness"
+    - "## GT-115 \u2014 Design Baseline Selection"
+    - "## GT-120 \u2014 Change Increment Selection"
+    - "## GT-130 \u2014 Integration Verification"
+    required_header_keys: []
+- entry_id: PS-004
+  entry_class: product_owned
+  source: preservation_reference/MIGRATION__TD_DC_DB_GT115_v0.1.0.md
+  target: lantern/preservation/MIGRATION__TD_DC_DB_GT115_v0.1.0.md
+  adaptation_notes: Lantern-local preservation reference with all prior-product markers normalized and file names kept Lantern-safe.
+  preservation_signature:
+    required_headings:
+    - "# Migration note \u2014 TD / DC / DB / GT-115 increment"
+    required_header_keys: []
+- entry_id: PS-005
+  entry_class: product_owned
+  source: preservation_reference/POC_VALUE_EXTRACTION_MAP.md
+  target: lantern/preservation/POC_VALUE_EXTRACTION_MAP.md
+  adaptation_notes: Lantern-local preservation reference with all prior-product markers normalized and file names kept Lantern-safe.
+  preservation_signature:
+    required_headings:
+    - "# POC_VALUE_EXTRACTION_MAP \u2014 Mapping PoC `Lantern` workspace to Clean Restart Lantern workflow (WP3)"
+    - '## Purpose'
+    - '## High-level mapping decisions'
+    - '## File-by-file map'
+    - '## Non-goals of this mapping'
+    required_header_keys: []
+- entry_id: PS-006
+  entry_class: product_owned
+  source: preservation_reference/LANTERN_MODEL_BINDING.md
+  target: lantern/preservation/LANTERN_MODEL_BINDING.md
+  adaptation_notes: Lantern-local preservation reference with all prior-product markers normalized and file names kept Lantern-safe.
+  preservation_signature:
+    required_headings:
+    - '# Lantern model binding for Lantern workflow'
+    - '## Artifact family bindings'
+    - '## Gate bindings'
+    - '## Status bindings used by the workflow'
+    - '## Binding rule'
+    required_header_keys: []
+- entry_id: PS-007
+  entry_class: product_owned
+  source: preservation_reference/UPSTREAM_INPUT_ARTIFACTS.md
+  target: lantern/preservation/UPSTREAM_INPUT_ARTIFACTS.md
+  adaptation_notes: Lantern-local preservation reference with all prior-product markers normalized and file names kept Lantern-safe.
+  preservation_signature:
+    required_headings:
+    - '# Upstream input artifacts'
+    - '## Canonical upstream families'
+    - '## TD posture'
+    required_header_keys: []
+- entry_id: PS-008
+  entry_class: product_owned
+  source: preservation_reference/WORKBENCH_MAP.md
+  target: lantern/preservation/WORKBENCH_MAP.md
+  adaptation_notes: Lantern-local preservation reference with all prior-product markers normalized and file names kept Lantern-safe.
+  preservation_signature:
+    required_headings:
+    - "# WORKBENCH_MAP \u2014 Lantern workflow all-gates workbench decomposition"
+    - '## Workbench families'
+    - '## All-gates quick reference'
+    required_header_keys: []
+- entry_id: PS-009
+  entry_class: product_owned
+  source: preservation_reference/WORKSPACE_TOPOLOGY.md
+  target: lantern/preservation/WORKSPACE_TOPOLOGY.md
+  adaptation_notes: Lantern-local preservation reference with all prior-product markers normalized and file names kept Lantern-safe.
+  preservation_signature:
+    required_headings:
+    - "# WORKSPACE_TOPOLOGY \u2014 Lantern workflow operation across separated repositories"
+    - '## Scope'
+    - '## Definitions'
+    - '## Boundary rules (hard)'
+    - '## Canonical path conventions'
+    - '## Binding record posture'
+    - '## Operating modes'
+    - '## Non-goals'
+    required_header_keys: []
+- entry_id: IR-001
+  entry_class: product_owned
+  source: instruction_snapshot/upstream_intake_and_baselines.md
+  target: lantern/resources/instructions/upstream_intake_and_baselines.md
+  adaptation_notes: Checked-in Lantern instruction snapshot aligned to the current workbench registry and Lantern-local guide
+    paths.
+  preservation_signature:
+    required_headings:
+    - '## Workbench'
+    - '## Artifacts in scope'
+    - '## Key actions'
+    - '## MCP usage'
+    - '## Constraints'
+    required_header_keys: []
+- entry_id: IR-002
+  entry_class: product_owned
+  source: instruction_snapshot/ch_and_td_readiness.md
+  target: lantern/resources/instructions/ch_and_td_readiness.md
+  adaptation_notes: Checked-in Lantern instruction snapshot aligned to the current workbench registry and Lantern-local guide
+    paths.
+  preservation_signature:
+    required_headings:
+    - '## Workbench'
+    - '## Artifacts in scope'
+    - '## Key actions'
+    - '## MCP usage'
+    - '## Constraints'
+    required_header_keys: []
+- entry_id: IR-003
+  entry_class: product_owned
+  source: instruction_snapshot/design_candidate_authoring.md
+  target: lantern/resources/instructions/design_candidate_authoring.md
+  adaptation_notes: Checked-in Lantern instruction snapshot aligned to the current workbench registry and Lantern-local guide
+    paths.
+  preservation_signature:
+    required_headings:
+    - '## Workbench'
+    - '## Artifacts in scope'
+    - '## Key actions'
+    - '## MCP usage'
+    - '## Constraints'
+    required_header_keys: []
+- entry_id: IR-004
+  entry_class: product_owned
+  source: instruction_snapshot/design_selection.md
+  target: lantern/resources/instructions/design_selection.md
+  adaptation_notes: Checked-in Lantern instruction snapshot aligned to the current workbench registry and Lantern-local guide
+    paths.
+  preservation_signature:
+    required_headings:
+    - '## Workbench'
+    - '## Artifacts in scope'
+    - '## Key actions'
+    - '## MCP usage'
+    - '## Constraints'
+    required_header_keys: []
+- entry_id: IR-005
+  entry_class: product_owned
+  source: instruction_snapshot/ci_authoring.md
+  target: lantern/resources/instructions/ci_authoring.md
+  adaptation_notes: Checked-in Lantern instruction snapshot aligned to the current workbench registry and Lantern-local guide
+    paths.
+  preservation_signature:
+    required_headings:
+    - '## Workbench'
+    - '## Artifacts in scope'
+    - '## Key actions'
+    - '## MCP usage'
+    - '## Constraints'
+    required_header_keys: []
+- entry_id: IR-006
+  entry_class: product_owned
+  source: instruction_snapshot/ci_selection.md
+  target: lantern/resources/instructions/ci_selection.md
+  adaptation_notes: Checked-in Lantern instruction snapshot aligned to the current workbench registry and Lantern-local guide
+    paths.
+  preservation_signature:
+    required_headings:
+    - '## Workbench'
+    - '## Artifacts in scope'
+    - '## Key actions'
+    - '## MCP usage'
+    - '## Constraints'
+    required_header_keys: []
+- entry_id: IR-007
+  entry_class: product_owned
+  source: instruction_snapshot/selected_ci_application.md
+  target: lantern/resources/instructions/selected_ci_application.md
+  adaptation_notes: Checked-in Lantern instruction snapshot aligned to the current workbench registry and Lantern-local guide
+    paths.
+  preservation_signature:
+    required_headings:
+    - '## Workbench'
+    - '## Artifacts in scope'
+    - '## Key actions'
+    - '## MCP usage'
+    - '## Constraints'
+    required_header_keys: []
+- entry_id: IR-008
+  entry_class: product_owned
+  source: instruction_snapshot/verification_and_closure.md
+  target: lantern/resources/instructions/verification_and_closure.md
+  adaptation_notes: Checked-in Lantern instruction snapshot aligned to the current workbench registry and Lantern-local guide
+    paths.
+  preservation_signature:
+    required_headings:
+    - '## Workbench'
+    - '## Artifacts in scope'
+    - '## Key actions'
+    - '## MCP usage'
+    - '## Constraints'
+    required_header_keys: []
+- entry_id: IR-009
+  entry_class: product_owned
+  source: instruction_snapshot/issue_operations.md
+  target: lantern/resources/instructions/issue_operations.md
+  adaptation_notes: Checked-in Lantern instruction snapshot aligned to the current workbench registry and Lantern-local guide
+    paths.
+  preservation_signature:
+    required_headings:
+    - '## Workbench'
+    - '## Artifacts in scope'
+    - '## Key actions'
+    - '## MCP usage'
+    - '## Constraints'
+    required_header_keys: []
+- entry_id: IR-010
+  entry_class: product_owned
+  source: instruction_snapshot/governance_onboarding.md
+  target: lantern/resources/instructions/governance_onboarding.md
+  adaptation_notes: Checked-in Lantern instruction snapshot aligned to the current workbench registry and Lantern-local guide
+    paths.
+  preservation_signature:
+    required_headings:
+    - '## Workbench'
+    - '## Artifacts in scope'
+    - '## Key actions'
+    - '## MCP usage'
+    - '## Constraints'
+    required_header_keys: []
