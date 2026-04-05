@@ -30,6 +30,14 @@ _TEXT_EXTENSIONS = {
 _SKIP_DIRS = {".git", ".pytest_cache", "__pycache__", ".mypy_cache", ".ruff_cache", ".venv", "venv"}
 _FORBIDDEN_NAME_PATTERN = re.compile("(?i)(?:" + "tier" + r"[-_ ]?" + "h|_" + "tier" + "_" + "h)")
 _CONTRACT_REF_PATTERN = re.compile(r"^contract\.[a-z0-9_]+(?:\.[a-z0-9_]+)*\.v\d+$")
+_FOUNDATION_WORKFLOW_SURFACE_FIELDS = frozenset(
+    {
+        "allowed_transaction_kinds",
+        "draftable_artifact_families",
+        "contract_refs",
+        "inspect_views",
+    }
+)
 
 
 def load_workbench_registry(
@@ -46,15 +54,10 @@ def load_workbench_registry(
     schema_metadata = _load_yaml(schema_yaml_file)
     schema_payload = json.loads(schema_json_file.read_text(encoding="utf-8"))
 
-    _validate_against_schema(registry_payload, schema_payload)
-    _validate_schema_metadata(registry_payload, schema_metadata)
-    _validate_workflow_references(registry_payload)
-    validate_gate_coverage(registry_payload, required_gates=schema_metadata["required_full_governed_gates"])
-
-    workbenches = tuple(_build_workbench(entry) for entry in registry_payload["workbenches"])
-    return WorkbenchRegistry(
-        runtime_surface_classification=registry_payload["runtime_surface_classification"],
-        workbenches=workbenches,
+    return _build_projected_workbench_registry(
+        registry_payload=registry_payload,
+        schema_metadata=schema_metadata,
+        schema_payload=schema_payload,
     )
 
 
@@ -158,6 +161,38 @@ def scan_forbidden_names(root: str | Path) -> list[NameViolation]:
 
 def _load_yaml(path: Path) -> Any:
     return yaml.safe_load(path.read_text(encoding="utf-8"))
+
+
+def _project_foundation_registry_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
+    projection = json.loads(json.dumps(payload))
+    for workbench in projection.get("workbenches", []):
+        workflow_surface = workbench.get("workflow_surface")
+        if not isinstance(workflow_surface, dict):
+            continue
+        for field in tuple(workflow_surface.keys()):
+            if field not in _FOUNDATION_WORKFLOW_SURFACE_FIELDS:
+                workflow_surface.pop(field, None)
+    return projection
+
+
+def _build_projected_workbench_registry(
+    *,
+    registry_payload: Mapping[str, Any],
+    schema_metadata: Mapping[str, Any],
+    schema_payload: Mapping[str, Any],
+) -> WorkbenchRegistry:
+    projected_payload = _project_foundation_registry_payload(registry_payload)
+
+    _validate_against_schema(projected_payload, schema_payload)
+    _validate_schema_metadata(projected_payload, schema_metadata)
+    _validate_workflow_references(projected_payload)
+    validate_gate_coverage(projected_payload, required_gates=schema_metadata["required_full_governed_gates"])
+
+    workbenches = tuple(_build_workbench(entry) for entry in projected_payload["workbenches"])
+    return WorkbenchRegistry(
+        runtime_surface_classification=projected_payload["runtime_surface_classification"],
+        workbenches=workbenches,
+    )
 
 
 def _validate_against_schema(payload: Mapping[str, Any], schema_payload: Mapping[str, Any]) -> None:

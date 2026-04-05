@@ -1,0 +1,1141 @@
+[
+  {
+    "compatibility": {
+      "gate_dependencies": {
+        "GT-110": {
+          "gate_id": "lg:gates/gt_110",
+          "relation_ids": [
+            "lg:rel/gt_110.requires_evidence.dec",
+            "lg:rel/gt_110.requires_evidence.ev",
+            "lg:rel/gt_110.requires_input.arch",
+            "lg:rel/gt_110.requires_input.ch",
+            "lg:rel/gt_110.requires_input.spec",
+            "lg:rel/gt_110.requires_input.td",
+            "lg:rel/gt_110.requires_status.approved",
+            "lg:rel/gt_110.requires_status.proposed"
+          ],
+          "requires_evidence": [
+            "lg:records/dec",
+            "lg:records/ev"
+          ],
+          "requires_input": [
+            "lg:artifacts/arch",
+            "lg:artifacts/ch",
+            "lg:artifacts/spec",
+            "lg:artifacts/td"
+          ],
+          "requires_status": [
+            "lg:statuses/approved",
+            "lg:statuses/proposed"
+          ]
+        }
+      },
+      "grammar_package_version": "0.2.1",
+      "grammar_version": "0.3.0",
+      "runtime_surface_classification": "full_governed_surface"
+    },
+    "contract_ref": "contract.ch_td_readiness.v1",
+    "family_binding": [
+      "CH",
+      "TD",
+      "EV",
+      "DEC"
+    ],
+    "gate_binding": [
+      "GT-110"
+    ],
+    "guide_refs": [
+      "lantern/resources/instructions/ch_and_td_readiness.md",
+      "lantern/authoring_contracts/change_intention_refinement_guide_v0.2.1.md",
+      "lantern/resources/guides/ch_and_td_readiness.md"
+    ],
+    "provenance": {
+      "generated_from": [
+        "lantern/workflow/definitions/workbench_registry.yaml",
+        "lantern/workflow/definitions/transaction_profiles.yaml",
+        "lantern/preservation/relocation_manifest.yaml"
+      ],
+      "source": "lantern-governance/ch/CH-0001.md"
+    },
+    "request_schema_ref": "schema.request.ch_and_td_readiness.v1",
+    "response_surface_bindings": [
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "catalog",
+        "transaction_kind": "inspect"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "readiness",
+        "transaction_kind": "inspect"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "lineage",
+        "transaction_kind": "inspect"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides",
+          "administration_guides"
+        ],
+        "response_envelope": "default",
+        "transaction_kind": "draft"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "administration_guides"
+        ],
+        "response_envelope": "default",
+        "transaction_kind": "commit"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "default",
+        "transaction_kind": "validate"
+      }
+    ],
+    "transaction_kind": "draft",
+    "workbench_refs": [
+      "ch_and_td_readiness"
+    ]
+  },
+  {
+    "compatibility": {
+      "gate_dependencies": {
+        "GT-115": {
+          "gate_id": "lg:gates/gt_115",
+          "relation_ids": [
+            "lg:rel/gt_115.requires_evidence.dec",
+            "lg:rel/gt_115.requires_evidence.ev",
+            "lg:rel/gt_115.requires_input.arch",
+            "lg:rel/gt_115.requires_input.ch",
+            "lg:rel/gt_115.requires_input.dc",
+            "lg:rel/gt_115.requires_input.spec",
+            "lg:rel/gt_115.requires_input.td",
+            "lg:rel/gt_115.requires_status.approved",
+            "lg:rel/gt_115.requires_status.candidate",
+            "lg:rel/gt_115.requires_status.ready"
+          ],
+          "requires_evidence": [
+            "lg:records/dec",
+            "lg:records/ev"
+          ],
+          "requires_input": [
+            "lg:artifacts/arch",
+            "lg:artifacts/ch",
+            "lg:artifacts/dc",
+            "lg:artifacts/spec",
+            "lg:artifacts/td"
+          ],
+          "requires_status": [
+            "lg:statuses/approved",
+            "lg:statuses/candidate",
+            "lg:statuses/ready"
+          ]
+        },
+        "GT-120": {
+          "gate_id": "lg:gates/gt_120",
+          "relation_ids": [
+            "lg:rel/gt_120.requires_evidence.dec",
+            "lg:rel/gt_120.requires_evidence.ev",
+            "lg:rel/gt_120.requires_input.ch",
+            "lg:rel/gt_120.requires_input.ci",
+            "lg:rel/gt_120.requires_input.db",
+            "lg:rel/gt_120.requires_input.td",
+            "lg:rel/gt_120.requires_status.approved",
+            "lg:rel/gt_120.requires_status.candidate",
+            "lg:rel/gt_120.requires_status.ready"
+          ],
+          "requires_evidence": [
+            "lg:records/dec",
+            "lg:records/ev"
+          ],
+          "requires_input": [
+            "lg:artifacts/ch",
+            "lg:artifacts/ci",
+            "lg:artifacts/db",
+            "lg:artifacts/td"
+          ],
+          "requires_status": [
+            "lg:statuses/approved",
+            "lg:statuses/candidate",
+            "lg:statuses/ready"
+          ]
+        }
+      },
+      "grammar_package_version": "0.2.1",
+      "grammar_version": "0.3.0",
+      "runtime_surface_classification": "full_governed_surface"
+    },
+    "contract_ref": "contract.ci_authoring.v1",
+    "family_binding": [
+      "CI"
+    ],
+    "gate_binding": [
+      "GT-115",
+      "GT-120"
+    ],
+    "guide_refs": [
+      "lantern/resources/instructions/ci_authoring.md",
+      "lantern/authoring_contracts/change_increment_authoring_guide_v0.2.1.md",
+      "lantern/resources/guides/ci_authoring.md"
+    ],
+    "provenance": {
+      "generated_from": [
+        "lantern/workflow/definitions/workbench_registry.yaml",
+        "lantern/workflow/definitions/transaction_profiles.yaml",
+        "lantern/preservation/relocation_manifest.yaml"
+      ],
+      "source": "lantern-governance/ch/CH-0001.md"
+    },
+    "request_schema_ref": "schema.request.ci_authoring.v1",
+    "response_surface_bindings": [
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "catalog",
+        "transaction_kind": "inspect"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "implementation_scope",
+        "transaction_kind": "inspect"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides",
+          "administration_guides"
+        ],
+        "response_envelope": "default",
+        "transaction_kind": "draft"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "default",
+        "transaction_kind": "validate"
+      }
+    ],
+    "transaction_kind": "draft",
+    "workbench_refs": [
+      "ci_authoring"
+    ]
+  },
+  {
+    "compatibility": {
+      "gate_dependencies": {
+        "GT-120": {
+          "gate_id": "lg:gates/gt_120",
+          "relation_ids": [
+            "lg:rel/gt_120.requires_evidence.dec",
+            "lg:rel/gt_120.requires_evidence.ev",
+            "lg:rel/gt_120.requires_input.ch",
+            "lg:rel/gt_120.requires_input.ci",
+            "lg:rel/gt_120.requires_input.db",
+            "lg:rel/gt_120.requires_input.td",
+            "lg:rel/gt_120.requires_status.approved",
+            "lg:rel/gt_120.requires_status.candidate",
+            "lg:rel/gt_120.requires_status.ready"
+          ],
+          "requires_evidence": [
+            "lg:records/dec",
+            "lg:records/ev"
+          ],
+          "requires_input": [
+            "lg:artifacts/ch",
+            "lg:artifacts/ci",
+            "lg:artifacts/db",
+            "lg:artifacts/td"
+          ],
+          "requires_status": [
+            "lg:statuses/approved",
+            "lg:statuses/candidate",
+            "lg:statuses/ready"
+          ]
+        }
+      },
+      "grammar_package_version": "0.2.1",
+      "grammar_version": "0.3.0",
+      "runtime_surface_classification": "full_governed_surface"
+    },
+    "contract_ref": "contract.ci_selection.v1",
+    "family_binding": [
+      "CI",
+      "EV",
+      "DEC"
+    ],
+    "gate_binding": [
+      "GT-120"
+    ],
+    "guide_refs": [
+      "lantern/resources/instructions/ci_selection.md",
+      "lantern/authoring_contracts/change_increment_selection_guide_v0.2.1.md",
+      "lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION_v0.2.1.md",
+      "lantern/resources/guides/ci_selection.md"
+    ],
+    "provenance": {
+      "generated_from": [
+        "lantern/workflow/definitions/workbench_registry.yaml",
+        "lantern/workflow/definitions/transaction_profiles.yaml",
+        "lantern/preservation/relocation_manifest.yaml"
+      ],
+      "source": "lantern-governance/td/TD-0001.md"
+    },
+    "request_schema_ref": "schema.request.ci_selection.v1",
+    "response_surface_bindings": [
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "catalog",
+        "transaction_kind": "inspect"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "ci_selection",
+        "transaction_kind": "inspect"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides",
+          "administration_guides"
+        ],
+        "response_envelope": "default",
+        "transaction_kind": "draft"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "administration_guides"
+        ],
+        "response_envelope": "default",
+        "transaction_kind": "commit"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "default",
+        "transaction_kind": "validate"
+      }
+    ],
+    "transaction_kind": "commit",
+    "workbench_refs": [
+      "ci_selection"
+    ]
+  },
+  {
+    "compatibility": {
+      "gate_dependencies": {
+        "GT-110": {
+          "gate_id": "lg:gates/gt_110",
+          "relation_ids": [
+            "lg:rel/gt_110.requires_evidence.dec",
+            "lg:rel/gt_110.requires_evidence.ev",
+            "lg:rel/gt_110.requires_input.arch",
+            "lg:rel/gt_110.requires_input.ch",
+            "lg:rel/gt_110.requires_input.spec",
+            "lg:rel/gt_110.requires_input.td",
+            "lg:rel/gt_110.requires_status.approved",
+            "lg:rel/gt_110.requires_status.proposed"
+          ],
+          "requires_evidence": [
+            "lg:records/dec",
+            "lg:records/ev"
+          ],
+          "requires_input": [
+            "lg:artifacts/arch",
+            "lg:artifacts/ch",
+            "lg:artifacts/spec",
+            "lg:artifacts/td"
+          ],
+          "requires_status": [
+            "lg:statuses/approved",
+            "lg:statuses/proposed"
+          ]
+        },
+        "GT-115": {
+          "gate_id": "lg:gates/gt_115",
+          "relation_ids": [
+            "lg:rel/gt_115.requires_evidence.dec",
+            "lg:rel/gt_115.requires_evidence.ev",
+            "lg:rel/gt_115.requires_input.arch",
+            "lg:rel/gt_115.requires_input.ch",
+            "lg:rel/gt_115.requires_input.dc",
+            "lg:rel/gt_115.requires_input.spec",
+            "lg:rel/gt_115.requires_input.td",
+            "lg:rel/gt_115.requires_status.approved",
+            "lg:rel/gt_115.requires_status.candidate",
+            "lg:rel/gt_115.requires_status.ready"
+          ],
+          "requires_evidence": [
+            "lg:records/dec",
+            "lg:records/ev"
+          ],
+          "requires_input": [
+            "lg:artifacts/arch",
+            "lg:artifacts/ch",
+            "lg:artifacts/dc",
+            "lg:artifacts/spec",
+            "lg:artifacts/td"
+          ],
+          "requires_status": [
+            "lg:statuses/approved",
+            "lg:statuses/candidate",
+            "lg:statuses/ready"
+          ]
+        }
+      },
+      "grammar_package_version": "0.2.1",
+      "grammar_version": "0.3.0",
+      "runtime_surface_classification": "full_governed_surface"
+    },
+    "contract_ref": "contract.design_candidate_authoring.v1",
+    "family_binding": [
+      "DC"
+    ],
+    "gate_binding": [
+      "GT-110",
+      "GT-115"
+    ],
+    "guide_refs": [
+      "lantern/resources/instructions/design_candidate_authoring.md",
+      "lantern/authoring_contracts/design_candidate_authoring_guide_v0.1.0.md",
+      "lantern/resources/guides/design_candidate_authoring.md"
+    ],
+    "provenance": {
+      "generated_from": [
+        "lantern/workflow/definitions/workbench_registry.yaml",
+        "lantern/workflow/definitions/transaction_profiles.yaml",
+        "lantern/preservation/relocation_manifest.yaml"
+      ],
+      "source": "lantern-governance/dip/DIP-0006.md"
+    },
+    "request_schema_ref": "schema.request.design_candidate_authoring.v1",
+    "response_surface_bindings": [
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "catalog",
+        "transaction_kind": "inspect"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "design_candidates",
+        "transaction_kind": "inspect"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides",
+          "administration_guides"
+        ],
+        "response_envelope": "default",
+        "transaction_kind": "draft"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "default",
+        "transaction_kind": "validate"
+      }
+    ],
+    "transaction_kind": "draft",
+    "workbench_refs": [
+      "design_candidate_authoring"
+    ]
+  },
+  {
+    "compatibility": {
+      "gate_dependencies": {
+        "GT-115": {
+          "gate_id": "lg:gates/gt_115",
+          "relation_ids": [
+            "lg:rel/gt_115.requires_evidence.dec",
+            "lg:rel/gt_115.requires_evidence.ev",
+            "lg:rel/gt_115.requires_input.arch",
+            "lg:rel/gt_115.requires_input.ch",
+            "lg:rel/gt_115.requires_input.dc",
+            "lg:rel/gt_115.requires_input.spec",
+            "lg:rel/gt_115.requires_input.td",
+            "lg:rel/gt_115.requires_status.approved",
+            "lg:rel/gt_115.requires_status.candidate",
+            "lg:rel/gt_115.requires_status.ready"
+          ],
+          "requires_evidence": [
+            "lg:records/dec",
+            "lg:records/ev"
+          ],
+          "requires_input": [
+            "lg:artifacts/arch",
+            "lg:artifacts/ch",
+            "lg:artifacts/dc",
+            "lg:artifacts/spec",
+            "lg:artifacts/td"
+          ],
+          "requires_status": [
+            "lg:statuses/approved",
+            "lg:statuses/candidate",
+            "lg:statuses/ready"
+          ]
+        }
+      },
+      "grammar_package_version": "0.2.1",
+      "grammar_version": "0.3.0",
+      "runtime_surface_classification": "full_governed_surface"
+    },
+    "contract_ref": "contract.design_selection.v1",
+    "family_binding": [
+      "DC",
+      "DB",
+      "EV",
+      "DEC"
+    ],
+    "gate_binding": [
+      "GT-115"
+    ],
+    "guide_refs": [
+      "lantern/resources/instructions/design_selection.md",
+      "lantern/authoring_contracts/design_candidate_selection_guide_v0.1.0.md",
+      "lantern/administration_procedures/GT-115__DESIGN_BASELINE_SELECTION_v0.1.0.md",
+      "lantern/resources/guides/design_selection.md"
+    ],
+    "provenance": {
+      "generated_from": [
+        "lantern/workflow/definitions/workbench_registry.yaml",
+        "lantern/workflow/definitions/transaction_profiles.yaml",
+        "lantern/preservation/relocation_manifest.yaml"
+      ],
+      "source": "lantern-governance/db/DB-0001.md"
+    },
+    "request_schema_ref": "schema.request.design_selection.v1",
+    "response_surface_bindings": [
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "catalog",
+        "transaction_kind": "inspect"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "design_selection",
+        "transaction_kind": "inspect"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides",
+          "administration_guides"
+        ],
+        "response_envelope": "default",
+        "transaction_kind": "draft"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "administration_guides"
+        ],
+        "response_envelope": "default",
+        "transaction_kind": "commit"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "default",
+        "transaction_kind": "validate"
+      }
+    ],
+    "transaction_kind": "commit",
+    "workbench_refs": [
+      "design_selection"
+    ]
+  },
+  {
+    "compatibility": {
+      "gate_dependencies": {},
+      "grammar_package_version": "0.2.1",
+      "grammar_version": "0.3.0",
+      "runtime_surface_classification": "full_governed_surface"
+    },
+    "contract_ref": "contract.governance_onboarding.v1",
+    "family_binding": [
+      "INI",
+      "CH",
+      "TD"
+    ],
+    "gate_binding": [],
+    "guide_refs": [
+      "lantern/resources/instructions/governance_onboarding.md",
+      "lantern/administration_procedures/SSOT_BLOB_INGESTION_v0.2.0.md",
+      "lantern/administration_procedures/INITIATIVE__AUTHORING_AND_READYING_v0.1.0.md",
+      "lantern/administration_procedures/INITIATIVE__DECOMPOSITION_AND_CH_SIZING_v0.1.0.md",
+      "lantern/resources/guides/governance_onboarding.md"
+    ],
+    "provenance": {
+      "generated_from": [
+        "lantern/workflow/definitions/workbench_registry.yaml",
+        "lantern/workflow/definitions/transaction_profiles.yaml",
+        "lantern/preservation/relocation_manifest.yaml"
+      ],
+      "source": "lantern-governance/dip/DIP-0001.md"
+    },
+    "request_schema_ref": "schema.request.governance_onboarding.v1",
+    "response_surface_bindings": [
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "catalog",
+        "transaction_kind": "inspect"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "onboarding",
+        "transaction_kind": "inspect"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides",
+          "administration_guides"
+        ],
+        "response_envelope": "default",
+        "transaction_kind": "draft"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "default",
+        "transaction_kind": "validate"
+      }
+    ],
+    "transaction_kind": "draft",
+    "workbench_refs": [
+      "governance_onboarding"
+    ]
+  },
+  {
+    "compatibility": {
+      "gate_dependencies": {},
+      "grammar_package_version": "0.2.1",
+      "grammar_version": "0.3.0",
+      "runtime_surface_classification": "full_governed_surface"
+    },
+    "contract_ref": "contract.issue_operations.v1",
+    "family_binding": [
+      "IS"
+    ],
+    "gate_binding": [],
+    "guide_refs": [
+      "lantern/resources/instructions/issue_operations.md",
+      "lantern/administration_procedures/ISSUE__INTAKE_TRIAGE_RESOLUTION_v0.2.0.md",
+      "lantern/resources/guides/issue_operations.md"
+    ],
+    "provenance": {
+      "generated_from": [
+        "lantern/workflow/definitions/workbench_registry.yaml",
+        "lantern/workflow/definitions/transaction_profiles.yaml",
+        "lantern/preservation/relocation_manifest.yaml"
+      ],
+      "source": "lantern-governance/is/IS-0002.md"
+    },
+    "request_schema_ref": "schema.request.issue_operations.v1",
+    "response_surface_bindings": [
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "catalog",
+        "transaction_kind": "inspect"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "issues",
+        "transaction_kind": "inspect"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides",
+          "administration_guides"
+        ],
+        "response_envelope": "default",
+        "transaction_kind": "draft"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "administration_guides"
+        ],
+        "response_envelope": "default",
+        "transaction_kind": "commit"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "default",
+        "transaction_kind": "validate"
+      }
+    ],
+    "transaction_kind": "commit",
+    "workbench_refs": [
+      "issue_operations"
+    ]
+  },
+  {
+    "compatibility": {
+      "gate_dependencies": {
+        "GT-120": {
+          "gate_id": "lg:gates/gt_120",
+          "relation_ids": [
+            "lg:rel/gt_120.requires_evidence.dec",
+            "lg:rel/gt_120.requires_evidence.ev",
+            "lg:rel/gt_120.requires_input.ch",
+            "lg:rel/gt_120.requires_input.ci",
+            "lg:rel/gt_120.requires_input.db",
+            "lg:rel/gt_120.requires_input.td",
+            "lg:rel/gt_120.requires_status.approved",
+            "lg:rel/gt_120.requires_status.candidate",
+            "lg:rel/gt_120.requires_status.ready"
+          ],
+          "requires_evidence": [
+            "lg:records/dec",
+            "lg:records/ev"
+          ],
+          "requires_input": [
+            "lg:artifacts/ch",
+            "lg:artifacts/ci",
+            "lg:artifacts/db",
+            "lg:artifacts/td"
+          ],
+          "requires_status": [
+            "lg:statuses/approved",
+            "lg:statuses/candidate",
+            "lg:statuses/ready"
+          ]
+        },
+        "GT-130": {
+          "gate_id": "lg:gates/gt_130",
+          "relation_ids": [
+            "lg:rel/gt_130.requires_evidence.dec",
+            "lg:rel/gt_130.requires_evidence.ev",
+            "lg:rel/gt_130.requires_input.ch",
+            "lg:rel/gt_130.requires_input.ci",
+            "lg:rel/gt_130.requires_input.db",
+            "lg:rel/gt_130.requires_input.td",
+            "lg:rel/gt_130.requires_status.approved",
+            "lg:rel/gt_130.requires_status.ready",
+            "lg:rel/gt_130.requires_status.selected"
+          ],
+          "requires_evidence": [
+            "lg:records/dec",
+            "lg:records/ev"
+          ],
+          "requires_input": [
+            "lg:artifacts/ch",
+            "lg:artifacts/ci",
+            "lg:artifacts/db",
+            "lg:artifacts/td"
+          ],
+          "requires_status": [
+            "lg:statuses/approved",
+            "lg:statuses/ready",
+            "lg:statuses/selected"
+          ]
+        }
+      },
+      "grammar_package_version": "0.2.1",
+      "grammar_version": "0.3.0",
+      "runtime_surface_classification": "full_governed_surface"
+    },
+    "contract_ref": "contract.selected_ci_application.v1",
+    "family_binding": [
+      "CI"
+    ],
+    "gate_binding": [
+      "GT-120",
+      "GT-130"
+    ],
+    "guide_refs": [
+      "lantern/resources/instructions/selected_ci_application.md",
+      "lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION_v0.2.1.md",
+      "lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION_v0.1.0.md",
+      "lantern/resources/guides/selected_ci_application.md"
+    ],
+    "provenance": {
+      "generated_from": [
+        "lantern/workflow/definitions/workbench_registry.yaml",
+        "lantern/workflow/definitions/transaction_profiles.yaml",
+        "lantern/preservation/relocation_manifest.yaml"
+      ],
+      "source": "lantern-governance/spec/SPEC-0001.md"
+    },
+    "request_schema_ref": "schema.request.selected_ci_application.v1",
+    "response_surface_bindings": [
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "catalog",
+        "transaction_kind": "inspect"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "change_surface",
+        "transaction_kind": "inspect"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "administration_guides"
+        ],
+        "response_envelope": "default",
+        "transaction_kind": "commit"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "default",
+        "transaction_kind": "validate"
+      }
+    ],
+    "transaction_kind": "commit",
+    "workbench_refs": [
+      "selected_ci_application"
+    ]
+  },
+  {
+    "compatibility": {
+      "gate_dependencies": {
+        "GT-030": {
+          "gate_id": "lg:gates/gt_030",
+          "relation_ids": [
+            "lg:rel/gt_030.requires_evidence.dec",
+            "lg:rel/gt_030.requires_evidence.ev",
+            "lg:rel/gt_030.requires_input.dip",
+            "lg:rel/gt_030.requires_status.draft"
+          ],
+          "requires_evidence": [
+            "lg:records/dec",
+            "lg:records/ev"
+          ],
+          "requires_input": [
+            "lg:artifacts/dip"
+          ],
+          "requires_status": [
+            "lg:statuses/draft"
+          ]
+        },
+        "GT-050": {
+          "gate_id": "lg:gates/gt_050",
+          "relation_ids": [
+            "lg:rel/gt_050.requires_evidence.dec",
+            "lg:rel/gt_050.requires_evidence.ev",
+            "lg:rel/gt_050.requires_input.arch",
+            "lg:rel/gt_050.requires_input.dip",
+            "lg:rel/gt_050.requires_status.approved",
+            "lg:rel/gt_050.requires_status.draft"
+          ],
+          "requires_evidence": [
+            "lg:records/dec",
+            "lg:records/ev"
+          ],
+          "requires_input": [
+            "lg:artifacts/arch",
+            "lg:artifacts/dip"
+          ],
+          "requires_status": [
+            "lg:statuses/approved",
+            "lg:statuses/draft"
+          ]
+        },
+        "GT-060": {
+          "gate_id": "lg:gates/gt_060",
+          "relation_ids": [
+            "lg:rel/gt_060.requires_evidence.dec",
+            "lg:rel/gt_060.requires_evidence.ev",
+            "lg:rel/gt_060.requires_input.dip",
+            "lg:rel/gt_060.requires_input.spec",
+            "lg:rel/gt_060.requires_status.approved",
+            "lg:rel/gt_060.requires_status.draft"
+          ],
+          "requires_evidence": [
+            "lg:records/dec",
+            "lg:records/ev"
+          ],
+          "requires_input": [
+            "lg:artifacts/dip",
+            "lg:artifacts/spec"
+          ],
+          "requires_status": [
+            "lg:statuses/approved",
+            "lg:statuses/draft"
+          ]
+        }
+      },
+      "grammar_package_version": "0.2.1",
+      "grammar_version": "0.3.0",
+      "runtime_surface_classification": "full_governed_surface"
+    },
+    "contract_ref": "contract.upstream_intake.v1",
+    "family_binding": [
+      "DIP",
+      "SPEC",
+      "ARCH",
+      "INI"
+    ],
+    "gate_binding": [
+      "GT-030",
+      "GT-050",
+      "GT-060"
+    ],
+    "guide_refs": [
+      "lantern/resources/instructions/upstream_intake_and_baselines.md",
+      "lantern/administration_procedures/GT-030__DIP_LOCK_ADMINISTRATION_v0.1.0.md",
+      "lantern/administration_procedures/GT-050_GT-060__BASELINE_READINESS_ADMINISTRATION_v0.1.0.md",
+      "lantern/administration_procedures/INITIATIVE__AUTHORING_AND_READYING_v0.1.0.md",
+      "lantern/resources/guides/upstream_intake_and_baselines.md"
+    ],
+    "provenance": {
+      "generated_from": [
+        "lantern/workflow/definitions/workbench_registry.yaml",
+        "lantern/workflow/definitions/transaction_profiles.yaml",
+        "lantern/preservation/relocation_manifest.yaml"
+      ],
+      "source": "lantern-governance/spec/SPEC-0001.md"
+    },
+    "request_schema_ref": "schema.request.upstream_intake_and_baselines.v1",
+    "response_surface_bindings": [
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "catalog",
+        "transaction_kind": "inspect"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "baselines",
+        "transaction_kind": "inspect"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "lineage",
+        "transaction_kind": "inspect"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides",
+          "administration_guides"
+        ],
+        "response_envelope": "default",
+        "transaction_kind": "draft"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "administration_guides"
+        ],
+        "response_envelope": "default",
+        "transaction_kind": "commit"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "default",
+        "transaction_kind": "validate"
+      }
+    ],
+    "transaction_kind": "draft",
+    "workbench_refs": [
+      "upstream_intake_and_baselines"
+    ]
+  },
+  {
+    "compatibility": {
+      "gate_dependencies": {
+        "GT-130": {
+          "gate_id": "lg:gates/gt_130",
+          "relation_ids": [
+            "lg:rel/gt_130.requires_evidence.dec",
+            "lg:rel/gt_130.requires_evidence.ev",
+            "lg:rel/gt_130.requires_input.ch",
+            "lg:rel/gt_130.requires_input.ci",
+            "lg:rel/gt_130.requires_input.db",
+            "lg:rel/gt_130.requires_input.td",
+            "lg:rel/gt_130.requires_status.approved",
+            "lg:rel/gt_130.requires_status.ready",
+            "lg:rel/gt_130.requires_status.selected"
+          ],
+          "requires_evidence": [
+            "lg:records/dec",
+            "lg:records/ev"
+          ],
+          "requires_input": [
+            "lg:artifacts/ch",
+            "lg:artifacts/ci",
+            "lg:artifacts/db",
+            "lg:artifacts/td"
+          ],
+          "requires_status": [
+            "lg:statuses/approved",
+            "lg:statuses/ready",
+            "lg:statuses/selected"
+          ]
+        }
+      },
+      "grammar_package_version": "0.2.1",
+      "grammar_version": "0.3.0",
+      "runtime_surface_classification": "full_governed_surface"
+    },
+    "contract_ref": "contract.verification_and_closure.v1",
+    "family_binding": [
+      "CI",
+      "EV",
+      "DEC"
+    ],
+    "gate_binding": [
+      "GT-130"
+    ],
+    "guide_refs": [
+      "lantern/resources/instructions/verification_and_closure.md",
+      "lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION_v0.1.0.md",
+      "lantern/resources/guides/verification_and_closure.md"
+    ],
+    "provenance": {
+      "generated_from": [
+        "lantern/workflow/definitions/workbench_registry.yaml",
+        "lantern/workflow/definitions/transaction_profiles.yaml",
+        "lantern/preservation/relocation_manifest.yaml"
+      ],
+      "source": "lantern-governance/spec/SPEC-0001.md"
+    },
+    "request_schema_ref": "schema.request.verification_and_closure.v1",
+    "response_surface_bindings": [
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "catalog",
+        "transaction_kind": "inspect"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "verification",
+        "transaction_kind": "inspect"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "closure",
+        "transaction_kind": "inspect"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides",
+          "administration_guides"
+        ],
+        "response_envelope": "default",
+        "transaction_kind": "draft"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "administration_guides"
+        ],
+        "response_envelope": "default",
+        "transaction_kind": "commit"
+      },
+      {
+        "allowed_resource_roles": [
+          "instruction_resource",
+          "authoritative_guides"
+        ],
+        "response_envelope": "default",
+        "transaction_kind": "validate"
+      }
+    ],
+    "transaction_kind": "commit",
+    "workbench_refs": [
+      "verification_and_closure"
+    ]
+  }
+]

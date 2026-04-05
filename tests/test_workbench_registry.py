@@ -85,6 +85,18 @@ def test_content_hashes_are_deterministic_across_loads() -> None:
     assert [item.content_hash for item in first.workbenches] == [item.content_hash for item in second.workbenches]
 
 
+def test_foundation_loader_projects_additive_workflow_surface_fields() -> None:
+    payload = _load_registry_payload()
+    payload["workbenches"][0]["workflow_surface"]["future_additive_projection_only"] = ["preview"]
+
+    registry = _load_registry_from_payload("ch0002_projection_regression", payload)
+    workbench = registry.get("upstream_intake_and_baselines")
+
+    assert workbench.workflow_surface.allowed_transaction_kinds == ("inspect", "draft", "commit", "validate")
+    assert not hasattr(workbench.workflow_surface, "response_surface_bindings")
+    assert not hasattr(workbench.workflow_surface, "future_additive_projection_only")
+
+
 def test_missing_required_field_is_fatal() -> None:
     payload = _load_registry_payload()
     del payload["workbenches"][0]["workbench_id"]

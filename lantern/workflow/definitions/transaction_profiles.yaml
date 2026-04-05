@@ -1,0 +1,116 @@
+transaction_profiles:
+- transaction_kind: inspect
+  required_refs:
+  - instruction_resource
+  bounded_families: []
+  allowed_contract_refs:
+  - contract.upstream_intake.v1
+  - contract.ch_td_readiness.v1
+  - contract.design_candidate_authoring.v1
+  - contract.design_selection.v1
+  - contract.ci_authoring.v1
+  - contract.ci_selection.v1
+  - contract.selected_ci_application.v1
+  - contract.verification_and_closure.v1
+  - contract.issue_operations.v1
+  - contract.governance_onboarding.v1
+  side_effect_class: read_only
+- transaction_kind: orient
+  required_refs:
+  - instruction_resource
+  bounded_families: []
+  allowed_contract_refs:
+  - contract.upstream_intake.v1
+  - contract.ch_td_readiness.v1
+  - contract.design_candidate_authoring.v1
+  - contract.design_selection.v1
+  - contract.ci_authoring.v1
+  - contract.ci_selection.v1
+  - contract.selected_ci_application.v1
+  - contract.verification_and_closure.v1
+  - contract.issue_operations.v1
+  - contract.governance_onboarding.v1
+  side_effect_class: read_only
+- transaction_kind: draft
+  required_refs:
+  - instruction_resource
+  - authoritative_guides
+  bounded_families:
+  - ARCH
+  - CH
+  - CI
+  - DB
+  - DC
+  - DEC
+  - DIP
+  - EV
+  - INI
+  - IS
+  - SPEC
+  - TD
+  allowed_contract_refs:
+  - contract.upstream_intake.v1
+  - contract.ch_td_readiness.v1
+  - contract.design_candidate_authoring.v1
+  - contract.design_selection.v1
+  - contract.ci_authoring.v1
+  - contract.ci_selection.v1
+  - contract.verification_and_closure.v1
+  - contract.issue_operations.v1
+  - contract.governance_onboarding.v1
+  side_effect_class: draft_buffer_only
+- transaction_kind: commit
+  required_refs:
+  - instruction_resource
+  - administration_guides
+  bounded_families:
+  - ARCH
+  - CH
+  - CI
+  - DB
+  - DC
+  - DEC
+  - DIP
+  - EV
+  - INI
+  - IS
+  - SPEC
+  - TD
+  allowed_contract_refs:
+  - contract.upstream_intake.v1
+  - contract.ch_td_readiness.v1
+  - contract.design_selection.v1
+  - contract.ci_selection.v1
+  - contract.selected_ci_application.v1
+  - contract.verification_and_closure.v1
+  - contract.issue_operations.v1
+  side_effect_class: governed_write
+- transaction_kind: validate
+  required_refs:
+  - instruction_resource
+  bounded_families:
+  - ARCH
+  - CH
+  - CI
+  - DB
+  - DC
+  - DEC
+  - DIP
+  - EV
+  - INI
+  - IS
+  - SPEC
+  - TD
+  allowed_contract_refs:
+  - contract.upstream_intake.v1
+  - contract.ch_td_readiness.v1
+  - contract.design_candidate_authoring.v1
+  - contract.design_selection.v1
+  - contract.ci_authoring.v1
+  - contract.ci_selection.v1
+  - contract.selected_ci_application.v1
+  - contract.verification_and_closure.v1
+  - contract.issue_operations.v1
+  - contract.governance_onboarding.v1
+  side_effect_class: validation_only
+

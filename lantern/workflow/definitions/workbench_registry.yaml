@@ -1,262 +1,625 @@
 runtime_surface_classification: full_governed_surface
 workbenches:
-  - workbench_id: upstream_intake_and_baselines
-    display_name: Upstream Intake and Baselines
-    lifecycle_placement:
-      kind: covered_gates
-      covered_gates: [GT-030, GT-050, GT-060]
-    artifacts_in_scope: [DIP, SPEC, ARCH, INI]
-    intent_classes: [baseline_intake, baseline_approval]
-    posture_constraints: [requires_governance_workspace, startup_validated]
-    workflow_surface:
-      allowed_transaction_kinds: [inspect, draft, commit, validate]
-      draftable_artifact_families: [DIP, SPEC, ARCH, INI]
-      contract_refs: [contract.upstream_intake.v1]
-      inspect_views: [catalog, baselines, lineage]
-    instruction_resource: lantern/resources/instructions/upstream_intake_and_baselines.md
-    authoritative_guides:
-      - lantern/resources/guides/upstream_intake_and_baselines.md
-    administration_guides:
-      - lantern/resources/instructions/upstream_intake_and_baselines.md
-    entry_conditions:
-      - governance workspace bootstrapped
-    exit_conditions:
-      - upstream baselines approved
-    source: lantern-governance/spec/SPEC-0001.md
-    enabled: true
-    governance_mode: full
+- workbench_id: upstream_intake_and_baselines
+  display_name: Upstream Intake and Baselines
+  lifecycle_placement:
+    kind: covered_gates
+    covered_gates:
+    - GT-030
+    - GT-050
+    - GT-060
+  artifacts_in_scope:
+  - DIP
+  - SPEC
+  - ARCH
+  - INI
+  intent_classes:
+  - baseline_intake
+  - baseline_approval
+  posture_constraints:
+  - requires_governance_workspace
+  - startup_validated
+  workflow_surface:
+    allowed_transaction_kinds:
+    - inspect
+    - draft
+    - commit
+    - validate
+    draftable_artifact_families:
+    - DIP
+    - SPEC
+    - ARCH
+    - INI
+    contract_refs:
+    - contract.upstream_intake.v1
+    inspect_views:
+    - catalog
+    - baselines
+    - lineage
+    response_surface_bindings:
+    - transaction_kind: inspect
+      response_envelope: catalog
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+    - transaction_kind: inspect
+      response_envelope: baselines
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+    - transaction_kind: inspect
+      response_envelope: lineage
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+    - transaction_kind: draft
+      response_envelope: default
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+      - administration_guides
+    - transaction_kind: commit
+      response_envelope: default
+      allowed_resource_roles:
+      - instruction_resource
+      - administration_guides
+    - transaction_kind: validate
+      response_envelope: default
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+  instruction_resource: lantern/resources/instructions/upstream_intake_and_baselines.md
+  authoritative_guides:
+  - lantern/resources/guides/upstream_intake_and_baselines.md
+  administration_guides:
+  - lantern/administration_procedures/GT-030__DIP_LOCK_ADMINISTRATION_v0.1.0.md
+  - lantern/administration_procedures/GT-050_GT-060__BASELINE_READINESS_ADMINISTRATION_v0.1.0.md
+  - lantern/administration_procedures/INITIATIVE__AUTHORING_AND_READYING_v0.1.0.md
+  entry_conditions:
+  - governance workspace bootstrapped
+  exit_conditions:
+  - upstream baselines approved
+  source: lantern-governance/spec/SPEC-0001.md
+  enabled: true
+  governance_mode: full
+- workbench_id: ch_and_td_readiness
+  display_name: CH and TD Readiness
+  lifecycle_placement:
+    kind: covered_gates
+    covered_gates:
+    - GT-110
+  artifacts_in_scope:
+  - CH
+  - TD
+  - EV
+  - DEC
+  intent_classes:
+  - change_readiness
+  - test_definition_authoring
+  posture_constraints:
+  - requires_upstream_baselines
+  workflow_surface:
+    allowed_transaction_kinds:
+    - inspect
+    - draft
+    - commit
+    - validate
+    draftable_artifact_families:
+    - CH
+    - TD
+    - EV
+    - DEC
+    contract_refs:
+    - contract.ch_td_readiness.v1
+    inspect_views:
+    - catalog
+    - readiness
+    - lineage
+    response_surface_bindings:
+    - transaction_kind: inspect
+      response_envelope: catalog
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+    - transaction_kind: inspect
+      response_envelope: readiness
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+    - transaction_kind: inspect
+      response_envelope: lineage
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+    - transaction_kind: draft
+      response_envelope: default
+      allowed_resource_roles: &id001
+      - instruction_resource
+      - authoritative_guides
+      - administration_guides
+    - transaction_kind: commit
+      response_envelope: default
+      allowed_resource_roles: &id003
+      - instruction_resource
+      - administration_guides
+    - transaction_kind: validate
+      response_envelope: default
+      allowed_resource_roles: &id002
+      - instruction_resource
+      - authoritative_guides
+  instruction_resource: lantern/resources/instructions/ch_and_td_readiness.md
+  authoritative_guides:
+  - lantern/resources/guides/ch_and_td_readiness.md
+  administration_guides:
+  - lantern/authoring_contracts/change_intention_refinement_guide_v0.2.1.md
+  entry_conditions:
+  - upstream baselines approved
+  exit_conditions:
+  - GT-110 passed
+  source: lantern-governance/ch/CH-0001.md
+  enabled: true
+  governance_mode: full
+- workbench_id: design_candidate_authoring
+  display_name: Design Candidate Authoring
+  lifecycle_placement:
+    kind: lifecycle_span
+    start_gate: GT-110
+    end_gate: GT-115
+  artifacts_in_scope:
+  - DC
+  intent_classes:
+  - design_candidate_authoring
+  posture_constraints:
+  - requires_ready_ch
+  workflow_surface:
+    allowed_transaction_kinds:
+    - inspect
+    - draft
+    - validate
+    draftable_artifact_families:
+    - DC
+    contract_refs:
+    - contract.design_candidate_authoring.v1
+    inspect_views:
+    - catalog
+    - design_candidates
+    response_surface_bindings:
+    - transaction_kind: inspect
+      response_envelope: catalog
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+    - transaction_kind: inspect
+      response_envelope: design_candidates
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+    - transaction_kind: draft
+      response_envelope: default
+      allowed_resource_roles: *id001
+    - transaction_kind: validate
+      response_envelope: default
+      allowed_resource_roles: *id002
+  instruction_resource: lantern/resources/instructions/design_candidate_authoring.md
+  authoritative_guides:
+  - lantern/resources/guides/design_candidate_authoring.md
+  administration_guides:
+  - lantern/authoring_contracts/design_candidate_authoring_guide_v0.1.0.md
+  entry_conditions:
+  - GT-110 passed
+  exit_conditions:
+  - at least one design candidate exists
+  source: lantern-governance/dip/DIP-0006.md
+  enabled: true
+  governance_mode: full
+- workbench_id: design_selection
+  display_name: Design Selection
+  lifecycle_placement:
+    kind: covered_gates
+    covered_gates:
+    - GT-115
+  artifacts_in_scope:
+  - DC
+  - DB
+  - EV
+  - DEC
+  intent_classes:
+  - design_selection
+  posture_constraints:
+  - requires_candidate_comparison
+  workflow_surface:
+    allowed_transaction_kinds:
+    - inspect
+    - draft
+    - commit
+    - validate
+    draftable_artifact_families:
+    - DB
+    - EV
+    - DEC
+    contract_refs:
+    - contract.design_selection.v1
+    inspect_views:
+    - catalog
+    - design_selection
+    response_surface_bindings:
+    - transaction_kind: inspect
+      response_envelope: catalog
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+    - transaction_kind: inspect
+      response_envelope: design_selection
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+    - transaction_kind: draft
+      response_envelope: default
+      allowed_resource_roles: *id001
+    - transaction_kind: commit
+      response_envelope: default
+      allowed_resource_roles: *id003
+    - transaction_kind: validate
+      response_envelope: default
+      allowed_resource_roles: *id002
+  instruction_resource: lantern/resources/instructions/design_selection.md
+  authoritative_guides:
+  - lantern/resources/guides/design_selection.md
+  administration_guides:
+  - lantern/authoring_contracts/design_candidate_selection_guide_v0.1.0.md
+  - lantern/administration_procedures/GT-115__DESIGN_BASELINE_SELECTION_v0.1.0.md
+  entry_conditions:
+  - GT-110 passed
+  exit_conditions:
+  - DB approved
+  source: lantern-governance/db/DB-0001.md
+  enabled: true
+  governance_mode: full
+- workbench_id: ci_authoring
+  display_name: CI Authoring
+  lifecycle_placement:
+    kind: lifecycle_span
+    start_gate: GT-115
+    end_gate: GT-120
+  artifacts_in_scope:
+  - CI
+  intent_classes:
+  - ci_authoring
+  posture_constraints:
+  - requires_approved_db
+  workflow_surface:
+    allowed_transaction_kinds:
+    - inspect
+    - draft
+    - validate
+    draftable_artifact_families:
+    - CI
+    contract_refs:
+    - contract.ci_authoring.v1
+    inspect_views:
+    - catalog
+    - implementation_scope
+    response_surface_bindings:
+    - transaction_kind: inspect
+      response_envelope: catalog
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+    - transaction_kind: inspect
+      response_envelope: implementation_scope
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+    - transaction_kind: draft
+      response_envelope: default
+      allowed_resource_roles: *id001
+    - transaction_kind: validate
+      response_envelope: default
+      allowed_resource_roles: *id002
+  instruction_resource: lantern/resources/instructions/ci_authoring.md
+  authoritative_guides:
+  - lantern/resources/guides/ci_authoring.md
+  administration_guides:
+  - lantern/authoring_contracts/change_increment_authoring_guide_v0.2.1.md
+  entry_conditions:
+  - GT-115 passed
+  exit_conditions:
+  - at least one CI candidate exists
+  source: lantern-governance/ch/CH-0001.md
+  enabled: true
+  governance_mode: full
+- workbench_id: ci_selection
+  display_name: CI Selection
+  lifecycle_placement:
+    kind: covered_gates
+    covered_gates:
+    - GT-120
+  artifacts_in_scope:
+  - CI
+  - EV
+  - DEC
+  intent_classes:
+  - ci_selection
+  posture_constraints:
+  - requires_execution_grade_candidate
+  workflow_surface:
+    allowed_transaction_kinds:
+    - inspect
+    - draft
+    - commit
+    - validate
+    draftable_artifact_families:
+    - EV
+    - DEC
+    contract_refs:
+    - contract.ci_selection.v1
+    inspect_views:
+    - catalog
+    - ci_selection
+    response_surface_bindings:
+    - transaction_kind: inspect
+      response_envelope: catalog
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+    - transaction_kind: inspect
+      response_envelope: ci_selection
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+    - transaction_kind: draft
+      response_envelope: default
+      allowed_resource_roles: *id001
+    - transaction_kind: commit
+      response_envelope: default
+      allowed_resource_roles: *id003
+    - transaction_kind: validate
+      response_envelope: default
+      allowed_resource_roles: *id002
+  instruction_resource: lantern/resources/instructions/ci_selection.md
+  authoritative_guides:
+  - lantern/resources/guides/ci_selection.md
+  administration_guides:
+  - lantern/authoring_contracts/change_increment_selection_guide_v0.2.1.md
+  - lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION_v0.2.1.md
+  entry_conditions:
+  - GT-115 passed
+  exit_conditions:
+  - selected CI recorded
+  source: lantern-governance/td/TD-0001.md
+  enabled: true
+  governance_mode: full
+- workbench_id: selected_ci_application
+  display_name: Selected CI Application
+  lifecycle_placement:
+    kind: lifecycle_span
+    start_gate: GT-120
+    end_gate: GT-130
+  artifacts_in_scope:
+  - CI
+  intent_classes:
+  - selected_ci_application
+  posture_constraints:
+  - product_writes_permitted
+  workflow_surface:
+    allowed_transaction_kinds:
+    - inspect
+    - commit
+    - validate
+    draftable_artifact_families: []
+    contract_refs:
+    - contract.selected_ci_application.v1
+    inspect_views:
+    - catalog
+    - change_surface
+    response_surface_bindings:
+    - transaction_kind: inspect
+      response_envelope: catalog
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+    - transaction_kind: inspect
+      response_envelope: change_surface
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+    - transaction_kind: commit
+      response_envelope: default
+      allowed_resource_roles: *id003
+    - transaction_kind: validate
+      response_envelope: default
+      allowed_resource_roles: *id002
+  instruction_resource: lantern/resources/instructions/selected_ci_application.md
+  authoritative_guides:
+  - lantern/resources/guides/selected_ci_application.md
+  administration_guides:
+  - lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION_v0.2.1.md
+  - lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION_v0.1.0.md
+  entry_conditions:
+  - GT-120 passed
+  exit_conditions:
+  - selected CI applied
+  source: lantern-governance/spec/SPEC-0001.md
+  enabled: true
+  governance_mode: full
+- workbench_id: verification_and_closure
+  display_name: Verification and Closure
+  lifecycle_placement:
+    kind: covered_gates
+    covered_gates:
+    - GT-130
+  artifacts_in_scope:
+  - CI
+  - EV
+  - DEC
+  intent_classes:
+  - verification_and_closure
+  posture_constraints:
+  - requires_selected_ci
+  workflow_surface:
+    allowed_transaction_kinds:
+    - inspect
+    - draft
+    - commit
+    - validate
+    draftable_artifact_families:
+    - EV
+    - DEC
+    contract_refs:
+    - contract.verification_and_closure.v1
+    inspect_views:
+    - catalog
+    - verification
+    - closure
+    response_surface_bindings:
+    - transaction_kind: inspect
+      response_envelope: catalog
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+    - transaction_kind: inspect
+      response_envelope: verification
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+    - transaction_kind: inspect
+      response_envelope: closure
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+    - transaction_kind: draft
+      response_envelope: default
+      allowed_resource_roles: *id001
+    - transaction_kind: commit
+      response_envelope: default
+      allowed_resource_roles: *id003
+    - transaction_kind: validate
+      response_envelope: default
+      allowed_resource_roles: *id002
+  instruction_resource: lantern/resources/instructions/verification_and_closure.md
+  authoritative_guides:
+  - lantern/resources/guides/verification_and_closure.md
+  administration_guides:
+  - lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION_v0.1.0.md
+  entry_conditions:
+  - selected CI applied
+  exit_conditions:
+  - GT-130 passed
+  source: lantern-governance/spec/SPEC-0001.md
+  enabled: true
+  governance_mode: full
+- workbench_id: issue_operations
+  display_name: Issue Operations
+  lifecycle_placement:
+    kind: lifecycle-independent
+  artifacts_in_scope:
+  - IS
+  intent_classes:
+  - issue_intake
+  - issue_resolution
+  posture_constraints:
+  - issue_first_for_regressions
+  workflow_surface:
+    allowed_transaction_kinds:
+    - inspect
+    - draft
+    - commit
+    - validate
+    draftable_artifact_families:
+    - IS
+    contract_refs:
+    - contract.issue_operations.v1
+    inspect_views:
+    - catalog
+    - issues
+    response_surface_bindings:
+    - transaction_kind: inspect
+      response_envelope: catalog
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+    - transaction_kind: inspect
+      response_envelope: issues
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+    - transaction_kind: draft
+      response_envelope: default
+      allowed_resource_roles: *id001
+    - transaction_kind: commit
+      response_envelope: default
+      allowed_resource_roles: *id003
+    - transaction_kind: validate
+      response_envelope: default
+      allowed_resource_roles: *id002
+  instruction_resource: lantern/resources/instructions/issue_operations.md
+  authoritative_guides:
+  - lantern/resources/guides/issue_operations.md
+  administration_guides:
+  - lantern/administration_procedures/ISSUE__INTAKE_TRIAGE_RESOLUTION_v0.2.0.md
+  entry_conditions:
+  - issue exists
+  exit_conditions:
+  - issue posture updated
+  source: lantern-governance/is/IS-0002.md
+  enabled: true
+  governance_mode: full
+- workbench_id: governance_onboarding
+  display_name: Governance Onboarding
+  lifecycle_placement:
+    kind: lifecycle-independent
+  artifacts_in_scope:
+  - INI
+  - CH
+  - TD
+  intent_classes:
+  - bootstrap
+  - onboarding
+  posture_constraints:
+  - supports_bootstrap_without_product_writes
+  workflow_surface:
+    allowed_transaction_kinds:
+    - inspect
+    - draft
+    - validate
+    draftable_artifact_families:
+    - INI
+    - CH
+    - TD
+    contract_refs:
+    - contract.governance_onboarding.v1
+    inspect_views:
+    - catalog
+    - onboarding
+    response_surface_bindings:
+    - transaction_kind: inspect
+      response_envelope: catalog
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+    - transaction_kind: inspect
+      response_envelope: onboarding
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+    - transaction_kind: draft
+      response_envelope: default
+      allowed_resource_roles: *id001
+    - transaction_kind: validate
+      response_envelope: default
+      allowed_resource_roles: *id002
+  instruction_resource: lantern/resources/instructions/governance_onboarding.md
+  authoritative_guides:
+  - lantern/resources/guides/governance_onboarding.md
+  administration_guides:
+  - lantern/administration_procedures/SSOT_BLOB_INGESTION_v0.2.0.md
+  - lantern/administration_procedures/INITIATIVE__AUTHORING_AND_READYING_v0.1.0.md
+  - lantern/administration_procedures/INITIATIVE__DECOMPOSITION_AND_CH_SIZING_v0.1.0.md
+  entry_conditions:
+  - governance repo not yet prepared or needs inspection
+  exit_conditions:
+  - governance onboarding complete
+  source: lantern-governance/dip/DIP-0001.md
+  enabled: true
+  governance_mode: intervention
 
-  - workbench_id: ch_and_td_readiness
-    display_name: CH and TD Readiness
-    lifecycle_placement:
-      kind: covered_gates
-      covered_gates: [GT-110]
-    artifacts_in_scope: [CH, TD, EV, DEC]
-    intent_classes: [change_readiness, test_definition_authoring]
-    posture_constraints: [requires_upstream_baselines]
-    workflow_surface:
-      allowed_transaction_kinds: [inspect, draft, commit, validate]
-      draftable_artifact_families: [CH, TD, EV, DEC]
-      contract_refs: [contract.ch_td_readiness.v1]
-      inspect_views: [catalog, readiness, lineage]
-    instruction_resource: lantern/resources/instructions/ch_and_td_readiness.md
-    authoritative_guides:
-      - lantern/resources/guides/ch_and_td_readiness.md
-    administration_guides:
-      - lantern/resources/instructions/ch_and_td_readiness.md
-    entry_conditions:
-      - upstream baselines approved
-    exit_conditions:
-      - GT-110 passed
-    source: lantern-governance/ch/CH-0001.md
-    enabled: true
-    governance_mode: full
-
-  - workbench_id: design_candidate_authoring
-    display_name: Design Candidate Authoring
-    lifecycle_placement:
-      kind: lifecycle_span
-      start_gate: GT-110
-      end_gate: GT-115
-    artifacts_in_scope: [DC]
-    intent_classes: [design_candidate_authoring]
-    posture_constraints: [requires_ready_ch]
-    workflow_surface:
-      allowed_transaction_kinds: [inspect, draft, validate]
-      draftable_artifact_families: [DC]
-      contract_refs: [contract.design_candidate_authoring.v1]
-      inspect_views: [catalog, design_candidates]
-    instruction_resource: lantern/resources/instructions/design_candidate_authoring.md
-    authoritative_guides:
-      - lantern/resources/guides/design_candidate_authoring.md
-    administration_guides:
-      - lantern/resources/instructions/design_candidate_authoring.md
-    entry_conditions:
-      - GT-110 passed
-    exit_conditions:
-      - at least one design candidate exists
-    source: lantern-governance/dip/DIP-0006.md
-    enabled: true
-    governance_mode: full
-
-  - workbench_id: design_selection
-    display_name: Design Selection
-    lifecycle_placement:
-      kind: covered_gates
-      covered_gates: [GT-115]
-    artifacts_in_scope: [DC, DB, EV, DEC]
-    intent_classes: [design_selection]
-    posture_constraints: [requires_candidate_comparison]
-    workflow_surface:
-      allowed_transaction_kinds: [inspect, draft, commit, validate]
-      draftable_artifact_families: [DB, EV, DEC]
-      contract_refs: [contract.design_selection.v1]
-      inspect_views: [catalog, design_selection]
-    instruction_resource: lantern/resources/instructions/design_selection.md
-    authoritative_guides:
-      - lantern/resources/guides/design_selection.md
-    administration_guides:
-      - lantern/resources/instructions/design_selection.md
-    entry_conditions:
-      - GT-110 passed
-    exit_conditions:
-      - DB approved
-    source: lantern-governance/db/DB-0001.md
-    enabled: true
-    governance_mode: full
-
-  - workbench_id: ci_authoring
-    display_name: CI Authoring
-    lifecycle_placement:
-      kind: lifecycle_span
-      start_gate: GT-115
-      end_gate: GT-120
-    artifacts_in_scope: [CI]
-    intent_classes: [ci_authoring]
-    posture_constraints: [requires_approved_db]
-    workflow_surface:
-      allowed_transaction_kinds: [inspect, draft, validate]
-      draftable_artifact_families: [CI]
-      contract_refs: [contract.ci_authoring.v1]
-      inspect_views: [catalog, implementation_scope]
-    instruction_resource: lantern/resources/instructions/ci_authoring.md
-    authoritative_guides:
-      - lantern/resources/guides/ci_authoring.md
-    administration_guides:
-      - lantern/resources/instructions/ci_authoring.md
-    entry_conditions:
-      - GT-115 passed
-    exit_conditions:
-      - at least one CI candidate exists
-    source: lantern-governance/ch/CH-0001.md
-    enabled: true
-    governance_mode: full
-
-  - workbench_id: ci_selection
-    display_name: CI Selection
-    lifecycle_placement:
-      kind: covered_gates
-      covered_gates: [GT-120]
-    artifacts_in_scope: [CI, EV, DEC]
-    intent_classes: [ci_selection]
-    posture_constraints: [requires_execution_grade_candidate]
-    workflow_surface:
-      allowed_transaction_kinds: [inspect, draft, commit, validate]
-      draftable_artifact_families: [EV, DEC]
-      contract_refs: [contract.ci_selection.v1]
-      inspect_views: [catalog, ci_selection]
-    instruction_resource: lantern/resources/instructions/ci_selection.md
-    authoritative_guides:
-      - lantern/resources/guides/ci_selection.md
-    administration_guides:
-      - lantern/resources/instructions/ci_selection.md
-    entry_conditions:
-      - GT-115 passed
-    exit_conditions:
-      - selected CI recorded
-    source: lantern-governance/td/TD-0001.md
-    enabled: true
-    governance_mode: full
-
-  - workbench_id: selected_ci_application
-    display_name: Selected CI Application
-    lifecycle_placement:
-      kind: lifecycle_span
-      start_gate: GT-120
-      end_gate: GT-130
-    artifacts_in_scope: [CI]
-    intent_classes: [selected_ci_application]
-    posture_constraints: [product_writes_permitted]
-    workflow_surface:
-      allowed_transaction_kinds: [inspect, commit, validate]
-      draftable_artifact_families: []
-      contract_refs: [contract.selected_ci_application.v1]
-      inspect_views: [catalog, change_surface]
-    instruction_resource: lantern/resources/instructions/selected_ci_application.md
-    authoritative_guides:
-      - lantern/resources/guides/selected_ci_application.md
-    administration_guides:
-      - lantern/resources/instructions/selected_ci_application.md
-    entry_conditions:
-      - GT-120 passed
-    exit_conditions:
-      - selected CI applied
-    source: lantern-governance/spec/SPEC-0001.md
-    enabled: true
-    governance_mode: full
-
-  - workbench_id: verification_and_closure
-    display_name: Verification and Closure
-    lifecycle_placement:
-      kind: covered_gates
-      covered_gates: [GT-130]
-    artifacts_in_scope: [CI, EV, DEC]
-    intent_classes: [verification_and_closure]
-    posture_constraints: [requires_selected_ci]
-    workflow_surface:
-      allowed_transaction_kinds: [inspect, draft, commit, validate]
-      draftable_artifact_families: [EV, DEC]
-      contract_refs: [contract.verification_and_closure.v1]
-      inspect_views: [catalog, verification, closure]
-    instruction_resource: lantern/resources/instructions/verification_and_closure.md
-    authoritative_guides:
-      - lantern/resources/guides/verification_and_closure.md
-    administration_guides:
-      - lantern/resources/instructions/verification_and_closure.md
-    entry_conditions:
-      - selected CI applied
-    exit_conditions:
-      - GT-130 passed
-    source: lantern-governance/spec/SPEC-0001.md
-    enabled: true
-    governance_mode: full
-
-  - workbench_id: issue_operations
-    display_name: Issue Operations
-    lifecycle_placement:
-      kind: lifecycle-independent
-    artifacts_in_scope: [IS]
-    intent_classes: [issue_intake, issue_resolution]
-    posture_constraints: [issue_first_for_regressions]
-    workflow_surface:
-      allowed_transaction_kinds: [inspect, draft, commit, validate]
-      draftable_artifact_families: [IS]
-      contract_refs: [contract.issue_operations.v1]
-      inspect_views: [catalog, issues]
-    instruction_resource: lantern/resources/instructions/issue_operations.md
-    authoritative_guides:
-      - lantern/resources/guides/issue_operations.md
-    administration_guides:
-      - lantern/resources/instructions/issue_operations.md
-    entry_conditions:
-      - issue exists
-    exit_conditions:
-      - issue posture updated
-    source: lantern-governance/is/IS-0002.md
-    enabled: true
-    governance_mode: full
-
-  - workbench_id: governance_onboarding
-    display_name: Governance Onboarding
-    lifecycle_placement:
-      kind: lifecycle-independent
-    artifacts_in_scope: [INI, CH, TD]
-    intent_classes: [bootstrap, onboarding]
-    posture_constraints: [supports_bootstrap_without_product_writes]
-    workflow_surface:
-      allowed_transaction_kinds: [inspect, draft, validate]
-      draftable_artifact_families: [INI, CH, TD]
-      contract_refs: [contract.governance_onboarding.v1]
-      inspect_views: [catalog, onboarding]
-    instruction_resource: lantern/resources/instructions/governance_onboarding.md
-    authoritative_guides:
-      - lantern/resources/guides/governance_onboarding.md
-    administration_guides:
-      - lantern/resources/instructions/governance_onboarding.md
-    entry_conditions:
-      - governance repo not yet prepared or needs inspection
-    exit_conditions:
-      - governance onboarding complete
-    source: lantern-governance/dip/DIP-0001.md
-    enabled: true
-    governance_mode: intervention

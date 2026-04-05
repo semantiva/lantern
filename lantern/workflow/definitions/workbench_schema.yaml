@@ -1,53 +1,75 @@
-schema_id: lantern.workbench_schema.v1
+schema_id: lantern.workflow.workbench_schema.v2
 top_level_required:
-  - runtime_surface_classification
-  - workbenches
+- runtime_surface_classification
+- workbenches
 runtime_surface_classification_values:
-  - full_governed_surface
-  - partial_governed_surface
-  - intervention_surface
+- full_governed_surface
+- partial_governed_surface
+- intervention_surface
 required_workbench_fields:
-  - workbench_id
-  - display_name
-  - lifecycle_placement
-  - artifacts_in_scope
-  - intent_classes
-  - posture_constraints
-  - workflow_surface
-  - instruction_resource
-  - authoritative_guides
-  - administration_guides
-  - entry_conditions
-  - exit_conditions
-  - source
-  - enabled
-  - governance_mode
+- workbench_id
+- display_name
+- lifecycle_placement
+- artifacts_in_scope
+- intent_classes
+- posture_constraints
+- workflow_surface
+- instruction_resource
+- authoritative_guides
+- administration_guides
+- entry_conditions
+- exit_conditions
+- source
+- enabled
+- governance_mode
+required_workflow_surface_fields:
+- allowed_transaction_kinds
+- draftable_artifact_families
+- contract_refs
+- inspect_views
+- response_surface_bindings
+allowed_transaction_kinds:
+- inspect
+- orient
+- draft
+- commit
+- validate
+allowed_resource_roles:
+- instruction_resource
+- authoritative_guides
+- administration_guides
 required_full_governed_gates:
-  - GT-030
-  - GT-050
-  - GT-060
-  - GT-110
-  - GT-115
-  - GT-120
-  - GT-130
+- GT-030
+- GT-050
+- GT-060
+- GT-110
+- GT-115
+- GT-120
+- GT-130
 built_in_workbench_ids:
-  - upstream_intake_and_baselines
-  - ch_and_td_readiness
-  - design_candidate_authoring
-  - design_selection
-  - ci_authoring
-  - ci_selection
-  - selected_ci_application
-  - verification_and_closure
-  - issue_operations
-  - governance_onboarding
+- upstream_intake_and_baselines
+- ch_and_td_readiness
+- design_candidate_authoring
+- design_selection
+- ci_authoring
+- ci_selection
+- selected_ci_application
+- verification_and_closure
+- issue_operations
+- governance_onboarding
 lifecycle_placement_variants:
   covered_gates:
     requires:
-      - covered_gates
+    - covered_gates
   lifecycle_span:
     requires:
-      - start_gate
-      - end_gate
+    - start_gate
+    - end_gate
   lifecycle-independent:
     requires: []
+response_surface_binding_shape:
+  required:
+  - transaction_kind
+  - response_envelope
+  - allowed_resource_roles
+
