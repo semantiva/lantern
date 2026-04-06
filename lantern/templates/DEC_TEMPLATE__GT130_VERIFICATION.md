@@ -14,3 +14,7 @@ references:
 Gate: GT-130
 Decision: PASS | FAIL
 Verified CI: `CI-<CH_NUM>-<UUID>`
+
+
+## Expectation-to-delivery rationale
+Summarize initiative objective, roadmap role, requirements satisfaction, architectural fit, and clean-state / reproducibility posture before declaring PASS.

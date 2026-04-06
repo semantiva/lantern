@@ -24,3 +24,12 @@ Stabilizes GT-130 verification and closure posture so verification evidence and 
 ## Provenance
 This guide is a Lantern-authored projection over reviewed Lantern-local source material. The provenance block above records the reviewed inputs and relocation-manifest entry identifiers used for auditability.
 
+
+## Expectation-to-delivery review
+A GT-130 PASS for MVP slices requires all of the following review anchors to be explicit in the evidence packet:
+- initiative objective and roadmap role for the governing CH
+- requirements satisfaction against the approved SPEC / TD envelope
+- architectural fit against the approved ARCH baseline
+- local verification execution, clean-state evidence, and reproducibility evidence
+- workflow-maintainer guidance that makes the review checklist explicit rather than optional
+

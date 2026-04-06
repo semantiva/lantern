@@ -23,3 +23,11 @@ CI, EV, DEC
 
 Referenced Lantern-local guides:
 - lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION_v0.1.0.md
+
+
+## Required GT-130 review anchors
+- Record initiative objective and roadmap role before judging local test output.
+- Map each approved TD case to actual verification evidence.
+- Confirm architectural fit against the approved ARCH baseline.
+- Capture clean-state and reproducibility evidence together with command output.
+- Treat local test passage alone as insufficient for GT-130 PASS.

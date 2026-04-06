@@ -1,4 +1,4 @@
-"""Journal persistence for CH-0004 transaction correlation."""
+"""Journal persistence for transaction correlation and post-application handoff."""
 from __future__ import annotations
 
 import json
@@ -12,11 +12,13 @@ def runtime_state_root(*, product_root: Path, governance_root: Path | None) -> P
     return product_root / ".lantern_runtime"
 
 
+
 def ensure_runtime_dirs(*, product_root: Path, governance_root: Path | None) -> Path:
     root = runtime_state_root(product_root=product_root, governance_root=governance_root)
     for relative in ("drafts", "journal", "validation"):
         (root / relative).mkdir(parents=True, exist_ok=True)
     return root
+
 
 
 def write_journal_record(
@@ -32,6 +34,7 @@ def write_journal_record(
     return journal_path
 
 
+
 def write_validation_snapshot(
     *,
     runtime_root: Path,
@@ -45,11 +48,35 @@ def write_validation_snapshot(
     return path
 
 
+
+def write_application_handoff(
+    *,
+    runtime_root: Path,
+    transaction_id: str,
+    handoff: dict[str, Any],
+) -> Path:
+    journal_dir = runtime_root / "journal" / transaction_id
+    journal_dir.mkdir(parents=True, exist_ok=True)
+    handoff_path = journal_dir / "application_handoff.json"
+    handoff_path.write_text(json.dumps(handoff, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return handoff_path
+
+
+
 def load_journal_record(*, runtime_root: Path, transaction_id: str) -> dict[str, Any]:
     path = runtime_root / "journal" / transaction_id / "journal.json"
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+
 def load_validation_snapshot(*, runtime_root: Path, transaction_id: str) -> dict[str, Any]:
     path = runtime_root / "validation" / f"{transaction_id}.json"
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+
+def load_application_handoff(*, runtime_root: Path, transaction_id: str) -> dict[str, Any] | None:
+    path = runtime_root / "journal" / transaction_id / "application_handoff.json"
+    if not path.exists():
+        return None
     return json.loads(path.read_text(encoding="utf-8"))

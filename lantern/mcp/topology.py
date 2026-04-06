@@ -7,6 +7,8 @@ from typing import Optional
 
 import yaml
 
+from lantern.artifacts.validator import validate_workspace_readiness
+
 
 @dataclass(frozen=True)
 class TopologyPosture:
@@ -16,6 +18,7 @@ class TopologyPosture:
     consistency_state: str
     startup_issues: tuple[str, ...]
     read_only: bool = True
+
 
 
 def resolve_topology(
@@ -42,6 +45,17 @@ def resolve_topology(
     if not registry_path.exists():
         issues.append(f"workflow registry missing: {registry_path.relative_to(root)}")
 
+    readiness_findings = []
+    if root.is_dir() and registry_path.exists():
+        readiness_findings = validate_workspace_readiness(
+            product_root=root,
+            governance_root=resolved_governance if resolved_governance and resolved_governance.is_dir() else None,
+        )
+        for finding in readiness_findings:
+            artifact_id = finding.get("artifact_id")
+            prefix = f"{artifact_id}: " if artifact_id else ""
+            issues.append(prefix + finding["message"])
+
     runtime_surface = _read_runtime_surface(registry_path)
     consistency = "valid" if not issues else ("missing_governance" if resolved_governance is None else "degraded")
 
@@ -53,6 +67,7 @@ def resolve_topology(
         startup_issues=tuple(issues),
         read_only=True,
     )
+
 
 
 def _read_runtime_surface(registry_path: Path) -> str:

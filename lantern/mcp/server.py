@@ -26,7 +26,7 @@ except ImportError:  # pragma: no cover
                 return func
             return decorator
 
-        def list_tools(self):
+        async def list_tools(self):
             return tuple(self._tools)
 
         def run(self):

@@ -18,11 +18,14 @@ from lantern.artifacts.validator import (
     validate_commit_request,
     validate_draft_request,
     validate_selected_ci_commit_request,
+    validate_workspace_readiness,
 )
 from lantern.mcp.journal import (
     ensure_runtime_dirs,
+    load_application_handoff,
     load_journal_record,
     load_validation_snapshot,
+    write_application_handoff,
     write_journal_record,
     write_validation_snapshot,
 )
@@ -44,6 +47,7 @@ class ChangeSurface:
     product_root: str
     governance_root: str | None
     allowed_change_surface: tuple[str, ...]
+    runtime_managed_change_surface: tuple[str, ...]
     change_surface_hash: str
 
 
@@ -75,6 +79,7 @@ class TransactionEngine:
             allowed_paths = tuple(str(item).strip() for item in allowed if str(item).strip())
         else:
             raise TransactionError("selected CI artifact is missing allowed_change_surface")
+        runtime_managed = (".gitignore",) if _gitignore_needs_hygiene_block(self.product_root) else ()
         token_payload = {
             "workbench_id": workbench_id,
             "contract_ref": workbench.contract_refs[0],
@@ -82,6 +87,7 @@ class TransactionEngine:
             "product_root": str(self.product_root),
             "governance_root": str(self.governance_root) if self.governance_root else None,
             "allowed_change_surface": list(allowed_paths),
+            "runtime_managed_change_surface": list(runtime_managed),
         }
         digest = sha256(json.dumps(token_payload, sort_keys=True).encode("utf-8")).hexdigest()
         return ChangeSurface(
@@ -91,6 +97,7 @@ class TransactionEngine:
             product_root=token_payload["product_root"],
             governance_root=token_payload["governance_root"],
             allowed_change_surface=allowed_paths,
+            runtime_managed_change_surface=runtime_managed,
             change_surface_hash=digest,
         )
 
@@ -275,14 +282,25 @@ class TransactionEngine:
             if hold_seconds > 0:
                 time.sleep(hold_seconds)
             affected_paths: list[str] = []
-            for operation in operations:
-                rel_path = str(operation["path"])
+            for index, operation in enumerate(operations):
+                rel_path = str(operation["path"]).strip()
+                if rel_path == ".gitignore":
+                    return {
+                        "status": "invalid",
+                        "findings": [
+                            {
+                                "path": f"payload.operations[{index}].path",
+                                "message": ".gitignore is runtime-managed during selected CI application and cannot be supplied by the operator payload",
+                                "anchor": "selected_ci_application.runtime_managed_hygiene",
+                            }
+                        ],
+                    }
                 if not _is_path_allowed(rel_path, change_surface.allowed_change_surface):
                     return {
                         "status": "invalid",
                         "findings": [
                             {
-                                "path": f"payload.operations[{operations.index(operation)}].path",
+                                "path": f"payload.operations[{index}].path",
                                 "message": f"path {rel_path!r} is outside the inspected change surface",
                                 "anchor": "inspect.change_surface.allowed_change_surface",
                             }
@@ -291,9 +309,19 @@ class TransactionEngine:
                 target = self.product_root / rel_path
                 target.parent.mkdir(parents=True, exist_ok=True)
                 target.write_text(str(operation["content"]), encoding="utf-8")
-                affected_paths.append(str(target))
+                affected_paths.append(str(target.resolve()))
+            managed_hygiene_path = self._ensure_runtime_managed_gitignore_hygiene(change_surface)
+            if managed_hygiene_path is not None:
+                affected_paths.append(managed_hygiene_path)
             transaction_id = self._new_transaction_id()
             validation_findings = self._post_commit_product_validation(affected_paths)
+            handoff = self._build_application_handoff(
+                workbench_id=workbench_id,
+                actor=actor,
+                ci_path=Path(str(payload["ci_path"])),
+                change_surface=change_surface,
+                affected_paths=affected_paths,
+            )
             validation_snapshot = {
                 "scope": "transaction",
                 "transaction_id": transaction_id,
@@ -301,6 +329,7 @@ class TransactionEngine:
                 "findings": validation_findings,
                 "affected_paths": affected_paths,
                 "change_surface_hash": change_surface.change_surface_hash,
+                "application_handoff": handoff,
             }
             journal_record = {
                 "tx_id": transaction_id,
@@ -313,10 +342,12 @@ class TransactionEngine:
                     "contract_ref": change_surface.contract_ref,
                     "change_surface_hash": change_surface.change_surface_hash,
                     "validation_scope": "transaction",
+                    "post_application_state": "awaiting_gt130",
                 },
                 "touched_paths": affected_paths,
                 "created_paths": affected_paths,
                 "validation_snapshot": str((self.runtime_root / "validation" / f"{transaction_id}.json").resolve()),
+                "application_handoff": str((self.runtime_root / "journal" / transaction_id / "application_handoff.json").resolve()),
             }
             journal_path = write_journal_record(
                 runtime_root=self.runtime_root,
@@ -328,6 +359,11 @@ class TransactionEngine:
                 transaction_id=transaction_id,
                 snapshot=validation_snapshot,
             )
+            handoff_path = write_application_handoff(
+                runtime_root=self.runtime_root,
+                transaction_id=transaction_id,
+                handoff=handoff,
+            )
             return {
                 "status": "committed",
                 "transaction_id": transaction_id,
@@ -335,13 +371,19 @@ class TransactionEngine:
                 "journal_path": str(journal_path),
                 "change_surface": {
                     "allowed_change_surface": list(change_surface.allowed_change_surface),
+                    "runtime_managed_change_surface": list(change_surface.runtime_managed_change_surface),
                     "change_surface_hash": change_surface.change_surface_hash,
+                },
+                "application_handoff": {
+                    **handoff,
+                    "path": str(handoff_path),
                 },
                 "validation": {
                     "scope": "transaction",
                     "path": str(validation_path),
                     "valid": not validation_findings,
                     "findings": validation_findings,
+                    "application_handoff": handoff,
                 },
                 "correlation": {
                     "transaction_id": transaction_id,
@@ -364,10 +406,20 @@ class TransactionEngine:
     ) -> dict[str, Any]:
         if scope == "workspace":
             posture = resolve_topology(product_root=self.product_root, governance_root=self.governance_root)
-            findings = [
-                {"path": "workspace", "message": issue, "anchor": "topology"}
-                for issue in posture.startup_issues
-            ]
+            findings = validate_workspace_readiness(
+                product_root=self.product_root,
+                governance_root=self.governance_root if self.governance_root and self.governance_root.is_dir() else None,
+            )
+            if self.governance_root is None:
+                findings = [
+                    {"path": "workspace.governance_root", "message": "governance root not configured", "anchor": "topology"},
+                    *findings,
+                ]
+            elif not self.governance_root.is_dir():
+                findings = [
+                    {"path": "workspace.governance_root", "message": f"governance root not found: {self.governance_root}", "anchor": "topology"},
+                    *findings,
+                ]
             return {
                 "scope": "workspace",
                 "valid": not findings,
@@ -375,6 +427,9 @@ class TransactionEngine:
                 "workspace": {
                     "product_root": str(self.product_root),
                     "governance_root": str(self.governance_root) if self.governance_root else None,
+                    "runtime_surface_classification": posture.runtime_surface_classification,
+                    "consistency_state": posture.consistency_state,
+                    "startup_issues": list(posture.startup_issues),
                 },
             }
         if scope == "draft":
@@ -417,6 +472,7 @@ class TransactionEngine:
                 }
             journal = load_journal_record(runtime_root=self.runtime_root, transaction_id=transaction_id)
             snapshot = load_validation_snapshot(runtime_root=self.runtime_root, transaction_id=transaction_id)
+            handoff = load_application_handoff(runtime_root=self.runtime_root, transaction_id=transaction_id)
             return {
                 "scope": "transaction",
                 "transaction_id": transaction_id,
@@ -424,6 +480,7 @@ class TransactionEngine:
                 "findings": list(snapshot.get("findings", [])),
                 "journal_path": str((self.runtime_root / "journal" / transaction_id / "journal.json").resolve()),
                 "affected_paths": journal.get("touched_paths", []),
+                "application_handoff": handoff,
             }
         return {
             "scope": scope,
@@ -445,6 +502,55 @@ class TransactionEngine:
                 )
         return findings
 
+    def _ensure_runtime_managed_gitignore_hygiene(self, change_surface: ChangeSurface) -> str | None:
+        if ".gitignore" not in change_surface.runtime_managed_change_surface:
+            return None
+        gitignore_path = self.product_root / ".gitignore"
+        existing_lines = []
+        if gitignore_path.exists():
+            existing_lines = gitignore_path.read_text(encoding="utf-8").splitlines()
+        existing_entries = {line.strip() for line in existing_lines if line.strip() and not line.strip().startswith("#")}
+        missing_entries = [entry for entry in _MANAGED_GITIGNORE_ENTRIES if entry not in existing_entries]
+        if not missing_entries:
+            return None
+        managed_block = [
+            _MANAGED_GITIGNORE_START,
+            *missing_entries,
+            _MANAGED_GITIGNORE_END,
+        ]
+        if existing_lines and existing_lines[-1].strip():
+            existing_lines.append("")
+        existing_lines.extend(managed_block)
+        gitignore_path.write_text("\n".join(existing_lines) + "\n", encoding="utf-8")
+        return str(gitignore_path.resolve())
+
+    def _build_application_handoff(
+        self,
+        *,
+        workbench_id: str,
+        actor: str,
+        ci_path: Path,
+        change_surface: ChangeSurface,
+        affected_paths: list[str],
+    ) -> dict[str, Any]:
+        workbench = self.workflow_layer.get_workbench("verification_and_closure")
+        ci_header = parse_header_block(ci_path.read_text(encoding="utf-8"))
+        return {
+            "ci_id": str(ci_header.get("ci_id", ci_path.stem)),
+            "contract_ref": change_surface.contract_ref,
+            "effective_change_surface": list(change_surface.allowed_change_surface + change_surface.runtime_managed_change_surface),
+            "change_surface_hash": change_surface.change_surface_hash,
+            "affected_product_paths": affected_paths,
+            "applied_at_utc": _utc_now(),
+            "actor": actor,
+            "post_application_state": "awaiting_gt130",
+            "next_step": {
+                "workbench_id": workbench.workbench_id,
+                "instruction_resource": workbench.instruction_resource,
+                "guide_refs": list(workbench.authoritative_guides + workbench.administration_guides),
+            },
+        }
+
     @staticmethod
     def _new_transaction_id() -> str:
         stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%S")
@@ -464,3 +570,24 @@ def _is_path_allowed(relative_path: str, allowed_entries: tuple[str, ...]) -> bo
         if clean == allowed:
             return True
     return False
+
+
+_MANAGED_GITIGNORE_START = "# BEGIN LANTERN MANAGED PYTHON HYGIENE"
+_MANAGED_GITIGNORE_END = "# END LANTERN MANAGED PYTHON HYGIENE"
+_MANAGED_GITIGNORE_ENTRIES = (
+    "__pycache__/",
+    "*.py[cod]",
+    ".pytest_cache/",
+    ".mypy_cache/",
+    ".ruff_cache/",
+    ".venv/",
+    "venv/",
+)
+
+
+def _gitignore_needs_hygiene_block(product_root: Path) -> bool:
+    gitignore_path = product_root / ".gitignore"
+    if not gitignore_path.exists():
+        return True
+    existing_entries = {line.strip() for line in gitignore_path.read_text(encoding="utf-8").splitlines() if line.strip() and not line.strip().startswith("#")}
+    return any(entry not in existing_entries for entry in _MANAGED_GITIGNORE_ENTRIES)

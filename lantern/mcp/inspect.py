@@ -60,6 +60,7 @@ class InspectChangeSurfaceResult:
     product_root: str
     governance_root: Optional[str]
     allowed_change_surface: tuple[str, ...]
+    runtime_managed_change_surface: tuple[str, ...]
     change_surface_hash: str
 
 
@@ -195,5 +196,6 @@ def _handle_change_surface(
         product_root=posture.product_root,
         governance_root=posture.governance_root,
         allowed_change_surface=posture.allowed_change_surface,
+        runtime_managed_change_surface=posture.runtime_managed_change_surface,
         change_surface_hash=posture.change_surface_hash,
     )

@@ -267,3 +267,14 @@ Hard rules:
 - Do not change any CI content outside the YAML `status:` field.
 - Do not change CH content outside the YAML `status:` field.
 - Do not change CH status to Addressed unless the outcome is PASS."
+
+
+## Expectation-to-delivery review checklist (mandatory for MVP slices)
+Before a GT-130 PASS is approved, the verification packet MUST explicitly answer all of the following:
+- What initiative objective does this CH satisfy, and why does it exist in the roadmap now?
+- What role does this CH play in the current execution order?
+- Which approved SPEC / TD requirements are satisfied by the delivered result?
+- Does the delivered result remain aligned with the approved ARCH baseline?
+- What clean-state, reproducibility, and local verification evidence proves the result is repeatable?
+
+Local test passage is necessary but not sufficient. A packet that omits this expectation-to-delivery review is incomplete for GT-130.

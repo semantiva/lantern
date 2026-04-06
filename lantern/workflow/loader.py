@@ -302,7 +302,7 @@ def render_generated_artifacts(
 def _load_grammar():
     if Grammar is None:
         raise WorkflowLayerError(
-            "lantern_grammar public API import failed; install lantern_grammar before loading the workflow layer"
+            "lantern_grammar public API import failed; install lantern_grammar before loading the workflow layer (for example from a sibling checkout: pip install -e ../lantern-grammar)"
         ) from _GRAMMAR_IMPORT_ERROR
     try:
         grammar = Grammar.load()
@@ -644,7 +644,7 @@ def _assert_committed_json_matches(path: Path, expected_payload: Any, label: str
     actual_payload = json.loads(path.read_text(encoding="utf-8"))
     actual_text = _canonical_json(actual_payload)
     if actual_text != expected_text:
-        raise WorkflowLayerError(f"Committed {label} is stale relative to authored workflow inputs")
+        raise WorkflowLayerError(f"Committed {label} is stale relative to authored workflow inputs: {path}")
 
 
 def _assert_committed_text_matches(path: Path, expected_text: str, label: str) -> None:
@@ -652,7 +652,7 @@ def _assert_committed_text_matches(path: Path, expected_text: str, label: str) -
         raise WorkflowLayerError(f"Missing generated artifact {label}: {path}")
     actual = path.read_text(encoding="utf-8")
     if actual != expected_text:
-        raise WorkflowLayerError(f"Committed {label} is stale relative to authored workflow inputs")
+        raise WorkflowLayerError(f"Committed {label} is stale relative to authored workflow inputs: {path}")
 
 
 def _resource_kind_for_path(rel_path: str) -> str:

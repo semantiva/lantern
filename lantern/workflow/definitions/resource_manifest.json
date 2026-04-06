@@ -584,7 +584,7 @@
     "workbench_id": "selected_ci_application"
   },
   {
-    "content_hash": "9610e57872d47ee28760b76adc7a8a582e32a01b8bc89d2b058c98949cad7cdc",
+    "content_hash": "018daab5c7ab462c41887e2229fdbb45ae863498a10566b311200301159cd616",
     "kind": "administration_guide",
     "path": "lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION_v0.1.0.md",
     "projection_trace": {
@@ -606,7 +606,7 @@
     "workbench_id": "selected_ci_application"
   },
   {
-    "content_hash": "d36acb3de7dd06d7f76423f482846a007655cfdfbf770b4d97f50f3c5fa92cf7",
+    "content_hash": "ea12fb8d123b8f48237148ce8aa19ab171f39ecef235b4ff099339a34f2c0411",
     "kind": "authoritative_guide",
     "path": "lantern/resources/guides/selected_ci_application.md",
     "projection_trace": {
@@ -628,7 +628,7 @@
     "workbench_id": "selected_ci_application"
   },
   {
-    "content_hash": "f0ba4e6f73fbe072bf4300316d8335404644e7d28585e32b567ad58ef62784ca",
+    "content_hash": "b847d612d5c5dcff6b763cf7d92225b96ae88d0a55cb844e4b05aa87e1eae326",
     "kind": "instruction",
     "path": "lantern/resources/instructions/selected_ci_application.md",
     "projection_trace": {
@@ -764,7 +764,7 @@
     "workbench_id": "upstream_intake_and_baselines"
   },
   {
-    "content_hash": "9610e57872d47ee28760b76adc7a8a582e32a01b8bc89d2b058c98949cad7cdc",
+    "content_hash": "018daab5c7ab462c41887e2229fdbb45ae863498a10566b311200301159cd616",
     "kind": "administration_guide",
     "path": "lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION_v0.1.0.md",
     "projection_trace": {
@@ -786,7 +786,7 @@
     "workbench_id": "verification_and_closure"
   },
   {
-    "content_hash": "d92ec0a55406a8047f474c624edc073914f64f346c6e9ffa3960eb7a68d60331",
+    "content_hash": "e87ca6a125d8028b37b9775f4b92fdc579d2875b7a1cde9c8eaf74d9735edb20",
     "kind": "authoritative_guide",
     "path": "lantern/resources/guides/verification_and_closure.md",
     "projection_trace": {
@@ -808,7 +808,7 @@
     "workbench_id": "verification_and_closure"
   },
   {
-    "content_hash": "1df582db4fe4b3494623f8a3d03937dae696f8819a50af1bc90c6d0480871493",
+    "content_hash": "a684176c4fb693e5b150b8e363a8ae819dd9c612a0a9bc3e97a1b2e3963ff9b5",
     "kind": "instruction",
     "path": "lantern/resources/instructions/verification_and_closure.md",
     "projection_trace": {

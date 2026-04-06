@@ -47,3 +47,14 @@ Outcome: PASS | FAIL
 CI disposition (if FAIL): Selected | Candidate | Rejected
 Approver: \<name/team\>
 Approved at (UTC): YYYY-MM-DDTHH:MM:SSZ
+
+
+## Expectation-to-delivery review
+
+| Review anchor | Evidence | PASS/FAIL |
+|---|---|---|
+| Initiative objective | <why this CH exists in the roadmap> | PASS / FAIL |
+| Roadmap role | <execution-order role for the CH> | PASS / FAIL |
+| Requirements satisfaction | <SPEC / TD alignment evidence> | PASS / FAIL |
+| Architectural fit | <ARCH alignment evidence> | PASS / FAIL |
+| Clean-state and reproducibility | <clean-state + rerun evidence> | PASS / FAIL |

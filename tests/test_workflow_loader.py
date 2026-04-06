@@ -4,12 +4,14 @@ import copy
 import dataclasses
 import hashlib
 import json
+import shutil
 from pathlib import Path
 
 import pytest
 import yaml
 from lantern_grammar import Grammar
 
+from lantern.artifacts.validator import validate_governance_corpus, validate_workspace_readiness
 from lantern.workflow.loader import (
     DEFAULT_CONTRACT_CATALOG_PATH,
     DEFAULT_REGISTRY_PATH,
@@ -252,3 +254,59 @@ def test_unresolved_authoritative_guide_path_is_fatal(tmp_path: Path) -> None:
     assert "resource.authoritative_guide.upstream_intake_and_baselines_authoritative_guides_does_not_exist" in message
     assert "affected_response_surface_bindings" in message
     assert "inspect:catalog" in message
+
+
+GOVERNANCE_ROOT = Path(__file__).resolve().parents[2] / "lantern-governance"
+
+
+def _copy_product_fixture(tmp_path: Path) -> Path:
+    fixture_root = tmp_path / "product_fixture"
+    shutil.copytree(Path(__file__).resolve().parents[1] / "lantern", fixture_root / "lantern", dirs_exist_ok=True)
+    return fixture_root
+
+
+def test_td0009_c01_missing_lantern_grammar_failure_names_manual_install_step(monkeypatch: pytest.MonkeyPatch) -> None:
+    from lantern.workflow.loader import WorkflowLayerError
+
+    def _raise_missing_grammar():
+        raise WorkflowLayerError(
+            "lantern_grammar public API import failed; install lantern_grammar before loading the workflow layer (for example from a sibling checkout: pip install -e ../lantern-grammar)"
+        )
+
+    monkeypatch.setattr("lantern.workflow.loader._load_grammar", _raise_missing_grammar)
+    findings = validate_workspace_readiness(product_root=Path(__file__).resolve().parents[1])
+    assert findings
+    assert findings[0]["path"] == "workspace.grammar"
+    assert "pip install -e ../lantern-grammar" in findings[0]["message"]
+
+
+def test_td0009_c02_stale_generated_artifact_is_reported_with_path(tmp_path: Path) -> None:
+    fixture_root = _copy_product_fixture(tmp_path)
+    workflow_map = fixture_root / "lantern" / "workflow" / "definitions" / "workflow_map.md"
+    workflow_map.write_text(workflow_map.read_text(encoding="utf-8") + "\nSTALE\n", encoding="utf-8")
+
+    findings = validate_workspace_readiness(product_root=fixture_root)
+    assert findings
+    assert any(
+        finding["path"].endswith("lantern/workflow/definitions/workflow_map.md") and "stale" in finding["message"]
+        for finding in findings
+    )
+
+
+def test_td0009_c03_governance_conformance_reports_artifact_id_and_path(tmp_path: Path) -> None:
+    governance_root = tmp_path / "governance"
+    artifact_path = governance_root / "ch" / "CH-9999.md"
+    artifact_path.parent.mkdir(parents=True, exist_ok=True)
+    artifact_path.write_text(
+        "```yaml\nch_id: CH-9999\n```\n\n## Missing title\n",
+        encoding="utf-8",
+    )
+
+    findings = validate_governance_corpus(governance_root)
+    assert findings
+    assert findings[0]["artifact_id"] == "CH-9999"
+    assert findings[0]["path"].startswith("CH-9999.")
+
+
+def test_td0009_c04_active_governance_corpus_passes_conformance() -> None:
+    assert validate_governance_corpus(GOVERNANCE_ROOT) == []

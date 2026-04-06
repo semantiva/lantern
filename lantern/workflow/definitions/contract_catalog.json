@@ -30,7 +30,7 @@
           ]
         }
       },
-      "grammar_package_version": "0.2.1",
+      "grammar_package_version": "0.3.0",
       "grammar_version": "0.3.0",
       "runtime_surface_classification": "full_governed_surface"
     },
@@ -178,7 +178,7 @@
           ]
         }
       },
-      "grammar_package_version": "0.2.1",
+      "grammar_package_version": "0.3.0",
       "grammar_version": "0.3.0",
       "runtime_surface_classification": "full_governed_surface"
     },
@@ -277,7 +277,7 @@
           ]
         }
       },
-      "grammar_package_version": "0.2.1",
+      "grammar_package_version": "0.3.0",
       "grammar_version": "0.3.0",
       "runtime_surface_classification": "full_governed_surface"
     },
@@ -415,7 +415,7 @@
           ]
         }
       },
-      "grammar_package_version": "0.2.1",
+      "grammar_package_version": "0.3.0",
       "grammar_version": "0.3.0",
       "runtime_surface_classification": "full_governed_surface"
     },
@@ -516,7 +516,7 @@
           ]
         }
       },
-      "grammar_package_version": "0.2.1",
+      "grammar_package_version": "0.3.0",
       "grammar_version": "0.3.0",
       "runtime_surface_classification": "full_governed_surface"
     },
@@ -596,7 +596,7 @@
   {
     "compatibility": {
       "gate_dependencies": {},
-      "grammar_package_version": "0.2.1",
+      "grammar_package_version": "0.3.0",
       "grammar_version": "0.3.0",
       "runtime_surface_classification": "full_governed_surface"
     },
@@ -666,7 +666,7 @@
   {
     "compatibility": {
       "gate_dependencies": {},
-      "grammar_package_version": "0.2.1",
+      "grammar_package_version": "0.3.0",
       "grammar_version": "0.3.0",
       "runtime_surface_classification": "full_governed_surface"
     },
@@ -799,7 +799,7 @@
           ]
         }
       },
-      "grammar_package_version": "0.2.1",
+      "grammar_package_version": "0.3.0",
       "grammar_version": "0.3.0",
       "runtime_surface_classification": "full_governed_surface"
     },
@@ -934,7 +934,7 @@
           ]
         }
       },
-      "grammar_package_version": "0.2.1",
+      "grammar_package_version": "0.3.0",
       "grammar_version": "0.3.0",
       "runtime_surface_classification": "full_governed_surface"
     },
@@ -1055,7 +1055,7 @@
           ]
         }
       },
-      "grammar_package_version": "0.2.1",
+      "grammar_package_version": "0.3.0",
       "grammar_version": "0.3.0",
       "runtime_surface_classification": "full_governed_surface"
     },

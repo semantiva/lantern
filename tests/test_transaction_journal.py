@@ -8,7 +8,7 @@ import pytest
 from lantern.artifacts.renderers import canonical_render_markdown
 from lantern.mcp.commit import handle_commit
 from lantern.mcp.draft import handle_draft
-from lantern.mcp.journal import load_journal_record, load_validation_snapshot, runtime_state_root
+from lantern.mcp.journal import load_application_handoff, load_journal_record, load_validation_snapshot, runtime_state_root
 from lantern.mcp.validate import handle_validate
 from lantern.workflow.loader import load_workflow_layer
 
@@ -52,6 +52,13 @@ def _write_selected_ci(governance_root: Path, *, allowed_change_surface: list[st
         encoding="utf-8",
     )
     return ci_path
+
+
+def _seed_runtime_hygiene_gitignore(product_root: Path) -> None:
+    (product_root / ".gitignore").write_text(
+        "__pycache__/\n*.py[cod]\n.pytest_cache/\n.mypy_cache/\n.ruff_cache/\n.venv/\nvenv/\n",
+        encoding="utf-8",
+    )
 
 
 def test_td0004_c09_commit_and_journal_capture_transaction_correlation_metadata(
@@ -181,6 +188,7 @@ def test_td0004_c12_post_commit_validation_remains_correlated_to_transaction(
     governance_root = tmp_path / "governance"
     product_root.mkdir()
     governance_root.mkdir()
+    _seed_runtime_hygiene_gitignore(product_root)
     ci_path = _write_selected_ci(
         governance_root,
         allowed_change_surface=["src/allowed.txt"],
@@ -212,12 +220,12 @@ def test_td0004_c12_post_commit_validation_remains_correlated_to_transaction(
         "anchor": "post_commit_validation",
     }
     assert commit_result["status"] == "committed"
-    assert commit_result["validation"] == {
-        "scope": "transaction",
-        "path": commit_result["validation"]["path"],
-        "valid": False,
-        "findings": [expected_finding],
-    }
+    assert commit_result["validation"]["scope"] == "transaction"
+    assert commit_result["validation"]["path"]
+    assert commit_result["validation"]["valid"] is False
+    assert commit_result["validation"]["findings"] == [expected_finding]
+    assert commit_result["validation"]["application_handoff"]["ci_id"] == "CI-0004-selected"
+    assert commit_result["validation"]["application_handoff"]["post_application_state"] == "awaiting_gt130"
     assert commit_result["correlation"] == {
         "transaction_id": commit_result["transaction_id"],
         "contract_ref": "contract.selected_ci_application.v1",
@@ -239,4 +247,37 @@ def test_td0004_c12_post_commit_validation_remains_correlated_to_transaction(
             ).resolve()
         ),
         "affected_paths": [failing_path],
+        "application_handoff": commit_result["validation"]["application_handoff"],
     }
+
+
+def test_td0009_c05_application_handoff_is_persisted_for_selected_ci_delivery(
+    workflow_layer, tmp_path: Path
+) -> None:
+    product_root = tmp_path / "product"
+    governance_root = tmp_path / "governance"
+    product_root.mkdir()
+    governance_root.mkdir()
+    ci_path = _write_selected_ci(
+        governance_root,
+        allowed_change_surface=["src/allowed.txt"],
+    )
+
+    commit_result = handle_commit(
+        workflow_layer=workflow_layer,
+        workbench_id="selected_ci_application",
+        payload={
+            "ci_path": str(ci_path),
+            "operations": [{"path": "src/allowed.txt", "content": "ok\n"}],
+        },
+        product_root=product_root,
+        governance_root=governance_root,
+        actor="validator",
+    )
+
+    runtime_root = runtime_state_root(product_root=product_root, governance_root=governance_root)
+    handoff = load_application_handoff(runtime_root=runtime_root, transaction_id=commit_result["transaction_id"])
+    assert handoff is not None
+    assert handoff["post_application_state"] == "awaiting_gt130"
+    assert handoff["ci_id"] == "CI-0004-selected"
+    assert ".gitignore" in handoff["effective_change_surface"]

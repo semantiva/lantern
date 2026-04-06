@@ -338,3 +338,25 @@ def test_c11_workflow_readme_has_authored_generated_boundary_text() -> None:
 def test_server_registers_fixed_five_tool_names() -> None:
     names = {tool.name for tool in asyncio.run(mcp_server.list_tools())}
     assert names == set(FIXED_TOOL_SURFACE)
+
+
+def test_td0009_c06_gt130_docs_require_expectation_to_delivery_review() -> None:
+    guide = (PRODUCT_ROOT / "lantern" / "resources" / "guides" / "verification_and_closure.md").read_text(encoding="utf-8")
+    admin = (PRODUCT_ROOT / "lantern" / "administration_procedures" / "GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION_v0.1.0.md").read_text(encoding="utf-8")
+    for anchor in (
+        "initiative objective",
+        "roadmap role",
+        "requirements satisfaction",
+        "architectural fit",
+        "clean-state",
+        "reproducibility",
+    ):
+        assert anchor in guide.lower() or anchor in admin.lower()
+
+
+def test_td0009_c07_readme_documents_manual_install_and_native_smoke_path() -> None:
+    content = (PRODUCT_ROOT / "README.md").read_text(encoding="utf-8")
+    assert "pip install -e ../lantern-grammar" in content
+    assert "python -m lantern.mcp.server" in content
+    assert 'validate(scope="workspace")' in content
+    assert "without `lantern-ops-bridge`" in content

@@ -25,3 +25,9 @@ CI
 Referenced Lantern-local guides:
 - lantern/preservation/WORKSPACE_TOPOLOGY.md
 - lantern/preservation/WORKBENCH_MAP.md
+
+
+## Post-application administration
+- Inspect the selected CI change surface before writing product files.
+- Treat `.gitignore` hygiene as runtime-managed; do not author `.gitignore` mutations in the operator payload.
+- After commit, capture the emitted `application_handoff` metadata and use its next-step anchors to prepare GT-130 verification.

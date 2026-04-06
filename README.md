@@ -22,12 +22,16 @@ The companion governance workspace (`lantern-governance/`) lives in a separate s
 
 ## Getting started
 
+Lantern's native MVP currently expects a manual `lantern_grammar` install before startup. In a multi-repository workspace the supported bootstrap path is:
+
 ```bash
+cd /path/to/lantern
+pip install -e ../lantern-grammar
 pip install -e ".[dev]"
-pytest
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -q
 ```
 
-All tests should pass without requiring external configuration.
+If `lantern_grammar` is not installed, Lantern fails descriptively at startup and tells the operator to complete the prerequisite step before loading the workflow layer.
 
 ## Workflow layer
 
@@ -120,3 +124,25 @@ resolution against the validated workflow layer:
 - `orient(governance_state, intent, ch_id)` — active workbench set, blockers, and next valid actions
 
 `draft`, `commit`, and `validate` mutation behavior is delivered in CH-0004.
+
+## Native MVP smoke path
+
+Use this bridge-free smoke path after the manual `lantern_grammar` install is complete:
+
+```bash
+python -m lantern.mcp.server \
+  --product-root /path/to/lantern/ \
+  --governance-root /path/to/lantern-governance/
+```
+
+In a second shell, run the bounded native regression path that exercises startup, mutation, selected-CI application hygiene, and validation without `lantern-ops-bridge`:
+
+```bash
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest \
+  tests/test_workflow_loader.py \
+  tests/test_mcp_server.py \
+  tests/test_mcp_mutation.py \
+  tests/test_transaction_journal.py -q
+```
+
+The native smoke path is only complete when startup succeeds with explicit product/governance roots, the selected-CI application flow records an application handoff that is `awaiting_gt130`, and `validate(scope="workspace")` plus `validate(scope="transaction")` both produce deterministic findings or a clean pass on the post-hardening baseline.

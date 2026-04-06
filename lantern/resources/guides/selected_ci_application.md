@@ -25,3 +25,10 @@ Stabilizes the post-GT-120, pre-GT-130 product-application posture and keeps it 
 ## Provenance
 This guide is a Lantern-authored projection over reviewed Lantern-local source material. The provenance block above records the reviewed inputs and relocation-manifest entry identifiers used for auditability.
 
+
+## Post-application posture
+- A successful `selected_ci_application` commit MUST emit runtime-managed `application_handoff` metadata.
+- The handoff records the applied CI id, contract ref, effective change surface, affected product paths, actor, timestamp, and the Lantern-local next-step anchors that govern GT-130 preparation.
+- Product bootstrap hygiene is runtime-managed and limited to a deterministic Python/test/cache `.gitignore` block when the target repository lacks the required ignore coverage.
+- The handoff posture is `awaiting_gt130`; it is not a new CI status and it does not create a new SSOT artifact family.
+
