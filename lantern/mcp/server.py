@@ -2,9 +2,10 @@
 from __future__ import annotations
 
 import argparse
+import json
 from dataclasses import asdict, is_dataclass
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Mapping, Optional
 
 try:
     from mcp.server.fastmcp import FastMCP
@@ -31,8 +32,11 @@ except ImportError:  # pragma: no cover
         def run(self):
             raise RuntimeError("mcp package not installed")
 
+from lantern.mcp.commit import handle_commit
+from lantern.mcp.draft import handle_draft
 from lantern.mcp.inspect import handle_inspect
 from lantern.mcp.orient import handle_orient
+from lantern.mcp.validate import handle_validate
 from lantern.workflow.loader import WorkflowLayer, load_workflow_layer
 
 mcp = FastMCP("lantern")
@@ -60,17 +64,27 @@ def _get_workflow_layer() -> WorkflowLayer:
     return _workflow_layer
 
 
+def _require_product_root() -> Path:
+    if _product_root is None:
+        raise RuntimeError("server paths not configured")
+    return _product_root
+
+
 @mcp.tool()
 def inspect(
     kind: str,
     contract_ref: str = "",
+    workbench_id: str = "",
+    ci_path: str = "",
 ) -> dict[str, Any]:
     result = handle_inspect(
         kind=kind,
         workflow_layer=_get_workflow_layer(),
+        workbench_id=workbench_id or None,
         contract_ref=contract_ref or None,
         product_root=_product_root,
         governance_root=_governance_root,
+        ci_path=ci_path or None,
     )
     return _to_dict(result)
 
@@ -97,39 +111,59 @@ def orient(
 def draft(
     workbench_id: str,
     artifact_family: str,
-    content: str = "",
+    payload: str = "{}",
+    contract_ref: str = "",
+    actor: str = "operator",
 ) -> dict[str, Any]:
-    del content
-    return {
-        "status": "not_implemented",
-        "detail": "draft mutation behavior is delivered in CH-0004",
-        "workbench_id": workbench_id,
-        "artifact_family": artifact_family,
-    }
+    result = handle_draft(
+        workflow_layer=_get_workflow_layer(),
+        workbench_id=workbench_id,
+        artifact_family=artifact_family,
+        payload=_parse_payload(payload),
+        product_root=_require_product_root(),
+        governance_root=_governance_root,
+        contract_ref=contract_ref or None,
+        actor=actor,
+    )
+    return _to_dict(result)
 
 
 @mcp.tool()
 def commit(
     workbench_id: str,
-    artifact_family: str,
     draft_id: str = "",
+    payload: str = "{}",
+    actor: str = "operator",
 ) -> dict[str, Any]:
-    del draft_id
-    return {
-        "status": "not_implemented",
-        "detail": "commit mutation behavior is delivered in CH-0004",
-        "workbench_id": workbench_id,
-        "artifact_family": artifact_family,
-    }
+    result = handle_commit(
+        workflow_layer=_get_workflow_layer(),
+        workbench_id=workbench_id,
+        draft_id=draft_id or None,
+        payload=_parse_payload(payload),
+        product_root=_require_product_root(),
+        governance_root=_governance_root,
+        actor=actor,
+    )
+    return _to_dict(result)
 
 
 @mcp.tool()
-def validate(workbench_id: str) -> dict[str, Any]:
-    return {
-        "status": "not_implemented",
-        "detail": "validate behavior is delivered in CH-0004",
-        "workbench_id": workbench_id,
-    }
+def validate(
+    scope: str,
+    draft_id: str = "",
+    artifact_path: str = "",
+    transaction_id: str = "",
+) -> dict[str, Any]:
+    result = handle_validate(
+        workflow_layer=_get_workflow_layer(),
+        scope=scope,
+        draft_id=draft_id or None,
+        artifact_path=artifact_path or None,
+        transaction_id=transaction_id or None,
+        product_root=_require_product_root(),
+        governance_root=_governance_root,
+    )
+    return _to_dict(result)
 
 
 def _parse_governance_state(
@@ -150,6 +184,17 @@ def _parse_governance_state(
         "active_gates": active_gates,
         "passed_gates": passed_gates,
     }
+
+
+def _parse_payload(raw: str) -> Mapping[str, Any] | None:
+    if not raw.strip():
+        return {}
+    payload = json.loads(raw)
+    if payload is None:
+        return None
+    if not isinstance(payload, dict):
+        raise ValueError("payload must decode to a JSON object")
+    return payload
 
 
 def _to_dict(obj: Any) -> dict[str, Any]:

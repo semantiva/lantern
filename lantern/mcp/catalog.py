@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Mapping
 
 from lantern.workflow.loader import WorkflowLayer, WorkflowWorkbench
 
@@ -26,11 +26,15 @@ class CatalogResponse:
 @dataclass(frozen=True)
 class ContractResponse:
     contract_ref: str
+    request_schema_ref: str
     transaction_kind: str
     workbench_refs: tuple[str, ...]
     family_binding: tuple[str, ...]
     gate_binding: tuple[str, ...]
+    guide_refs: tuple[str, ...]
     response_surface_bindings: tuple[dict[str, Any], ...]
+    compatibility: Mapping[str, Any]
+    provenance: Mapping[str, Any]
 
 
 def build_catalog_response(workflow_layer: WorkflowLayer) -> CatalogResponse:
@@ -50,10 +54,12 @@ def build_contract_response(
         if entry.contract_ref == contract_ref:
             return ContractResponse(
                 contract_ref=entry.contract_ref,
+                request_schema_ref=entry.request_schema_ref,
                 transaction_kind=entry.transaction_kind,
                 workbench_refs=entry.workbench_refs,
                 family_binding=entry.family_binding,
                 gate_binding=entry.gate_binding,
+                guide_refs=entry.guide_refs,
                 response_surface_bindings=tuple(
                     {
                         "transaction_kind": b.transaction_kind,
@@ -62,6 +68,8 @@ def build_contract_response(
                     }
                     for b in entry.response_surface_bindings
                 ),
+                compatibility=entry.compatibility,
+                provenance=entry.provenance,
             )
     raise KeyError(f"contract ref not found in catalog: {contract_ref!r}")
 

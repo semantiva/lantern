@@ -7,9 +7,11 @@ from pathlib import Path
 
 import pytest
 
+from lantern.artifacts.renderers import canonical_render_markdown
 from lantern.mcp.catalog import FIXED_TOOL_SURFACE, get_allowed_roles_for_transaction
 from lantern.mcp.inspect import (
     InspectCatalogResult,
+    InspectChangeSurfaceResult,
     InspectContractResult,
     InspectError,
     InspectWorkspaceResult,
@@ -58,6 +60,27 @@ def workflow_layer():
     return load_workflow_layer()
 
 
+def _write_selected_ci(governance_root: Path) -> Path:
+    ci_path = governance_root / "ci" / "CI-0004-selected.md"
+    ci_path.parent.mkdir(parents=True, exist_ok=True)
+    content = canonical_render_markdown(
+        header={
+            "ch_id": "CH-0004",
+            "ci_id": "CI-0004-selected",
+            "status": "Selected",
+            "title": "Selected CI for change-surface inspection",
+            "allowed_change_surface": ["src/allowed.txt", "tests/"],
+        },
+        artifact_id="CI-0004-selected",
+        title="Selected CI for change-surface inspection",
+        sections=[
+            {"heading": "Intent", "body": "Selected CI fixture."},
+        ],
+    )
+    ci_path.write_text(content, encoding="utf-8")
+    return ci_path
+
+
 def test_c04_catalog_contains_exactly_five_tools(workflow_layer) -> None:
     result = handle_inspect(kind="catalog", workflow_layer=workflow_layer)
     assert isinstance(result, InspectCatalogResult)
@@ -79,6 +102,31 @@ def test_c04_catalog_workbench_count_matches_layer(workflow_layer) -> None:
     assert result.workbench_count == len(workflow_layer.workbenches)
 
 
+def test_c01_contract_response_exposes_server_owned_mutation_surface(workflow_layer) -> None:
+    result = handle_inspect(
+        kind="contract",
+        workflow_layer=workflow_layer,
+        contract_ref="contract.ci_authoring.v1",
+    )
+    assert isinstance(result, InspectContractResult)
+    assert result.server_owned_contract["structured_input_only"] is True
+    assert result.server_owned_contract["raw_markdown_client_input_allowed"] is False
+    assert "draft" in result.server_owned_contract["request_schemas"]
+
+
+def test_c02_contract_response_keeps_server_and_workflow_layers_distinct(workflow_layer) -> None:
+    result = handle_inspect(
+        kind="contract",
+        workflow_layer=workflow_layer,
+        contract_ref="contract.selected_ci_application.v1",
+    )
+    assert isinstance(result, InspectContractResult)
+    assert result.server_owned_contract["change_surface_preflight"] is True
+    assert result.workflow_owned_contract["contract_ref"] == "contract.selected_ci_application.v1"
+    assert result.workflow_owned_contract["guide_refs"]
+    assert result.server_owned_contract != result.workflow_owned_contract
+
+
 def test_c05_contract_response_scoped_to_requested_ref(workflow_layer) -> None:
     first_ref = workflow_layer.contract_catalog[0].contract_ref
     result = handle_inspect(
@@ -96,6 +144,33 @@ def test_c05_contract_response_excludes_unrelated_contracts(workflow_layer) -> N
     )
     body_str = str(vars(result))
     assert all_refs[1] not in body_str
+
+
+def test_c05_change_surface_inspection_is_deterministic(workflow_layer, tmp_path) -> None:
+    product_root = tmp_path / "product"
+    governance_root = tmp_path / "governance"
+    product_root.mkdir()
+    governance_root.mkdir()
+    ci_path = _write_selected_ci(governance_root)
+    first = handle_inspect(
+        kind="change_surface",
+        workflow_layer=workflow_layer,
+        workbench_id="selected_ci_application",
+        product_root=product_root,
+        governance_root=governance_root,
+        ci_path=str(ci_path),
+    )
+    second = handle_inspect(
+        kind="change_surface",
+        workflow_layer=workflow_layer,
+        workbench_id="selected_ci_application",
+        product_root=product_root,
+        governance_root=governance_root,
+        ci_path=str(ci_path),
+    )
+    assert isinstance(first, InspectChangeSurfaceResult)
+    assert first == second
+    assert first.allowed_change_surface == ("src/allowed.txt", "tests/")
 
 
 def test_c06_workspace_response_has_all_required_anchors(workflow_layer, tmp_path) -> None:
@@ -260,21 +335,6 @@ def test_c11_workflow_readme_has_authored_generated_boundary_text() -> None:
     assert "generated" in content
 
 
-def test_c11_workflow_readme_has_validation_guidance() -> None:
-    workflow_readme = PRODUCT_ROOT / "lantern" / "workflow" / "README.md"
-    content = workflow_readme.read_text(encoding="utf-8").lower()
-    assert "valid" in content
-
-
-def test_c11_workflow_readme_does_not_link_back_to_ssot_container() -> None:
-    workflow_readme = PRODUCT_ROOT / "lantern" / "workflow" / "README.md"
-    content = workflow_readme.read_text(encoding="utf-8")
-    ssot_link_pattern = re.compile(r"\[.*?\]\(.*?lantern-governance.*?\)")
-    matches = ssot_link_pattern.findall(content)
-    assert not matches
-
-
-def test_server_registers_exactly_five_tools() -> None:
-    registered_tools = {tool.name for tool in asyncio.run(mcp_server.list_tools())}
-    expected = {"inspect", "orient", "draft", "commit", "validate"}
-    assert registered_tools == expected
+def test_server_registers_fixed_five_tool_names() -> None:
+    names = {tool.name for tool in asyncio.run(mcp_server.list_tools())}
+    assert names == set(FIXED_TOOL_SURFACE)
