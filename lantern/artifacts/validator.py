@@ -6,7 +6,17 @@ from pathlib import Path
 from typing import Any
 
 from lantern.artifacts.renderers import parse_header_block
-from lantern.workflow.loader import WorkflowWorkbench
+from lantern.workflow.loader import (
+    DEFAULT_CONTRACT_CATALOG_PATH,
+    DEFAULT_REGISTRY_PATH,
+    DEFAULT_RELOCATION_MANIFEST_PATH,
+    DEFAULT_RESOURCE_MANIFEST_PATH,
+    DEFAULT_SCHEMA_PATH,
+    DEFAULT_TRANSACTION_PROFILES_PATH,
+    DEFAULT_WORKBENCH_BINDINGS_PATH,
+    DEFAULT_WORKFLOW_MAP_PATH,
+    WorkflowWorkbench,
+)
 
 
 ValidationFinding = dict[str, str]
@@ -215,19 +225,19 @@ def validate_workspace_readiness(*, product_root: Path, governance_root: Path | 
         return [_finding("workspace.product_root", f"product root not found: {product_root}", anchor="workspace")]
 
     loader_kwargs = {
-        "registry_path": product_root / "lantern" / "workflow" / "definitions" / "workbench_registry.yaml",
-        "schema_path": product_root / "lantern" / "workflow" / "definitions" / "workbench_schema.yaml",
-        "transaction_profiles_path": product_root / "lantern" / "workflow" / "definitions" / "transaction_profiles.yaml",
-        "contract_catalog_path": product_root / "lantern" / "workflow" / "definitions" / "contract_catalog.json",
-        "resource_manifest_path": product_root / "lantern" / "workflow" / "definitions" / "resource_manifest.json",
-        "workflow_map_path": product_root / "lantern" / "workflow" / "definitions" / "workflow_map.md",
-        "workbench_resource_bindings_path": product_root / "lantern" / "workflow" / "definitions" / "workbench_resource_bindings.md",
-        "relocation_manifest_path": product_root / "lantern" / "preservation" / "relocation_manifest.yaml",
+        "registry_path": DEFAULT_REGISTRY_PATH,
+        "schema_path": DEFAULT_SCHEMA_PATH,
+        "transaction_profiles_path": DEFAULT_TRANSACTION_PROFILES_PATH,
+        "contract_catalog_path": DEFAULT_CONTRACT_CATALOG_PATH,
+        "resource_manifest_path": DEFAULT_RESOURCE_MANIFEST_PATH,
+        "workflow_map_path": DEFAULT_WORKFLOW_MAP_PATH,
+        "workbench_resource_bindings_path": DEFAULT_WORKBENCH_BINDINGS_PATH,
+        "relocation_manifest_path": DEFAULT_RELOCATION_MANIFEST_PATH,
     }
     try:
         load_workflow_layer(**loader_kwargs)
     except WorkflowLayerError as exc:
-        findings.extend(_map_workflow_layer_error(exc, product_root=product_root))
+        findings.extend(_map_workflow_layer_error(exc))
 
     if governance_root is not None:
         governance_root = Path(governance_root).resolve()
@@ -383,23 +393,30 @@ def _extract_h1(text: str) -> str:
 
 
 
-def _map_workflow_layer_error(exc: Exception, *, product_root: Path) -> list[ValidationFinding]:
+def _map_workflow_layer_error(exc: Exception) -> list[ValidationFinding]:
     message = str(exc)
     if message.startswith("lantern_grammar"):
         return [_finding("workspace.grammar", message, anchor="workspace.readiness")]
     if message.startswith("Missing generated artifact ") or message.startswith("Committed "):
         _, _, raw_path = message.partition(": ")
         target = raw_path.strip() if raw_path else "lantern/workflow/definitions"
-        return [_finding(_relative_path(target, product_root), message, anchor="workspace.generated_artifacts")]
+        return [_finding(_runtime_relative_path(target), message, anchor="workspace.generated_artifacts")]
     if message.startswith("Missing workflow registry") or message.startswith("Missing workflow schema"):
         _, _, raw_path = message.partition(": ")
-        return [_finding(_relative_path(raw_path.strip(), product_root), message, anchor="workspace.readiness")]
+        return [_finding(_runtime_relative_path(raw_path.strip()), message, anchor="workspace.readiness")]
     return [_finding("workspace.readiness", message, anchor="workspace.readiness")]
 
 
 
-def _relative_path(raw_path: str, product_root: Path) -> str:
+def _runtime_relative_path(raw_path: str) -> str:
+    runtime_package_root = Path(__file__).resolve().parents[1]
+    runtime_repo_root = runtime_package_root.parent
+    candidate = Path(raw_path)
     try:
-        return str(Path(raw_path).resolve().relative_to(product_root))
+        resolved = candidate.resolve()
+    except Exception:
+        return raw_path
+    try:
+        return str(resolved.relative_to(runtime_repo_root))
     except Exception:
         return raw_path

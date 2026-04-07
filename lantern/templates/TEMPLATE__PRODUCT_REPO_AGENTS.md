@@ -28,6 +28,7 @@ You may add repo-specific notes below the managed block.
 
 - If `bootstrap_required` is true, use the Lantern bootstrap/intake posture before any other governed write.
 - If this `AGENTS.md` file is missing, create it from the Lantern-managed template before continuing.
+- Bootstrap may add only minimal product-local identity, launcher, and ignore-surface files. Do **not** vendor or copy the Lantern runtime, workflow definitions, templates, or resources into this repository.
 - After bootstrap, continue governed intake from the same user request rather than making the user restart the conversation.
 
 ## Differential change posture

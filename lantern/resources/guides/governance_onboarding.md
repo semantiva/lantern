@@ -15,6 +15,11 @@ provenance_refs:
 Stabilizes onboarding and bootstrap guidance for governance workspaces before normal governed execution begins.
 
 ## Stable workflow-facing rules
+## External bootstrap boundary
+- The governed workspace is the product root plus the governance root; Lantern runtime assets remain owned by the executing Lantern install or source checkout.
+- A governed product repository must not vendor or mirror the Lantern runtime tree as a bootstrap prerequisite.
+- Minimal product-local bootstrap files are limited to identity/contract files, bounded launcher scripts, and ignored local MCP wiring.
+
 - Workbench id: `governance_onboarding`.
 - Instruction resource: `lantern/resources/instructions/governance_onboarding.md`.
 - This guide is the stable Lantern-authored workflow-facing surface for runtime delivery and maintainer inspection.

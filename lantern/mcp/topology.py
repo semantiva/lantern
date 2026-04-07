@@ -8,6 +8,7 @@ from typing import Optional
 import yaml
 
 from lantern.artifacts.validator import validate_workspace_readiness
+from lantern.workflow.loader import DEFAULT_REGISTRY_PATH
 
 
 @dataclass(frozen=True)
@@ -34,6 +35,8 @@ def resolve_topology(
     root = Path(product_root).resolve()
     issues: list[str] = []
     resolved_governance = None
+    if not root.is_dir():
+        issues.append(f"product root not found: {root}")
     if governance_root is None:
         issues.append("governance root not configured")
     else:
@@ -41,12 +44,8 @@ def resolve_topology(
         if not resolved_governance.is_dir():
             issues.append(f"governance root not found: {resolved_governance}")
 
-    registry_path = root / "lantern" / "workflow" / "definitions" / "workbench_registry.yaml"
-    if not registry_path.exists():
-        issues.append(f"workflow registry missing: {registry_path.relative_to(root)}")
-
     readiness_findings = []
-    if root.is_dir() and registry_path.exists():
+    if root.is_dir():
         readiness_findings = validate_workspace_readiness(
             product_root=root,
             governance_root=resolved_governance if resolved_governance and resolved_governance.is_dir() else None,
@@ -56,7 +55,7 @@ def resolve_topology(
             prefix = f"{artifact_id}: " if artifact_id else ""
             issues.append(prefix + finding["message"])
 
-    runtime_surface = _read_runtime_surface(registry_path)
+    runtime_surface = _read_runtime_surface(DEFAULT_REGISTRY_PATH)
     consistency = "valid" if not issues else ("missing_governance" if resolved_governance is None else "degraded")
 
     return TopologyPosture(

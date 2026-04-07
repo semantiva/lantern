@@ -448,7 +448,7 @@
     "workbench_id": "governance_onboarding"
   },
   {
-    "content_hash": "066f37335e33a6fdecadfc4b5fa10126199cad215194cca65e368a58d5277344",
+    "content_hash": "c6aac15fb1af147cd82a81c9c9eb4587347fa2a167a06c9a18b490bbeb12fd6a",
     "kind": "authoritative_guide",
     "path": "lantern/resources/guides/governance_onboarding.md",
     "projection_trace": {
@@ -474,7 +474,7 @@
     "workbench_id": "governance_onboarding"
   },
   {
-    "content_hash": "ff503e0301623d50ea17efe9ec87a6f91ce7d10645ce3e8118930323901f1eac",
+    "content_hash": "ca6b99d04bf1f9c9dc57bc502787c52e20dede3009480ba0057d8eb9227de95b",
     "kind": "instruction",
     "path": "lantern/resources/instructions/governance_onboarding.md",
     "projection_trace": {

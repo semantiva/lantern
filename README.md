@@ -22,7 +22,9 @@ The companion governance workspace (`lantern-governance/`) lives in a separate s
 
 ## Getting started
 
-Lantern's native MVP currently expects a manual `lantern_grammar` install before startup. In a multi-repository workspace the supported bootstrap path is:
+Lantern's native MVP currently expects a manual `lantern_grammar` install before startup. In a multi-repository workspace the supported runtime bootstrap paths are:
+
+### Installed-package mode
 
 ```bash
 cd /path/to/lantern
@@ -30,6 +32,16 @@ pip install -e ../lantern-grammar
 pip install -e ".[dev]"
 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -q
 ```
+
+### Source-checkout mode for an external product workspace
+
+```bash
+cd /path/to/lantern
+pip install -e ../lantern-grammar
+PYTHONPATH=/path/to/lantern python -m lantern.mcp.server   --product-root /path/to/product-repo   --governance-root /path/to/product-governance
+```
+
+In both modes, Lantern resolves its workflow release surface from the executing `lantern` runtime environment. Governed product repositories must **not** vendor or copy a `lantern/` runtime tree as a startup prerequisite.
 
 If `lantern_grammar` is not installed, Lantern fails descriptively at startup and tells the operator to complete the prerequisite step before loading the workflow layer.
 
@@ -49,6 +61,8 @@ The Lantern MCP server exposes exactly five tools: `inspect`, `orient`, `draft`,
 
 The server does not assume a default product path or governance path. Start it with an explicit product root. Pass a governance root when you want companion-governance posture and resource discovery; omitting it keeps the product runnable and surfaces a `missing_governance` workspace posture instead of creating a hard dependency.
 
+When Lantern governs an external product, `--product-root` must point at the governed product repository, not at the Lantern checkout. The executing Lantern package or source checkout provides the workflow release surface; the product repository should carry only product-local identity, local operator contract, bounded launcher scripts, and ignored local MCP wiring.
+
 ### Basic startup
 
 ```bash
@@ -56,6 +70,17 @@ python -m lantern.mcp.server \
   --product-root /path/to/lantern/ \
   --governance-root /path/to/lantern-governance/
 ```
+
+### Minimal tracked bootstrap surface for an external product repo
+
+A fresh governed product repository may contain only the following Lantern-related tracked files:
+
+- `README.md` for product identity and local operating notes
+- managed `AGENTS.md`
+- a bounded `tools/run-lantern-mcp.sh` launcher that points to an installed Lantern package or external Lantern checkout
+- minimal `.gitignore` entries for Python/test/cache artifacts when needed
+
+Repo-local editor or MCP wiring such as `.vscode/mcp.json` should stay ignored and must not be used to vendor Lantern into the product repository.
 
 ### Product-only startup
 

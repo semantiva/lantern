@@ -193,6 +193,28 @@ def test_c06_workspace_without_governance_reports_missing_governance(
     assert result.governance_root is None
     assert result.consistency_state == "missing_governance"
 
+def test_td0011_c01_external_workspace_topology_is_valid_without_product_local_lantern_tree(
+    workflow_layer,
+    tmp_path,
+) -> None:
+    product_root = tmp_path / "product"
+    governance_root = tmp_path / "governance"
+    product_root.mkdir()
+    governance_root.mkdir()
+
+    result = handle_inspect(
+        kind="workspace",
+        workflow_layer=workflow_layer,
+        product_root=product_root,
+        governance_root=governance_root,
+    )
+
+    assert result.consistency_state == "valid"
+    assert result.runtime_surface_classification == "full_governed_surface"
+    assert not result.startup_issues
+    assert not (product_root / "lantern").exists()
+
+
 
 def test_c06_workspace_requires_explicit_product_root(workflow_layer) -> None:
     with pytest.raises(InspectError):
@@ -360,3 +382,16 @@ def test_td0009_c07_readme_documents_manual_install_and_native_smoke_path() -> N
     assert "python -m lantern.mcp.server" in content
     assert 'validate(scope="workspace")' in content
     assert "without `lantern-ops-bridge`" in content
+
+
+def test_td0011_c03_bootstrap_docs_forbid_runtime_vendoring_and_define_minimal_product_surface() -> None:
+    readme = (PRODUCT_ROOT / "README.md").read_text(encoding="utf-8")
+    template = (PRODUCT_ROOT / "lantern" / "templates" / "TEMPLATE__PRODUCT_REPO_AGENTS.md").read_text(encoding="utf-8")
+    onboarding = (PRODUCT_ROOT / "lantern" / "resources" / "instructions" / "governance_onboarding.md").read_text(encoding="utf-8")
+
+    assert "must **not** vendor or copy a `lantern/` runtime tree" in readme
+    assert "Minimal tracked bootstrap surface" in readme
+    assert "tools/run-lantern-mcp.sh" in readme
+    assert ".vscode/mcp.json" in readme
+    assert "Do **not** vendor or copy the Lantern runtime" in template
+    assert "Do not instruct operators to vendor or copy the Lantern runtime" in onboarding

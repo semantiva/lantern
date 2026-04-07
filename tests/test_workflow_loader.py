@@ -282,15 +282,25 @@ def test_td0009_c01_missing_lantern_grammar_failure_names_manual_install_step(mo
 
 def test_td0009_c02_stale_generated_artifact_is_reported_with_path(tmp_path: Path) -> None:
     fixture_root = _copy_product_fixture(tmp_path)
-    workflow_map = fixture_root / "lantern" / "workflow" / "definitions" / "workflow_map.md"
+    definitions_root = fixture_root / "lantern" / "workflow" / "definitions"
+    workflow_map = definitions_root / "workflow_map.md"
     workflow_map.write_text(workflow_map.read_text(encoding="utf-8") + "\nSTALE\n", encoding="utf-8")
 
-    findings = validate_workspace_readiness(product_root=fixture_root)
-    assert findings
-    assert any(
-        finding["path"].endswith("lantern/workflow/definitions/workflow_map.md") and "stale" in finding["message"]
-        for finding in findings
-    )
+    with pytest.raises(WorkflowLayerError) as excinfo:
+        load_workflow_layer(
+            registry_path=definitions_root / "workbench_registry.yaml",
+            schema_path=definitions_root / "workbench_schema.yaml",
+            transaction_profiles_path=definitions_root / "transaction_profiles.yaml",
+            contract_catalog_path=definitions_root / "contract_catalog.json",
+            resource_manifest_path=definitions_root / "resource_manifest.json",
+            workflow_map_path=workflow_map,
+            workbench_resource_bindings_path=definitions_root / "workbench_resource_bindings.md",
+            relocation_manifest_path=fixture_root / "lantern" / "preservation" / "relocation_manifest.yaml",
+        )
+
+    message = str(excinfo.value)
+    assert "stale" in message
+    assert str(workflow_map) in message
 
 
 def test_td0009_c03_governance_conformance_reports_artifact_id_and_path(tmp_path: Path) -> None:
@@ -310,3 +320,37 @@ def test_td0009_c03_governance_conformance_reports_artifact_id_and_path(tmp_path
 
 def test_td0009_c04_active_governance_corpus_passes_conformance() -> None:
     assert validate_governance_corpus(GOVERNANCE_ROOT) == []
+
+
+def test_td0011_c02_external_workspace_readiness_uses_runtime_release_surface(tmp_path: Path) -> None:
+    product_root = tmp_path / "product"
+    governance_root = tmp_path / "governance"
+    product_root.mkdir()
+    governance_root.mkdir()
+
+    findings = validate_workspace_readiness(product_root=product_root, governance_root=governance_root)
+
+    assert findings == []
+    assert not (product_root / "lantern").exists()
+
+
+def test_td0011_c04_runtime_install_failures_do_not_point_at_product_local_lantern_tree(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    from lantern.workflow.loader import WorkflowLayerError
+
+    def _raise_missing_grammar():
+        raise WorkflowLayerError(
+            "lantern_grammar public API import failed; install lantern_grammar before loading the workflow layer (for example from a sibling checkout: pip install -e ../lantern-grammar)"
+        )
+
+    monkeypatch.setattr("lantern.workflow.loader._load_grammar", _raise_missing_grammar)
+    product_root = tmp_path / "product"
+    product_root.mkdir()
+
+    findings = validate_workspace_readiness(product_root=product_root)
+
+    assert findings
+    assert findings[0]["path"] == "workspace.grammar"
+    assert "product_root/lantern" not in findings[0]["message"]
+    assert "pip install -e ../lantern-grammar" in findings[0]["message"]
