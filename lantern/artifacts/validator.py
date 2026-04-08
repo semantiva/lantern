@@ -217,6 +217,13 @@ def validate_artifact_file(path: Path) -> list[ValidationFinding]:
 
 
 def validate_workspace_readiness(*, product_root: Path, governance_root: Path | None = None) -> list[ValidationFinding]:
+    """Validate only product-owned runtime readiness.
+
+    Product-repository readiness must not descend into governance-corpus validation.
+    A supplied governance_root is treated strictly as a topology/configuration input:
+    its presence may be checked, but governance-corpus conformance is owned by the
+    governance repository and its own test suite.
+    """
     from lantern.workflow.loader import WorkflowLayerError, load_workflow_layer
 
     findings: list[ValidationFinding] = []
@@ -249,8 +256,6 @@ def validate_workspace_readiness(*, product_root: Path, governance_root: Path | 
                     anchor="workspace",
                 )
             )
-        else:
-            findings.extend(validate_governance_corpus(governance_root))
     return findings
 
 

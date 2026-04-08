@@ -11,7 +11,7 @@ import pytest
 import yaml
 from lantern_grammar import Grammar
 
-from lantern.artifacts.validator import validate_governance_corpus, validate_workspace_readiness
+from lantern.artifacts.validator import validate_workspace_readiness
 from lantern.workflow.loader import (
     DEFAULT_CONTRACT_CATALOG_PATH,
     DEFAULT_REGISTRY_PATH,
@@ -256,9 +256,6 @@ def test_unresolved_authoritative_guide_path_is_fatal(tmp_path: Path) -> None:
     assert "inspect:catalog" in message
 
 
-GOVERNANCE_ROOT = Path(__file__).resolve().parents[2] / "lantern-governance"
-
-
 def _copy_product_fixture(tmp_path: Path) -> Path:
     fixture_root = tmp_path / "product_fixture"
     shutil.copytree(Path(__file__).resolve().parents[1] / "lantern", fixture_root / "lantern", dirs_exist_ok=True)
@@ -303,25 +300,6 @@ def test_td0009_c02_stale_generated_artifact_is_reported_with_path(tmp_path: Pat
     assert str(workflow_map) in message
 
 
-def test_td0009_c03_governance_conformance_reports_artifact_id_and_path(tmp_path: Path) -> None:
-    governance_root = tmp_path / "governance"
-    artifact_path = governance_root / "ch" / "CH-9999.md"
-    artifact_path.parent.mkdir(parents=True, exist_ok=True)
-    artifact_path.write_text(
-        "```yaml\nch_id: CH-9999\n```\n\n## Missing title\n",
-        encoding="utf-8",
-    )
-
-    findings = validate_governance_corpus(governance_root)
-    assert findings
-    assert findings[0]["artifact_id"] == "CH-9999"
-    assert findings[0]["path"].startswith("CH-9999.")
-
-
-def test_td0009_c04_active_governance_corpus_passes_conformance() -> None:
-    assert validate_governance_corpus(GOVERNANCE_ROOT) == []
-
-
 def test_td0011_c02_external_workspace_readiness_uses_runtime_release_surface(tmp_path: Path) -> None:
     product_root = tmp_path / "product"
     governance_root = tmp_path / "governance"
@@ -332,6 +310,23 @@ def test_td0011_c02_external_workspace_readiness_uses_runtime_release_surface(tm
 
     assert findings == []
     assert not (product_root / "lantern").exists()
+
+
+def test_td0011_c03_workspace_readiness_does_not_validate_external_governance_corpus(tmp_path: Path) -> None:
+    product_root = tmp_path / "product"
+    governance_root = tmp_path / "governance"
+    product_root.mkdir()
+    governance_root.mkdir()
+    invalid_issue = governance_root / "is" / "IS-9999.md"
+    invalid_issue.parent.mkdir(parents=True, exist_ok=True)
+    invalid_issue.write_text(
+        "# IS-9999: invalid governance issue fixture\n\nStatus: NEW\n",
+        encoding="utf-8",
+    )
+
+    findings = validate_workspace_readiness(product_root=product_root, governance_root=governance_root)
+
+    assert findings == []
 
 
 def test_td0011_c04_runtime_install_failures_do_not_point_at_product_local_lantern_tree(
