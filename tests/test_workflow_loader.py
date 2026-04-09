@@ -23,6 +23,8 @@ from lantern.workflow.loader import (
     render_generated_artifacts,
 )
 
+DEFAULT_STATUS_CONTRACT_JSON_PATH = Path(__file__).resolve().parents[1] / "lantern" / "workflow" / "definitions" / "artifact_status_contract.json"
+
 
 def _load_registry_payload() -> dict:
     return copy.deepcopy(yaml.safe_load(DEFAULT_REGISTRY_PATH.read_text(encoding="utf-8")))
@@ -125,6 +127,16 @@ def test_generated_artifacts_are_deterministic_and_match_committed_outputs() -> 
     assert json.loads(DEFAULT_RESOURCE_MANIFEST_PATH.read_text(encoding="utf-8")) == first.resource_manifest_payload
     assert DEFAULT_WORKFLOW_MAP_PATH.read_text(encoding="utf-8") == first.workflow_map_text
     assert DEFAULT_WORKBENCH_BINDINGS_PATH.read_text(encoding="utf-8") == first.workbench_resource_bindings_text
+
+
+def test_status_contract_projection_exists_and_is_machine_readable() -> None:
+    payload = json.loads(DEFAULT_STATUS_CONTRACT_JSON_PATH.read_text(encoding="utf-8"))
+
+    assert payload["projection_kind"] == "artifact_status_contract"
+    assert payload["generated_from"]["authoritative_path"] == "lantern-governance/workflow/artifact_status_contract.yaml"
+    assert payload["families"]["CH"]["canonical_statuses"] == ["Proposed", "Ready", "Addressed"]
+    assert payload["families"]["IS"]["canonical_statuses"] == ["NEW", "NEEDS_INFO", "ACCEPTED", "DEFERRED", "REJECTED", "RESOLVED"]
+    assert payload["families"]["EV"]["normal_path_policy"] == "statusless"
 
 
 def test_grammar_metadata_flows_into_contract_catalog_compatibility() -> None:
@@ -310,6 +322,21 @@ def test_td0011_c02_external_workspace_readiness_uses_runtime_release_surface(tm
 
     assert findings == []
     assert not (product_root / "lantern").exists()
+
+
+def test_workspace_readiness_reports_missing_status_contract_projection() -> None:
+    from lantern.artifacts import validator as validator_module
+
+    missing_projection = DEFAULT_STATUS_CONTRACT_JSON_PATH.with_name("artifact_status_contract.missing.json")
+    validator_module.load_status_contract.cache_clear()
+    findings = validate_workspace_readiness(
+        product_root=Path(__file__).resolve().parents[1],
+        status_contract_path=missing_projection,
+    )
+
+    assert findings
+    assert findings[0]["anchor"] == "workspace.status_contract"
+    assert findings[0]["path"].endswith("artifact_status_contract.missing.json")
 
 
 def test_td0011_c03_workspace_readiness_does_not_validate_external_governance_corpus(tmp_path: Path) -> None:

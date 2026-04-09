@@ -40,7 +40,7 @@ _GT110_ACTIVE = {
 }
 
 _GT115_SPAN = {
-    "ch_statuses": {"CH-0003": "InProgress"},
+    "ch_statuses": {"CH-0003": "Ready"},
     "active_gates": [],
     "passed_gates": ["GT-110"],
 }
@@ -165,6 +165,21 @@ def test_c10_single_non_terminal_ch_does_not_raise(workflow_layer) -> None:
     assert isinstance(result, ResolvedWorkbenchSet)
 
 
+def test_c10_inprogress_alias_does_not_create_second_non_terminal_ch(workflow_layer) -> None:
+    mixed_state = {
+        "ch_statuses": {"CH-0003": "Ready", "CH-0004": "InProgress"},
+        "active_gates": ["GT-110"],
+        "passed_gates": [],
+    }
+
+    result = resolve_active_workbenches(
+        workflow_layer=workflow_layer,
+        governance_state=mixed_state,
+    )
+
+    assert isinstance(result, ResolvedWorkbenchSet)
+
+
 def test_c12_repeated_resolution_produces_identical_output(workflow_layer) -> None:
     first = resolve_active_workbenches(
         workflow_layer=workflow_layer,
@@ -207,3 +222,12 @@ def test_c12_resolver_source_has_no_authoritative_stage_map_dict_literals() -> N
     visitor.visit(tree)
 
     assert not visitor.violations
+
+
+def test_c12_resolver_source_does_not_hardcode_legacy_ch_aliases() -> None:
+    resolver_path = Path(resolver_module.__file__)
+    source = resolver_path.read_text(encoding="utf-8")
+
+    assert '{"Draft", "Ready", "InProgress", "Selected"}' not in source
+    assert "InProgress" not in source
+    assert "Selected" not in source

@@ -10,11 +10,10 @@ lifecycle_placement declaration and the supplied governance_state dict.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import lru_cache
 from typing import Any, Optional
 
-_NON_TERMINAL_CH_STATUSES: frozenset[str] = frozenset(
-    {"Draft", "Ready", "InProgress", "Selected"}
-)
+from lantern.artifacts.validator import load_status_contract
 
 
 class ResolverAmbiguityError(RuntimeError):
@@ -29,6 +28,12 @@ class ResolvedWorkbenchSet:
     blockers: tuple[str, ...]
     preconditions: tuple[str, ...]
     next_valid_actions: tuple[str, ...]
+
+
+@lru_cache(maxsize=1)
+def _non_terminal_ch_statuses() -> frozenset[str]:
+    ch_rule = load_status_contract()["families"]["CH"]
+    return frozenset(item["from"] for item in ch_rule["transitions"])
 
 
 def resolve_active_workbenches(
@@ -81,7 +86,7 @@ def _check_multi_ch_ambiguity(
     ch_id: Optional[str],
 ) -> None:
     non_terminal = [
-        ch for ch, status in ch_statuses.items() if status in _NON_TERMINAL_CH_STATUSES
+        ch for ch, status in ch_statuses.items() if status in _non_terminal_ch_statuses()
     ]
     if len(non_terminal) > 1 and ch_id is None:
         raise ResolverAmbiguityError(

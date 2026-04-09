@@ -1,6 +1,6 @@
 ```yaml
 td_id: "TD-####"
-status: "Draft|Approved|Superseded"
+status: "Draft|Approved"
 title: "<concise title>"
 applies_to_ch: "CH-####"
 origin:
@@ -8,8 +8,8 @@ origin:
   rationale: "<why this TD exists>"
 governed_scope:
   - "<module-or-surface>"
-supersedes: []  # list of superseded TD ids, or empty
-superseded_by: ""  # id of the superseding TD, or empty
+supersedes: []  # historical lineage only, or empty
+superseded_by: ""  # historical lineage only, or empty
 ```
 
 # TD-#### — <short title>

@@ -1,6 +1,6 @@
 ```yaml
 db_id: "DB-####"
-status: "Draft|Approved|Superseded"
+status: "Draft|Approved"
 title: "<concise title>"
 source_dc_id: "DC-<CH_NUM>-<UUID>"
 applies_to_ch: "CH-####"
@@ -8,8 +8,8 @@ test_definition_refs:
   - "TD-####"
 governed_scope:
   - "<module-or-surface>"
-supersedes: []  # list of superseded DB ids, or empty
-superseded_by: ""  # id of the superseding DB, or empty
+supersedes: []  # historical lineage only, or empty
+superseded_by: ""  # historical lineage only, or empty
 ```
 
 # DB-#### — <short title>

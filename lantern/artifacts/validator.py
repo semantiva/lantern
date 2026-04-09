@@ -1,7 +1,10 @@
 """Validation helpers for CH-0004 requests and CH-0009 MVP-hardening checks."""
 from __future__ import annotations
 
+import json
+import re
 from collections.abc import Mapping
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -35,6 +38,8 @@ _HEADER_ID_KEYS = {
     "spec": "spec_id",
     "td": "td_id",
 }
+DEFAULT_STATUS_CONTRACT_PATH = Path(__file__).resolve().parents[1] / "workflow" / "definitions" / "artifact_status_contract.json"
+_ISSUE_STATUS_RE = re.compile(r"^Status:\s*(?P<status>[A-Za-z_][A-Za-z_ ]*)\s*$", re.MULTILINE)
 
 
 def _finding(path: str, message: str, *, anchor: str, artifact_id: str | None = None) -> ValidationFinding:
@@ -216,7 +221,175 @@ def validate_artifact_file(path: Path) -> list[ValidationFinding]:
 
 
 
-def validate_workspace_readiness(*, product_root: Path, governance_root: Path | None = None) -> list[ValidationFinding]:
+@lru_cache(maxsize=8)
+def load_status_contract(path: str | Path | None = None) -> dict[str, Any]:
+    target = Path(path or DEFAULT_STATUS_CONTRACT_PATH)
+    if not target.exists():
+        raise FileNotFoundError(f"Missing generated artifact artifact_status_contract.json: {target}")
+    payload = json.loads(target.read_text(encoding="utf-8"))
+    if payload.get("projection_kind") != "artifact_status_contract":
+        raise ValueError(f"invalid status-contract projection: {target}")
+    families = payload.get("families")
+    if not isinstance(families, dict) or not families:
+        raise ValueError(f"status-contract projection has no family map: {target}")
+    return payload
+
+
+def validate_status_transition(family: str, from_status: str, to_status: str) -> list[ValidationFinding]:
+    contract = load_status_contract()
+    rule = _family_contract(family, contract)
+    from_findings = _validate_family_status(family, from_status, artifact_id=family, contract=contract)
+    to_findings = _validate_family_status(family, to_status, artifact_id=family, contract=contract)
+    if from_findings or to_findings:
+        return [
+            _finding(
+                f"{family}.transition",
+                f"{family} transition {from_status!r} -> {to_status!r} is not allowed by the authoritative status contract",
+                anchor="status_contract.transition",
+                artifact_id=family,
+            )
+        ]
+    allowed = {(item["from"], item["to"]) for item in rule["transitions"]}
+    if (from_status, to_status) in allowed:
+        return []
+    return [
+        _finding(
+            f"{family}.transition",
+            f"{family} transition {from_status!r} -> {to_status!r} is not allowed by the authoritative status contract",
+            anchor="status_contract.transition",
+            artifact_id=family,
+        )
+    ]
+
+
+def audit_legacy_status_values(governance_root: Path) -> list[dict[str, str]]:
+    governance_root = Path(governance_root).resolve()
+    contract = load_status_contract()
+    results: list[dict[str, str]] = []
+    for family_dir in _GOVERNED_FAMILY_DIRS:
+        family = family_dir.upper()
+        base = governance_root / family_dir
+        if not base.is_dir():
+            continue
+        for path in sorted(base.glob("*.md")):
+            artifact_id = path.stem
+            text = path.read_text(encoding="utf-8")
+            if family == "IS":
+                current = _extract_issue_status(text)
+            elif text.startswith("```yaml\n"):
+                try:
+                    current = parse_header_block(text).get("status")
+                except ValueError:
+                    current = None
+            else:
+                current = None
+            if current is None:
+                continue
+            alias = _normalization_target(family, str(current).strip(), contract)
+            if alias is None:
+                continue
+            results.append(
+                {
+                    "artifact_id": artifact_id,
+                    "family": family,
+                    "path": f"{artifact_id}.status",
+                    "current": str(current).strip(),
+                    "normalized": alias,
+                }
+            )
+    return results
+
+
+def _family_contract(family: str, contract: Mapping[str, Any]) -> Mapping[str, Any]:
+    return contract["families"][family]
+
+
+def _normalization_target(family: str, value: str, contract: Mapping[str, Any]) -> str | None:
+    rule = _family_contract(family, contract)
+    aliases = dict(rule["aliases"])
+    if value in aliases:
+        if family == "IS":
+            issue_rewrites = {"Open": "NEW", "Resolved": "RESOLVED", "Closed": "RESOLVED"}
+            if value in issue_rewrites:
+                return issue_rewrites[value]
+        replacement = aliases[value]
+        return replacement if replacement is not None else "<remove status>"
+    if rule["normal_path_policy"] == "statusless" and value:
+        return "<remove status>"
+    return None
+
+
+def _validate_family_status(
+    family: str,
+    status_value: str | None,
+    *,
+    artifact_id: str,
+    contract: Mapping[str, Any],
+) -> list[ValidationFinding]:
+    rule = _family_contract(family, contract)
+    policy = rule["normal_path_policy"]
+    canonical = tuple(rule["canonical_statuses"])
+    aliases = dict(rule["aliases"])
+
+    if policy == "statusless":
+        if status_value is None:
+            return []
+        return [
+            _finding(
+                f"{artifact_id}.status",
+                f"{family} is statusless on the normal path; remove status {status_value!r}",
+                anchor="status_contract.lifecycle_exempt",
+                artifact_id=artifact_id,
+            )
+        ]
+
+    if status_value is None or not str(status_value).strip():
+        if policy == "allow_record_local_status":
+            return []
+        return [
+            _finding(
+                f"{artifact_id}.status",
+                f"{family} requires an admissible status from {list(canonical)}",
+                anchor="status_contract.status",
+                artifact_id=artifact_id,
+            )
+        ]
+
+    value = str(status_value).strip()
+    if value in canonical:
+        return []
+    if value in aliases:
+        replacement = aliases[value]
+        action = f"use {replacement!r}" if replacement is not None else "remove the status field"
+        return [
+            _finding(
+                f"{artifact_id}.status",
+                f"{family} status {value!r} is legacy-only on the normal path; {action}",
+                anchor="status_contract.alias",
+                artifact_id=artifact_id,
+            )
+        ]
+    return [
+        _finding(
+            f"{artifact_id}.status",
+            f"{family} status {value!r} is not admissible; expected one of {list(canonical)}",
+            anchor="status_contract.status",
+            artifact_id=artifact_id,
+        )
+    ]
+
+
+def _extract_issue_status(text: str) -> str | None:
+    match = _ISSUE_STATUS_RE.search(text)
+    return match.group("status").strip() if match else None
+
+
+def validate_workspace_readiness(
+    *,
+    product_root: Path,
+    governance_root: Path | None = None,
+    status_contract_path: Path | None = None,
+) -> list[ValidationFinding]:
     """Validate only product-owned runtime readiness.
 
     Product-repository readiness must not descend into governance-corpus validation.
@@ -230,6 +403,18 @@ def validate_workspace_readiness(*, product_root: Path, governance_root: Path | 
     product_root = Path(product_root).resolve()
     if not product_root.is_dir():
         return [_finding("workspace.product_root", f"product root not found: {product_root}", anchor="workspace")]
+
+    try:
+        load_status_contract(status_contract_path)
+    except (FileNotFoundError, ValueError) as exc:
+        target = Path(status_contract_path or DEFAULT_STATUS_CONTRACT_PATH)
+        findings.append(
+            _finding(
+                _runtime_relative_path(str(target)),
+                str(exc),
+                anchor="workspace.status_contract",
+            )
+        )
 
     loader_kwargs = {
         "registry_path": DEFAULT_REGISTRY_PATH,
@@ -262,22 +447,23 @@ def validate_workspace_readiness(*, product_root: Path, governance_root: Path | 
 
 def validate_governance_corpus(governance_root: Path) -> list[ValidationFinding]:
     governance_root = Path(governance_root).resolve()
+    contract = load_status_contract()
     findings: list[ValidationFinding] = []
     for family_dir in _GOVERNED_FAMILY_DIRS:
         base = governance_root / family_dir
         if not base.is_dir():
             continue
         for path in sorted(base.glob("*.md")):
-            findings.extend(_validate_governed_artifact(path))
+            findings.extend(_validate_governed_artifact(path, contract))
     return findings
 
 
 
-def _validate_governed_artifact(path: Path) -> list[ValidationFinding]:
+def _validate_governed_artifact(path: Path, contract: Mapping[str, Any]) -> list[ValidationFinding]:
     family = path.parent.name
     artifact_id = path.stem
     if family == "is":
-        return _validate_issue_record(path, artifact_id)
+        return _validate_issue_record(path, artifact_id, contract)
 
     text = path.read_text(encoding="utf-8")
     try:
@@ -326,11 +512,19 @@ def _validate_governed_artifact(path: Path) -> list[ValidationFinding]:
                 artifact_id=artifact_id,
             )
         )
+    findings.extend(
+        _validate_family_status(
+            family.upper(),
+            header.get("status"),
+            artifact_id=artifact_id,
+            contract=contract,
+        )
+    )
     return findings
 
 
 
-def _validate_issue_record(path: Path, artifact_id: str) -> list[ValidationFinding]:
+def _validate_issue_record(path: Path, artifact_id: str, contract: Mapping[str, Any]) -> list[ValidationFinding]:
     text = path.read_text(encoding="utf-8")
     findings: list[ValidationFinding] = []
     h1 = _extract_h1(text)
@@ -362,29 +556,14 @@ def _validate_issue_record(path: Path, artifact_id: str) -> list[ValidationFindi
                     artifact_id=artifact_id,
                 )
             )
-    if text.startswith("```yaml\n"):
-        try:
-            header = parse_header_block(text)
-        except ValueError as exc:
-            findings.append(
-                _finding(
-                    f"{artifact_id}.header",
-                    str(exc),
-                    anchor="governance_corpus.issue_record",
-                    artifact_id=artifact_id,
-                )
-            )
-        else:
-            header_id = str(header.get("is_id", "")).strip()
-            if header_id and header_id != artifact_id:
-                findings.append(
-                    _finding(
-                        f"{artifact_id}.is_id",
-                        f"header is_id must match filename stem {artifact_id!r}",
-                        anchor="governance_corpus.issue_record",
-                        artifact_id=artifact_id,
-                    )
-                )
+    findings.extend(
+        _validate_family_status(
+            "IS",
+            _extract_issue_status(text),
+            artifact_id=artifact_id,
+            contract=contract,
+        )
+    )
     return findings
 
 

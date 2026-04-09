@@ -2,9 +2,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from hashlib import sha256
 from pathlib import Path
 from typing import Any, Optional
 
+from lantern.artifacts.validator import DEFAULT_STATUS_CONTRACT_PATH, load_status_contract
 from lantern.artifacts.render_contracts import build_two_layer_contract
 from lantern.mcp.catalog import build_catalog_response, build_contract_response
 from lantern.mcp.topology import TopologyPosture, resolve_topology
@@ -52,6 +54,15 @@ class InspectWorkspaceResult:
 
 
 @dataclass(frozen=True)
+class InspectStatusContractResult:
+    kind: str
+    projection_path: str
+    authoritative_source_path: str
+    projection_sha256: str
+    families: dict[str, Any]
+
+
+@dataclass(frozen=True)
 class InspectChangeSurfaceResult:
     kind: str
     workbench_id: str
@@ -73,13 +84,15 @@ def handle_inspect(
     product_root: Optional[Path] = None,
     governance_root: Optional[Path] = None,
     ci_path: Optional[str] = None,
-) -> InspectCatalogResult | InspectContractResult | InspectWorkspaceResult | InspectChangeSurfaceResult:
+) -> InspectCatalogResult | InspectContractResult | InspectWorkspaceResult | InspectStatusContractResult | InspectChangeSurfaceResult:
     if kind == "catalog":
         return _handle_catalog(workflow_layer)
     if kind == "contract":
         return _handle_contract(workflow_layer, contract_ref)
     if kind == "workspace":
         return _handle_workspace(product_root, governance_root)
+    if kind == "status_contract":
+        return _handle_status_contract()
     if kind == "change_surface":
         return _handle_change_surface(
             workflow_layer=workflow_layer,
@@ -159,6 +172,18 @@ def _handle_workspace(
         consistency_state=posture.consistency_state,
         startup_issues=posture.startup_issues,
         read_only=posture.read_only,
+    )
+
+
+def _handle_status_contract() -> InspectStatusContractResult:
+    payload = load_status_contract()
+    raw = DEFAULT_STATUS_CONTRACT_PATH.read_text(encoding="utf-8")
+    return InspectStatusContractResult(
+        kind="status_contract",
+        projection_path="lantern/workflow/definitions/artifact_status_contract.json",
+        authoritative_source_path=str(payload["generated_from"]["authoritative_path"]),
+        projection_sha256=sha256(raw.encode("utf-8")).hexdigest(),
+        families=dict(payload["families"]),
     )
 
 

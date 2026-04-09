@@ -24,7 +24,7 @@ It defines only how to use Initiative as a practical planning and decomposition 
 Recommended Initiative status labels:
 - `Proposed`
 - `Ready`
-- `InProgress`
+- `In Progress`
 - `Concluded`
 
 If a project chooses to keep Initiative records in SSOT, use stable repo-local references or repo-relative paths. No allocator namespace is required by this guide.

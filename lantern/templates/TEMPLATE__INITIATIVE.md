@@ -1,6 +1,6 @@
 ```yaml
 initiative_id: "INI-####"
-status: "Draft|Proposed|Ready|InProgress|Concluded"
+status: "Draft|Proposed|Ready|In Progress|Concluded"
 title: "<short, specific title>"
 owner: "<name/role or TBD>"
 created: "YYYY-MM-DD"

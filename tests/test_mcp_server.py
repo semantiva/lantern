@@ -14,6 +14,7 @@ from lantern.mcp.inspect import (
     InspectChangeSurfaceResult,
     InspectContractResult,
     InspectError,
+    InspectStatusContractResult,
     InspectWorkspaceResult,
     handle_inspect,
 )
@@ -112,6 +113,17 @@ def test_c01_contract_response_exposes_server_owned_mutation_surface(workflow_la
     assert result.server_owned_contract["structured_input_only"] is True
     assert result.server_owned_contract["raw_markdown_client_input_allowed"] is False
     assert "draft" in result.server_owned_contract["request_schemas"]
+
+
+def test_c01_status_contract_inspect_is_machine_readable(workflow_layer) -> None:
+    result = handle_inspect(kind="status_contract", workflow_layer=workflow_layer)
+
+    assert isinstance(result, InspectStatusContractResult)
+    assert result.authoritative_source_path == "lantern-governance/workflow/artifact_status_contract.yaml"
+    assert len(result.projection_sha256) == 64
+    assert result.families["CH"]["canonical_statuses"] == ["Proposed", "Ready", "Addressed"]
+    assert result.families["IS"]["canonical_statuses"] == ["NEW", "NEEDS_INFO", "ACCEPTED", "DEFERRED", "REJECTED", "RESOLVED"]
+    assert result.families["EV"]["normal_path_policy"] == "statusless"
 
 
 def test_c02_contract_response_keeps_server_and_workflow_layers_distinct(workflow_layer) -> None:

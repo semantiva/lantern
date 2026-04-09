@@ -1,0 +1,211 @@
+{
+  "projection_kind": "artifact_status_contract",
+  "generated_from": {
+    "authoritative_path": "lantern-governance/workflow/artifact_status_contract.yaml",
+    "schema_path": "lantern-governance/workflow/artifact_status_contract.schema.json",
+    "version": "1.0.0",
+    "date": "2026-04-08"
+  },
+  "families": {
+    "INI": {
+      "ownership": "grammar_semantic",
+      "canonical_statuses": ["Draft", "Proposed", "Ready", "In Progress", "Concluded"],
+      "transitions": [
+        {"from": "Draft", "to": "Proposed"},
+        {"from": "Proposed", "to": "Ready"},
+        {"from": "Ready", "to": "In Progress"},
+        {"from": "In Progress", "to": "Concluded"}
+      ],
+      "grammar_mapping": {
+        "Draft": "lg:statuses/draft_initiative",
+        "Proposed": "lg:statuses/proposed_initiative",
+        "Ready": "lg:statuses/ready_initiative",
+        "In Progress": "lg:statuses/in_progress_initiative",
+        "Concluded": "lg:statuses/concluded_initiative"
+      },
+      "aliases": {
+        "InProgress": "In Progress"
+      },
+      "normal_path_policy": "reject_alias"
+    },
+    "DIP": {
+      "ownership": "grammar_semantic",
+      "canonical_statuses": ["Draft", "Approved", "Superseded"],
+      "transitions": [
+        {"from": "Draft", "to": "Approved"},
+        {"from": "Approved", "to": "Superseded"}
+      ],
+      "grammar_mapping": {
+        "Draft": "lg:statuses/draft",
+        "Approved": "lg:statuses/approved",
+        "Superseded": "lg:statuses/superseded"
+      },
+      "aliases": {},
+      "normal_path_policy": "reject_unknown"
+    },
+    "SPEC": {
+      "ownership": "grammar_semantic",
+      "canonical_statuses": ["Draft", "Approved", "Superseded"],
+      "transitions": [
+        {"from": "Draft", "to": "Approved"},
+        {"from": "Approved", "to": "Superseded"}
+      ],
+      "grammar_mapping": {
+        "Draft": "lg:statuses/draft",
+        "Approved": "lg:statuses/approved",
+        "Superseded": "lg:statuses/superseded"
+      },
+      "aliases": {},
+      "normal_path_policy": "reject_unknown"
+    },
+    "ARCH": {
+      "ownership": "grammar_semantic",
+      "canonical_statuses": ["Draft", "Approved", "Superseded"],
+      "transitions": [
+        {"from": "Draft", "to": "Approved"},
+        {"from": "Approved", "to": "Superseded"}
+      ],
+      "grammar_mapping": {
+        "Draft": "lg:statuses/draft",
+        "Approved": "lg:statuses/approved",
+        "Superseded": "lg:statuses/superseded"
+      },
+      "aliases": {},
+      "normal_path_policy": "reject_unknown"
+    },
+    "TD": {
+      "ownership": "grammar_semantic",
+      "canonical_statuses": ["Draft", "Approved"],
+      "transitions": [
+        {"from": "Draft", "to": "Approved"}
+      ],
+      "grammar_mapping": {
+        "Draft": "lg:statuses/draft",
+        "Approved": "lg:statuses/approved"
+      },
+      "aliases": {
+        "Superseded": null
+      },
+      "normal_path_policy": "reject_alias"
+    },
+    "CH": {
+      "ownership": "grammar_semantic",
+      "canonical_statuses": ["Proposed", "Ready", "Addressed"],
+      "transitions": [
+        {"from": "Proposed", "to": "Ready"},
+        {"from": "Ready", "to": "Addressed"}
+      ],
+      "grammar_mapping": {
+        "Proposed": "lg:statuses/proposed",
+        "Ready": "lg:statuses/ready",
+        "Addressed": "lg:statuses/addressed"
+      },
+      "aliases": {
+        "Draft": null,
+        "InProgress": null,
+        "Selected": null
+      },
+      "normal_path_policy": "reject_alias"
+    },
+    "DC": {
+      "ownership": "grammar_semantic",
+      "canonical_statuses": ["Draft", "Candidate", "Selected", "Rejected"],
+      "transitions": [
+        {"from": "Draft", "to": "Candidate"},
+        {"from": "Candidate", "to": "Selected"},
+        {"from": "Candidate", "to": "Rejected"}
+      ],
+      "grammar_mapping": {
+        "Draft": "lg:statuses/draft",
+        "Candidate": "lg:statuses/candidate",
+        "Selected": "lg:statuses/selected",
+        "Rejected": "lg:statuses/rejected"
+      },
+      "aliases": {},
+      "normal_path_policy": "reject_unknown"
+    },
+    "DB": {
+      "ownership": "grammar_semantic",
+      "canonical_statuses": ["Draft", "Approved"],
+      "transitions": [
+        {"from": "Draft", "to": "Approved"}
+      ],
+      "grammar_mapping": {
+        "Draft": "lg:statuses/draft",
+        "Approved": "lg:statuses/approved"
+      },
+      "aliases": {
+        "Superseded": null
+      },
+      "normal_path_policy": "reject_alias"
+    },
+    "CI": {
+      "ownership": "grammar_semantic",
+      "canonical_statuses": ["Draft", "Candidate", "Selected", "Rejected", "Verified"],
+      "transitions": [
+        {"from": "Draft", "to": "Candidate"},
+        {"from": "Candidate", "to": "Selected"},
+        {"from": "Candidate", "to": "Rejected"},
+        {"from": "Selected", "to": "Verified"}
+      ],
+      "grammar_mapping": {
+        "Draft": "lg:statuses/draft",
+        "Candidate": "lg:statuses/candidate",
+        "Selected": "lg:statuses/selected",
+        "Rejected": "lg:statuses/rejected",
+        "Verified": "lg:statuses/verified"
+      },
+      "aliases": {},
+      "normal_path_policy": "reject_unknown"
+    },
+    "IS": {
+      "ownership": "workflow_operational",
+      "canonical_statuses": ["NEW", "NEEDS_INFO", "ACCEPTED", "DEFERRED", "REJECTED", "RESOLVED"],
+      "transitions": [
+        {"from": "NEW", "to": "NEEDS_INFO"},
+        {"from": "NEW", "to": "ACCEPTED"},
+        {"from": "NEW", "to": "DEFERRED"},
+        {"from": "NEW", "to": "REJECTED"},
+        {"from": "NEEDS_INFO", "to": "ACCEPTED"},
+        {"from": "NEEDS_INFO", "to": "DEFERRED"},
+        {"from": "NEEDS_INFO", "to": "REJECTED"},
+        {"from": "ACCEPTED", "to": "RESOLVED"},
+        {"from": "DEFERRED", "to": "ACCEPTED"},
+        {"from": "DEFERRED", "to": "REJECTED"}
+      ],
+      "grammar_mapping": {},
+      "aliases": {
+        "Open": null,
+        "Closed": null,
+        "Resolved": "RESOLVED"
+      },
+      "normal_path_policy": "reject_alias"
+    },
+    "DEC": {
+      "ownership": "lifecycle_exempt",
+      "canonical_statuses": ["Active", "Superseded"],
+      "transitions": [],
+      "grammar_mapping": {},
+      "aliases": {},
+      "normal_path_policy": "allow_record_local_status"
+    },
+    "EV": {
+      "ownership": "lifecycle_exempt",
+      "canonical_statuses": [],
+      "transitions": [],
+      "grammar_mapping": {},
+      "aliases": {
+        "Recorded": null
+      },
+      "normal_path_policy": "statusless"
+    },
+    "Q": {
+      "ownership": "lifecycle_exempt",
+      "canonical_statuses": [],
+      "transitions": [],
+      "grammar_mapping": {},
+      "aliases": {},
+      "normal_path_policy": "statusless"
+    }
+  }
+}
