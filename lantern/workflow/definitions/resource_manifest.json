@@ -224,7 +224,7 @@
     "workbench_id": "ci_selection"
   },
   {
-    "content_hash": "39323d51486f3a6466518b3c8683e103cbb78b1454593e252ef78a8930ee16e6",
+    "content_hash": "1966afb7948cae598e2bcadd8b2cafa540286f932b19c5b6e332a71f4df45c0e",
     "kind": "authoring_contract",
     "path": "lantern/authoring_contracts/design_candidate_authoring_guide_v0.1.0.md",
     "projection_trace": {
@@ -290,7 +290,7 @@
     "workbench_id": "design_candidate_authoring"
   },
   {
-    "content_hash": "7bfc4b3f9e32c82999e35e9c858d49ad5b4d82b69695523086167781b7de9751",
+    "content_hash": "459214c1e1ad22c02079afadf7170fe0d0f15da817e52a372b553a678f5687ba",
     "kind": "administration_guide",
     "path": "lantern/administration_procedures/GT-115__DESIGN_BASELINE_SELECTION_v0.1.0.md",
     "projection_trace": {
@@ -312,7 +312,7 @@
     "workbench_id": "design_selection"
   },
   {
-    "content_hash": "d515e542a0b6cf51bcf60963467f8899169fee31c623c1ca483dcc0b6851cca4",
+    "content_hash": "ad55acaf4c03101cba07f85e671809ace7f37d0f78563973ad37c42191273eb6",
     "kind": "authoring_contract",
     "path": "lantern/authoring_contracts/design_candidate_selection_guide_v0.1.0.md",
     "projection_trace": {

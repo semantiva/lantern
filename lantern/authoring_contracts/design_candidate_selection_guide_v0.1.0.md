@@ -41,7 +41,7 @@ Until that point, do not update DC statuses and do not create DEC/EV records.
 
 - `lantern/preservation/EPISTEMIC_FRAME.md` (objects, IDs, statuses, anchoring)
 - `lantern/preservation/GATES.md` (GT-110/115/120 decision logic and GT-115 output semantics)
-- `Lantern/design_candidate_authoring_guide_v0.1.0.md` (normative DC/CH record shape; required DC sections)
+- `lantern/authoring_contracts/design_candidate_authoring_guide_v0.1.0.md` (normative DC/CH record shape; required DC sections)
 - The provided CH file for `CH_ID`: `ch/CH-####.md` (authoritative assessment criteria, constraints, validation target)
 - The provided SPEC file(s): (authoritative requirements baseline)
 - The provided ARCH file(s): (authoritative architecture baseline)
@@ -106,9 +106,9 @@ BLOCK selection if any of the following are false:
 - CH includes non-empty:
   - `assessment_criteria`
   - `validation_target`
-- CH includes the constraints containers (they may be empty but MUST exist):
-  - `constraints.must_not_change`
-  - `constraints.out_of_scope`
+- CH includes non-empty:
+  - `constraints`
+  - `allowed_change_surface`
 
 If CH is ineligible, output:
 
@@ -151,8 +151,7 @@ From the CH, SPEC, ARCH, and TD records, restate as a concise checklist:
 
 - Assessment criteria (as written in CH)
 - Constraints (as written in CH)
-  - must_not_change
-  - out_of_scope
+- Allowed change surface (as written in CH)
 - Validation target (as written in CH)
 - Key SPEC requirements relevant to the candidate pool
 - Key ARCH constraints relevant to the candidate pool
@@ -170,7 +169,8 @@ Use the same classes for every candidate:
 
 PASS requires:
 - DC contains `## Assessment Criteria Alignment (verbatim from CH)` and the listed criteria match the CH `assessment_criteria` verbatim.
-- DC contains `## Constraints (verbatim from CH)` and the `must_not_change` and `out_of_scope` lists match the CH constraints verbatim.
+- DC contains `## Constraints (verbatim from CH)` and the text matches the CH `constraints` field verbatim.
+- DC contains `## Allowed Change Surface (verbatim from CH)` and the text matches the CH `allowed_change_surface` field verbatim.
 - DC does not introduce new requirements, constraints, or validation targets that expand or shift the CH.
 
 #### B) Upstream Baseline Conformance & Record Validity
@@ -196,7 +196,7 @@ PASS requires:
 - DC declares an explicit, bounded `governed_scope` in the header and in `## Governed Scope`.
 - DC contains `## Compatibility Posture` that explicitly states compatibility assumptions, constraints, and non-goals (each sub-list non-empty or explicitly declared empty with rationale).
 - DC contains `## Interfaces / Public Surface Impact` with substantive content (must not be empty or aspirational).
-- Declared compatibility posture does not contradict the CH `must_not_change` constraints.
+- Declared compatibility posture does not contradict the CH `constraints` field or exceed the CH `allowed_change_surface`.
 - The governed scope is coherent with the scope implied by the CH assessment criteria.
 
 #### D) Design Completeness & Comparison Readiness
@@ -295,7 +295,8 @@ If multiple ranking-eligible candidates pass all classes A–E, use the tie-brea
 
 - Baseline Checklist (from CH + SPEC + ARCH + TD)
   - Assessment criteria
-  - Constraints (must_not_change, out_of_scope)
+  - Constraints
+  - Allowed change surface
   - Validation target
   - Key SPEC requirements relevant to the pool
   - Key ARCH constraints relevant to the pool
@@ -332,7 +333,8 @@ If multiple ranking-eligible candidates pass all classes A–E, use the tie-brea
 
 - Baseline Checklist (from CH + SPEC + ARCH + TD)
   - Assessment criteria
-  - Constraints (must_not_change, out_of_scope)
+  - Constraints
+  - Allowed change surface
   - Validation target
   - Key SPEC/ARCH requirements
   - TD coverage expectations
@@ -360,5 +362,5 @@ If multiple ranking-eligible candidates pass all classes A–E, use the tie-brea
 
 ## Close-out requirements
 
-- Do NOT update `Lantern/change/INDEX.md`, CH status, DC statuses, or create DEC/EV records in this step.
+- Do NOT update `INDEX.md` at the governance repo root, CH status, DC statuses, or create DEC/EV records in this step.
 - Do NOT apply changes or author the DB record. This step produces only a selection recommendation and issues list.

@@ -28,7 +28,19 @@ _TEXT_EXTENSIONS = {
     ".py", ".yaml", ".yml", ".json", ".md", ".txt", ".toml", ".ini", ".cfg", ".rst", ".sh"
 }
 _SKIP_DIRS = {".git", ".pytest_cache", "__pycache__", ".mypy_cache", ".ruff_cache", ".venv", "venv"}
-_FORBIDDEN_NAME_PATTERN = re.compile("(?i)(?:" + "tier" + r"[-_ ]?" + "h|_" + "tier" + "_" + "h)")
+_FORBIDDEN_NAME_PATTERN = re.compile(
+    "(?i)(?:"
+    + "tier"
+    + r"[-_ ]?"
+    + "h|_"
+    + "tier"
+    + "_"
+    + "h|"
+    + "lantern"
+    + "-"
+    + "governance"
+    + ")"
+)
 _CONTRACT_REF_PATTERN = re.compile(r"^contract\.[a-z0-9_]+(?:\.[a-z0-9_]+)*\.v\d+$")
 _FOUNDATION_WORKFLOW_SURFACE_FIELDS = frozenset(
     {

@@ -133,7 +133,7 @@ def test_status_contract_projection_exists_and_is_machine_readable() -> None:
     payload = json.loads(DEFAULT_STATUS_CONTRACT_JSON_PATH.read_text(encoding="utf-8"))
 
     assert payload["projection_kind"] == "artifact_status_contract"
-    assert payload["generated_from"]["authoritative_path"] == "lantern-governance/workflow/artifact_status_contract.yaml"
+    assert payload["generated_from"]["authoritative_path"] == "workflow/artifact_status_contract.yaml"
     assert payload["families"]["CH"]["canonical_statuses"] == ["Proposed", "Ready", "Addressed"]
     assert payload["families"]["IS"]["canonical_statuses"] == ["NEW", "NEEDS_INFO", "ACCEPTED", "DEFERRED", "REJECTED", "RESOLVED"]
     assert payload["families"]["EV"]["normal_path_policy"] == "statusless"

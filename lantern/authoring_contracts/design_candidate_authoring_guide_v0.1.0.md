@@ -69,7 +69,7 @@ Authoring workflow (normative):
 3. Ensure the design is complete enough to compare on technical merit, governed scope, compatibility posture, and TD traceability.
 4. Set `status: "Candidate"` if the package is complete.
 5. If completion is blocked, set `status: "Draft"` and include `## Blocking Items`.
-6. Ensure the DC is listed in `Lantern/change/INDEX.md`.
+6. Ensure the DC is listed in `INDEX.md` at the governance repo root.
 
 Eligibility rule:
 - A DC MUST NOT be compared at GT-115 unless it has `status: "Candidate"`.
@@ -124,10 +124,10 @@ Canonical locations:
 - `db/DB-####.md`
 - `ev/EV-####.md`
 - `dec/DEC-####.md`
-- `Lantern/change/INDEX.md`
+- `INDEX.md` (governance repo root)
 
 Registry rules:
-- Every DC MUST appear exactly once under `## Design Candidates` in `Lantern/change/INDEX.md`.
+- Every DC MUST appear exactly once under `## Design Candidates` in `INDEX.md` at the governance repo root.
 - The DC header and registry status MUST match.
 - GT-115 Evidence and Decision records MUST refer to the actual candidate pool.
 

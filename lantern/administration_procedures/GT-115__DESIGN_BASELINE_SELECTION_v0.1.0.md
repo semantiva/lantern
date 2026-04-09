@@ -31,10 +31,10 @@ These are administrative requirements, not evaluation criteria.
 - If any DC is still `Draft`, promote it to `Candidate` (Draft → Candidate promotion is a status-only administrative step; it MUST NOT change the technical substance of the DC) or exclude it with an explicit rationale in the DEC.
 
 3) Registry alignment:
-- Each Candidate DC MUST appear in `Lantern/change/INDEX.md` with status `Candidate` before the selection report is approved.
+- Each Candidate DC MUST appear in `INDEX.md` at the governance repo root with status `Candidate` before the selection report is approved.
 
 4) Selection report exists:
-- This procedure assumes the selection analysis report already exists (as chat output or a draft file), produced by running `Lantern/design_candidate_selection_guide_v0.1.0.md`.
+- This procedure assumes the selection analysis report already exists (as chat output or a draft file), produced by running `lantern/authoring_contracts/design_candidate_selection_guide_v0.1.0.md`.
 - A human has approved the chosen candidate (or explicitly overridden the assistant's recommendation).
 
 5) Stability:
@@ -45,7 +45,7 @@ These are administrative requirements, not evaluation criteria.
 ## Definitions (for this procedure)
 
 - "Candidate pool": the set of DC ids actively considered at GT-115 for a given `CH-####`.
-- "Selection report": the human-readable evaluation output produced by running `Lantern/design_candidate_selection_guide_v0.1.0.md`.
+- "Selection report": the human-readable evaluation output produced by running `lantern/authoring_contracts/design_candidate_selection_guide_v0.1.0.md`.
 
 ---
 
@@ -76,7 +76,7 @@ A) SSOT statuses are coherent
 B) Audit trail exists (stored under canonical paths)
 - One Evidence record exists for the selection report: `ev/EV-####.md`
 - One Decision record exists for the GT-115 outcome: `dec/DEC-####.md`
-- `Lantern/change/INDEX.md` links both records and reflects updated DC and DB statuses.
+- `INDEX.md` at the governance repo root links both records and reflects updated DC and DB statuses.
 
 C) No CH status drift
 - The CH status MUST remain `Ready` after GT-115. (CH becomes `Addressed` only at GT-130.)
@@ -122,7 +122,7 @@ Header requirements:
 - `artifacts` MUST include at least:
   - `kind: "path"` pointing to the CH file path
   - `kind: "path"` pointing to each DC file path (candidate pool)
-  - `kind: "path"` pointing to `Lantern/design_candidate_selection_guide_v0.1.0.md`
+  - `kind: "path"` pointing to `lantern/authoring_contracts/design_candidate_selection_guide_v0.1.0.md`
   - `kind: "path"` pointing to each Approved SPEC file used for the gate
   - `kind: "path"` pointing to each Approved ARCH file used for the gate
   - `kind: "path"` pointing to each Approved TD file used for the gate
@@ -141,21 +141,32 @@ Create: `dec/DEC-####.md`
 Use template: `lantern/templates/DEC_TEMPLATE__GT115_SELECTION.md`
 
 Header requirements:
+- `applies_to_initiative` MUST match the CH `initiative_refs` field
 - `applies_to_ch` MUST equal `CH_ID`
+- `gate_id` MUST be `GT-115`
 - `decision_type` MUST be `gate`
+- `status` MUST be `Active`
+- `outcome` MUST be `PASS` if a DC is selected and a DB is approved, otherwise `FAIL`
+- `title` MUST be `GT-115 PASS for CH-####` or `GT-115 FAIL for CH-####` as applicable
 - `references.evidence` MUST include the EV id created in Step 3
-- `references.dcs` MUST include:
-  - all candidate pool DC ids, AND
-  - the selected DC id first (if one is selected)
+- `references.db` MUST include the approved DB id when the outcome is PASS
+- `references.ch` MUST include `CH_ID`
+- `references.td` MUST include the Approved TD ids used for the gate
+- `references.spec` MUST include the Approved SPEC ids used for the gate
+- `references.arch` MUST include the Approved ARCH ids used for the gate
+- `references.dcs` MUST include all candidate pool DC ids and may list the selected DC first
+- `references.issues` SHOULD include the issue ids routed into the CH
 
 Body requirements:
-- Gate: `GT-115`
-- Outcome:
-  - `PASS` if a DC is selected and a DB is approved
-  - `FAIL` if "NONE" is approved
-- Selected design candidate: selected DC id (or "NONE")
-- Approved design baseline: DB id allocated in Step 2 (if PASS; leave blank if FAIL)
-- Rationale: 1 paragraph max, grounded in the selection report
+- Keep the `# GT-115 Decision` heading for template compatibility.
+- Include a `## Decision` section.
+- Include the lines:
+  - `Decision: PASS | FAIL`
+  - `Outcome: PASS | FAIL`
+  - `Gate: GT-115`
+  - `Selected DC: <dc-id> | NONE`
+  - `Approved DB: <db-id>` when PASS
+- Add a `## Decision rationale` section grounded in the selection report.
 
 ### Step 5 — Update DC statuses (finalize the selection)
 
@@ -194,7 +205,7 @@ If the Selected DC is ambiguous on any required design commitment:
 - Set `status: "Draft"` and add `## Blocking Items` referencing the exact DC section that needs clarification.
 - GT-120 remains blocked until the DB is promoted to `Approved`.
 
-### Step 7 — Update `Lantern/change/INDEX.md` (registry update)
+### Step 7 — Update `INDEX.md` at the governance repo root (registry update)
 
 Update four sections:
 
@@ -215,13 +226,13 @@ Update four sections:
 
 Before considering GT-115 closed, verify:
 
-- The selected DC id (if any) is in the CH's `related_dcs` list (if that field exists in the local CH shape).
+- The selected DC id (if any) remains anchored to `CH_ID` and the CH `initiative_refs` field is propagated into the EV/DEC headers.
 - The approved DB `source_dc_id` matches the selected DC id.
 - The approved DB `applies_to_ch` matches `CH_ID`.
 - The approved DB `test_definition_refs` are coherent with the Approved TD set used for the gate.
 - Exactly one DC for `CH_ID` has `status: "Selected"` (if Outcome is PASS).
 - Exactly one DB for `CH_ID` has `status: "Approved"` (if Outcome is PASS).
-- All file links in `Lantern/change/INDEX.md` resolve and point to existing files.
+- All file links in `INDEX.md` at the governance repo root resolve and point to existing files.
 - No prior Approved DB for the same scope remains in `Approved` state (if a supersession occurred).
 
 If any check fails, treat GT-115 as incomplete and do not proceed to GT-120.
@@ -244,7 +255,7 @@ Use this when you want an assistant to generate the exact file edits (without re
 - the full contents for EV-#### and DEC-#### (allocate ids using `python tools/allocate_lantern_id.py`)
 - the full contents for DB-#### (allocate id using `python tools/allocate_lantern_id.py`; author using `design_baseline_authoring_guide_v0.1.0.md`)
 - unified diffs for DC header `status` updates (candidate → selected/rejected)
-- a unified diff patch for `Lantern/change/INDEX.md` updates
+- a unified diff patch for `INDEX.md` updates at the governance repo root
 
 Hard rules:
 - Do not change any DC content outside the YAML `status:` field.

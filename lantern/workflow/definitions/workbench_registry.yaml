@@ -79,7 +79,7 @@ workbenches:
   - governance workspace bootstrapped
   exit_conditions:
   - upstream baselines approved
-  source: lantern-governance/spec/SPEC-0001.md
+  source: spec/SPEC-0001.md
   enabled: true
   governance_mode: full
 - workbench_id: ch_and_td_readiness
@@ -156,7 +156,7 @@ workbenches:
   - upstream baselines approved
   exit_conditions:
   - GT-110 passed
-  source: lantern-governance/ch/CH-0001.md
+  source: ch/CH-0001.md
   enabled: true
   governance_mode: full
 - workbench_id: design_candidate_authoring
@@ -209,7 +209,7 @@ workbenches:
   - GT-110 passed
   exit_conditions:
   - at least one design candidate exists
-  source: lantern-governance/dip/DIP-0006.md
+  source: dip/DIP-0006.md
   enabled: true
   governance_mode: full
 - workbench_id: design_selection
@@ -272,7 +272,7 @@ workbenches:
   - GT-110 passed
   exit_conditions:
   - DB approved
-  source: lantern-governance/db/DB-0001.md
+  source: db/DB-0001.md
   enabled: true
   governance_mode: full
 - workbench_id: ci_authoring
@@ -325,7 +325,7 @@ workbenches:
   - GT-115 passed
   exit_conditions:
   - at least one CI candidate exists
-  source: lantern-governance/ch/CH-0001.md
+  source: ch/CH-0001.md
   enabled: true
   governance_mode: full
 - workbench_id: ci_selection
@@ -386,7 +386,7 @@ workbenches:
   - GT-115 passed
   exit_conditions:
   - selected CI recorded
-  source: lantern-governance/td/TD-0001.md
+  source: td/TD-0001.md
   enabled: true
   governance_mode: full
 - workbench_id: selected_ci_application
@@ -439,7 +439,7 @@ workbenches:
   - GT-120 passed
   exit_conditions:
   - selected CI applied
-  source: lantern-governance/spec/SPEC-0001.md
+  source: spec/SPEC-0001.md
   enabled: true
   governance_mode: full
 - workbench_id: verification_and_closure
@@ -505,7 +505,7 @@ workbenches:
   - selected CI applied
   exit_conditions:
   - GT-130 passed
-  source: lantern-governance/spec/SPEC-0001.md
+  source: spec/SPEC-0001.md
   enabled: true
   governance_mode: full
 - workbench_id: issue_operations
@@ -561,7 +561,7 @@ workbenches:
   - issue exists
   exit_conditions:
   - issue posture updated
-  source: lantern-governance/is/IS-0002.md
+  source: is/IS-0002.md
   enabled: true
   governance_mode: full
 - workbench_id: governance_onboarding
@@ -619,7 +619,7 @@ workbenches:
   - governance repo not yet prepared or needs inspection
   exit_conditions:
   - governance onboarding complete
-  source: lantern-governance/dip/DIP-0001.md
+  source: dip/DIP-0001.md
   enabled: true
   governance_mode: intervention
 

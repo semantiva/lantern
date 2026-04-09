@@ -14,7 +14,7 @@ def assert_name_isolation(root: str | Path) -> None:
         formatted = "; ".join(
             f"{item.path}:{item.line_number}:{item.line_text}" for item in violations
         )
-        raise AssertionError(f"Forbidden prior-product name detected: {formatted}")
+        raise AssertionError(f"Forbidden repository-specific name detected: {formatted}")
 
 
 __all__ = ["NameViolation", "assert_name_isolation", "scan_forbidden_names"]

@@ -10,7 +10,7 @@ Purpose:
 - Preserve the rich template posture from `v0.2.0` while updating it for the active `TD / DC / DB / GT-115` downstream contract.
 
 These templates are designed for manual-but-structured execution (Mode 1) where:
-- the assistant uses the authoritative guides and templates in `Lantern/`,
+- the assistant uses the authoritative guides and templates in `lantern/`,
 - the human reviews the outputs before administrative finalization, or explicitly authorizes finalization.
 
 Normative anchors:
@@ -132,7 +132,7 @@ Stop condition:
 Deliverables:
 - New `CH-####.md`
 - Updated `INI-####.md` candidate CH list
-- Updated `Lantern/change/INDEX.md`
+- Updated `INDEX.md` at the governance repo root
 ```
 
 ## Template A — Execute GT-110 (CH + TD refinement to Ready)
@@ -148,7 +148,7 @@ Required fields:
 - td_scope: <existing TD ids or "allocate required TDs">
 
 Scope:
-- In scope: update the CH, author or refine the required `TD` set, create the required EV record(s), create the GT-110 DEC record, and update `Lantern/change/INDEX.md`.
+- In scope: update the CH, author or refine the required `TD` set, create the required EV record(s), create the GT-110 DEC record, and update `INDEX.md` at the governance repo root.
 - Out of scope: authoring DC candidates, GT-115, GT-120, GT-130, or any implementation work in product repositories.
 
 Authorization:
@@ -162,7 +162,7 @@ Deliverables:
 - New or updated `TD-####.md` artifacts as required
 - New `EV-####.md` (GT-110 evidence; id allocated with `python tools/allocate_lantern_id.py`)
 - New `DEC-####.md` (GT-110 decision; id allocated with `python tools/allocate_lantern_id.py`)
-- Updated `Lantern/change/INDEX.md`
+- Updated `INDEX.md` at the governance repo root
 ```
 
 ## Template A1 — Author DC candidates for a Ready CH (no GT-115 administration)
@@ -170,7 +170,7 @@ Deliverables:
 ```text
 We are working on CH-####.
 
-Your task is to author one or more Design Candidate artifacts for CH-#### using `Lantern/design_candidate_authoring_guide_v0.1.0.md`.
+Your task is to author one or more Design Candidate artifacts for CH-#### using `lantern/authoring_contracts/design_candidate_authoring_guide_v0.1.0.md`.
 
 Required fields:
 - governance_root: <path-to-ssot-repo-root>
@@ -180,7 +180,7 @@ Required fields:
 - td_ids: [TD-####, ...]
 
 Scope:
-- In scope: allocate DC ids, author one or more `DC` artifacts in `Candidate` or justified `Draft` status, and update `Lantern/change/INDEX.md`.
+- In scope: allocate DC ids, author one or more `DC` artifacts in `Candidate` or justified `Draft` status, and update `INDEX.md` at the governance repo root.
 - Out of scope: GT-115 selection administration, DB authoring, GT-120, GT-130, or implementation work.
 
 Authorization:
@@ -191,7 +191,7 @@ Stop condition:
 
 Deliverables:
 - New `DC-<CH_NUM>-<UUID>.md` candidate files
-- Updated `Lantern/change/INDEX.md`
+- Updated `INDEX.md` at the governance repo root
 ```
 
 ## Template A2 — Execute GT-115 selection (analysis only; no administration)
@@ -199,7 +199,7 @@ Deliverables:
 ```text
 We are working on CH-####.
 
-Your task is to execute `GT-115: Design Baseline Selection` for the DC candidates for CH-#### using `Lantern/design_candidate_selection_guide_v0.1.0.md`.
+Your task is to execute `GT-115: Design Baseline Selection` for the DC candidates for CH-#### using `lantern/authoring_contracts/design_candidate_selection_guide_v0.1.0.md`.
 
 Required fields:
 - governance_root: <path-to-ssot-repo-root>
@@ -210,7 +210,7 @@ Required fields:
 - td_ids: [TD-####, ...]
 
 Scope:
-- In scope: run the selection analysis from `Lantern/design_candidate_selection_guide_v0.1.0.md` against the candidate DC set (comparing against CH criteria, SPEC/ARCH baseline, TD traceability, governed scope, and compatibility posture) and produce a GT-115 selection report.
+- In scope: run the selection analysis from `lantern/authoring_contracts/design_candidate_selection_guide_v0.1.0.md` against the candidate DC set (comparing against CH criteria, SPEC/ARCH baseline, TD traceability, governed scope, and compatibility posture) and produce a GT-115 selection report.
 - Out of scope: status changes, DB authoring, registry updates, GT-120, GT-130, and implementation work.
 
 Authorization:
@@ -221,7 +221,7 @@ Stop condition:
 - Stop after producing the EV selection report and clearly stating the recommended selected DC id with rationale.
 
 Deliverables:
-- New `EV-####.md` (GT-115 selection report; allocate id with `python tools/allocate_lantern_id.py` and use `lantern/templates/EV_TEMPLATE__GT115_SELECTION_REPORT.md`)
+- GT-115 selection report output (analysis only; if persisted, use `lantern/templates/EV_TEMPLATE__GT115_SELECTION_REPORT.md` and allocate the EV id with `python tools/allocate_lantern_id.py`)
 ```
 
 ## Template A3 — Execute GT-115 selection + administration (full gate completion)
@@ -240,7 +240,7 @@ Required fields:
 - td_ids: [TD-####, ...]
 
 Scope:
-- In scope: selection analysis, EV selection report, DEC selection decision, DC status updates, DB authoring, and `Lantern/change/INDEX.md` updates.
+- In scope: selection analysis, EV selection report, DEC selection decision, DC status updates, DB authoring, and `INDEX.md` updates at the governance repo root.
 - Out of scope: GT-120, GT-130, and implementation work.
 
 Authorization:
@@ -259,7 +259,7 @@ Deliverables:
 - New `DEC-####.md` (GT-115 decision; id allocated with `python tools/allocate_lantern_id.py`)
 - Updated DC candidate files (statuses)
 - New `DB-####.md`
-- Updated `Lantern/change/INDEX.md`
+- Updated `INDEX.md` at the governance repo root
 ```
 
 ## Template B — Execute GT-120 selection (analysis only; no administration)
@@ -304,7 +304,7 @@ Required fields:
 - td_ids: [TD-####, ...]
 
 Scope:
-- In scope: selection analysis, EV selection report, DEC selection decision, CI status updates, CH updates, and `Lantern/change/INDEX.md` updates.
+- In scope: selection analysis, EV selection report, DEC selection decision, CI status updates, CH updates, and `INDEX.md` updates at the governance repo root.
 - Out of scope: GT-130 verification and any implementation work.
 
 Authorization:
@@ -323,7 +323,7 @@ Deliverables:
 - New `DEC-####.md` (GT-120 decision; id allocated with `python tools/allocate_lantern_id.py`)
 - Updated CI candidate files (statuses)
 - Updated `CH-####.md` (references to selected CI + EV/DEC)
-- Updated `Lantern/change/INDEX.md`
+- Updated `INDEX.md` at the governance repo root
 ```
 
 ## Template D — Execute GT-030 (DIP lock)
@@ -351,7 +351,7 @@ Deliverables:
 - New `EV-####.md` (GT-030 evidence; id allocated with `python tools/allocate_lantern_id.py`)
 - New `DEC-####.md` (GT-030 decision; id allocated with `python tools/allocate_lantern_id.py`)
 - Updated DIP status (Draft -> Approved on PASS)
-- Updated `Lantern/change/INDEX.md`
+- Updated `INDEX.md` at the governance repo root
 ```
 
 ## Template E — Prepare SPEC/ARCH derivation packet for GT-050 and GT-060
@@ -439,7 +439,7 @@ Deliverables:
 - New `EV-####.md` + `DEC-####.md` for GT-050 (allocate ids with `python tools/allocate_lantern_id.py`)
 - New `EV-####.md` + `DEC-####.md` for GT-060 (allocate ids with `python tools/allocate_lantern_id.py`)
 - Updated ARCH/SPEC statuses (Draft -> Approved on PASS)
-- Updated `Lantern/change/INDEX.md`
+- Updated `INDEX.md` at the governance repo root
 ```
 
 ## Template H — Execute GT-130 (integration verification + administration)
@@ -459,7 +459,7 @@ Required fields:
 - product_repo_commit: <commit-hash-or-tag>
 
 Scope:
-- In scope: execute the CI verification plan against the product repo, collect evidence, create EV and DEC records, update CI and CH statuses on PASS, and update `Lantern/change/INDEX.md`.
+- In scope: execute the CI verification plan against the product repo, collect evidence, create EV and DEC records, update CI and CH statuses on PASS, and update `INDEX.md` at the governance repo root.
 - Out of scope: any new implementation, CI authoring, GT-115/GT-120 re-execution, or changes to product repo content.
 
 Authorization:
@@ -478,5 +478,5 @@ Deliverables:
 - New `DEC-####.md` (GT-130 decision; id allocated with `python tools/allocate_lantern_id.py`)
 - Updated `CI-<CH_NUM>-<UUID>.md` (status: Verified on PASS)
 - Updated `CH-####.md` (status: Addressed on PASS only)
-- Updated `Lantern/change/INDEX.md`
+- Updated `INDEX.md` at the governance repo root
 ```

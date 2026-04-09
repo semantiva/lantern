@@ -55,7 +55,7 @@
         "lantern/workflow/definitions/transaction_profiles.yaml",
         "lantern/preservation/relocation_manifest.yaml"
       ],
-      "source": "lantern-governance/ch/CH-0001.md"
+      "source": "ch/CH-0001.md"
     },
     "request_schema_ref": "schema.request.ch_and_td_readiness.v1",
     "response_surface_bindings": [
@@ -201,7 +201,7 @@
         "lantern/workflow/definitions/transaction_profiles.yaml",
         "lantern/preservation/relocation_manifest.yaml"
       ],
-      "source": "lantern-governance/ch/CH-0001.md"
+      "source": "ch/CH-0001.md"
     },
     "request_schema_ref": "schema.request.ci_authoring.v1",
     "response_surface_bindings": [
@@ -302,7 +302,7 @@
         "lantern/workflow/definitions/transaction_profiles.yaml",
         "lantern/preservation/relocation_manifest.yaml"
       ],
-      "source": "lantern-governance/td/TD-0001.md"
+      "source": "td/TD-0001.md"
     },
     "request_schema_ref": "schema.request.ci_selection.v1",
     "response_surface_bindings": [
@@ -438,7 +438,7 @@
         "lantern/workflow/definitions/transaction_profiles.yaml",
         "lantern/preservation/relocation_manifest.yaml"
       ],
-      "source": "lantern-governance/dip/DIP-0006.md"
+      "source": "dip/DIP-0006.md"
     },
     "request_schema_ref": "schema.request.design_candidate_authoring.v1",
     "response_surface_bindings": [
@@ -542,7 +542,7 @@
         "lantern/workflow/definitions/transaction_profiles.yaml",
         "lantern/preservation/relocation_manifest.yaml"
       ],
-      "source": "lantern-governance/db/DB-0001.md"
+      "source": "db/DB-0001.md"
     },
     "request_schema_ref": "schema.request.design_selection.v1",
     "response_surface_bindings": [
@@ -620,7 +620,7 @@
         "lantern/workflow/definitions/transaction_profiles.yaml",
         "lantern/preservation/relocation_manifest.yaml"
       ],
-      "source": "lantern-governance/dip/DIP-0001.md"
+      "source": "dip/DIP-0001.md"
     },
     "request_schema_ref": "schema.request.governance_onboarding.v1",
     "response_surface_bindings": [
@@ -686,7 +686,7 @@
         "lantern/workflow/definitions/transaction_profiles.yaml",
         "lantern/preservation/relocation_manifest.yaml"
       ],
-      "source": "lantern-governance/is/IS-0002.md"
+      "source": "is/IS-0002.md"
     },
     "request_schema_ref": "schema.request.issue_operations.v1",
     "response_surface_bindings": [
@@ -823,7 +823,7 @@
         "lantern/workflow/definitions/transaction_profiles.yaml",
         "lantern/preservation/relocation_manifest.yaml"
       ],
-      "source": "lantern-governance/spec/SPEC-0001.md"
+      "source": "spec/SPEC-0001.md"
     },
     "request_schema_ref": "schema.request.selected_ci_application.v1",
     "response_surface_bindings": [
@@ -963,7 +963,7 @@
         "lantern/workflow/definitions/transaction_profiles.yaml",
         "lantern/preservation/relocation_manifest.yaml"
       ],
-      "source": "lantern-governance/spec/SPEC-0001.md"
+      "source": "spec/SPEC-0001.md"
     },
     "request_schema_ref": "schema.request.upstream_intake_and_baselines.v1",
     "response_surface_bindings": [
@@ -1079,7 +1079,7 @@
         "lantern/workflow/definitions/transaction_profiles.yaml",
         "lantern/preservation/relocation_manifest.yaml"
       ],
-      "source": "lantern-governance/spec/SPEC-0001.md"
+      "source": "spec/SPEC-0001.md"
     },
     "request_schema_ref": "schema.request.verification_and_closure.v1",
     "response_surface_bindings": [

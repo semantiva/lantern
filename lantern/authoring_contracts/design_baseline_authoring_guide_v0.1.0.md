@@ -14,7 +14,7 @@ Normative anchors:
 - `lantern/preservation/WORKSPACE_TOPOLOGY.md`
 - `lantern/preservation/LANTERN_MODEL_BINDING.md`
 - `lantern/preservation/ARTIFACT_ID_ALLOCATION.md`
-- `Lantern/design_candidate_authoring_guide_v0.1.0.md`
+- `lantern/authoring_contracts/design_candidate_authoring_guide_v0.1.0.md`
 
 ---
 
@@ -63,7 +63,7 @@ Authoring workflow (normative):
 4. State reopen GT-115 conditions clearly.
 5. Set `status: "Approved"` when all required fields are complete and the DB accurately represents the Selected DC.
 6. If completion is blocked (e.g., the Selected DC is ambiguous on a required commitment), set `status: "Draft"` and include `## Blocking Items` referencing the specific DC section that needs clarification.
-7. Ensure the DB is listed in `Lantern/change/INDEX.md`.
+7. Ensure the DB is listed in `INDEX.md` at the governance repo root.
 
 Eligibility rules:
 - A DB MUST be `Approved` before GT-120 and CI authoring may begin.
@@ -120,10 +120,10 @@ Hard rule:
 
 Canonical locations:
 - `db/DB-####.md`
-- `Lantern/change/INDEX.md`
+- `INDEX.md` (governance repo root)
 
 Registry rules:
-- Every DB MUST appear exactly once under `## Design Baselines` in `Lantern/change/INDEX.md`.
+- Every DB MUST appear exactly once under `## Design Baselines` in `INDEX.md` at the governance repo root.
 - The DB header status and registry status MUST match.
 - When a DB is superseded, both the old DB (updated to `Superseded`) and the new DB (`Approved`) MUST be reflected in the registry.
 
@@ -235,7 +235,7 @@ Steps required for valid supersession:
 2. Run GT-115 selection using the DC selection guide to select a new DC.
 3. Author the new DB, setting `supersedes: ["DB-####"]` for each prior DB that is being replaced.
 4. During GT-115 administration, update the old DB header: set `status: "Superseded"` and `superseded_by: "DB-####"` (the new DB id).
-5. Update `Lantern/change/INDEX.md` to reflect the new DB and the updated status of the superseded DB.
+5. Update `INDEX.md` at the governance repo root to reflect the new DB and the updated status of the superseded DB.
 6. Record the supersession rationale in the GT-115 DEC.
 
 Hard rule:

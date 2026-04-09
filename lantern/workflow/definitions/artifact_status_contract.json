@@ -1,8 +1,8 @@
 {
   "projection_kind": "artifact_status_contract",
   "generated_from": {
-    "authoritative_path": "lantern-governance/workflow/artifact_status_contract.yaml",
-    "schema_path": "lantern-governance/workflow/artifact_status_contract.schema.json",
+    "authoritative_path": "workflow/artifact_status_contract.yaml",
+    "schema_path": "workflow/artifact_status_contract.schema.json",
     "version": "1.0.0",
     "date": "2026-04-08"
   },

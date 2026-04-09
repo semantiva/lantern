@@ -26,4 +26,6 @@ Where `CH_NUM` is the numeric suffix of the governing `CH-####` identifier.
 
 ## Allocator rule
 
-Allocation MUST be performed using `tools/allocate_lantern_id.py` from the Lantern workflow product repository.
+Allocation MUST be performed using `python tools/allocate_lantern_id.py --artifact <FAMILY> --repo <path-to-governance-root>` from the Lantern workflow product repository.
+
+For CH-anchored families (`CI`, `DC`), the allocator invocation MUST also include `--ch CH-####`. The wrapper delegates to `lantern.artifacts.allocator.allocate_artifact_id` so sequential and CH-anchored families use the same runtime authority.

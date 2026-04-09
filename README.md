@@ -18,7 +18,7 @@ This is the **product repository**. It contains:
 - `lantern/` — the Lantern Python package
 - `tests/` — the test suite
 
-The companion governance workspace (`lantern-governance/`) lives in a separate sibling repository and is the authoritative SSOT for all governed artifacts. Do not create or edit governed records or `binding_record.md` in this repository.
+The companion governance workspace lives in a separate sibling repository and is the authoritative SSOT for all governed artifacts. Do not create or edit governed records or `binding_record.md` in this repository.
 
 ## Getting started
 
@@ -68,7 +68,7 @@ When Lantern governs an external product, `--product-root` must point at the gov
 ```bash
 python -m lantern.mcp.server \
   --product-root /path/to/lantern/ \
-  --governance-root /path/to/lantern-governance/
+  --governance-root /path/to/governance-root/
 ```
 
 ### Minimal tracked bootstrap surface for an external product repo
@@ -107,7 +107,7 @@ Edit your VS Code user settings at `~/.config/Code/User/mcp.json` (create if mis
         "--product-root",
         "/path/to/lantern/",
         "--governance-root",
-        "/path/to/lantern-governance/"
+        "/path/to/governance-root/"
       ]
     }
   },
@@ -125,7 +125,7 @@ Use the following configuration in your CODEX settings:
 [features]
 multi_agent = true
 
-[mcp_servers.lantern_governance]
+[mcp_servers.governed_workspace]
 command = "python"
 args = [
   "-m",
@@ -133,7 +133,7 @@ args = [
   "--product-root",
   "/path/to/lantern/",
   "--governance-root",
-  "/path/to/lantern-governance/"
+  "/path/to/governance-root/"
 ]
 enabled = true
 ```
@@ -157,7 +157,7 @@ Use this bridge-free smoke path after the manual `lantern_grammar` install is co
 ```bash
 python -m lantern.mcp.server \
   --product-root /path/to/lantern/ \
-  --governance-root /path/to/lantern-governance/
+  --governance-root /path/to/governance-root/
 ```
 
 In a second shell, run the bounded native regression path that exercises startup, mutation, selected-CI application hygiene, and validation without `lantern-ops-bridge`:
