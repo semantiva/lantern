@@ -350,5 +350,5 @@ If multiple ranking-eligible candidates pass all classes A–E, use the tie-brea
 
 ## Close-out requirements
 
-- Do NOT update `Lantern/change/INDEX.md`, CH status, CI statuses, or create DEC/EV records in this step.
+- Do NOT update `INDEX.md` (governance repository root), CH status, CI statuses, or create DEC/EV records in this step.
 - Do NOT apply changes or run integration. This step produces only a selection recommendation and issues list.

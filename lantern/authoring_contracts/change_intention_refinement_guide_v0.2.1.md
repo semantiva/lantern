@@ -29,7 +29,7 @@ In scope:
 - create/update the required TD artifacts referenced by the CH
 - create EV record(s) required for GT-110
 - create a DEC record to record the GT-110 outcome
-- update `Lantern/change/INDEX.md` registry
+- update `INDEX.md` (governance repository root) registry
 - set CH status to `Ready` when GT-110 is satisfied
 
 Out of scope:
@@ -45,7 +45,7 @@ A CH is GT-110-ready when ALL are true:
 2) an approved TD set exists and covers the CH assessment criteria
 3) required EV record(s) exist and are referenced by the CH header
 4) a GT-110 DEC record exists and is referenced by the CH header
-5) `Lantern/change/INDEX.md` reflects the updated CH status
+5) `INDEX.md` (governance repository root) reflects the updated CH status
 
 ## Procedure (deterministic)
 
@@ -192,7 +192,7 @@ Update CH header fields:
 - `status: "Ready"` only when the DEC records `PASS`
 
 Update the registry:
-- `Lantern/change/INDEX.md` MUST list the CH and its current status, and MUST list the referenced EV/DEC ids under their sections.
+- `INDEX.md` (governance repository root) MUST list the CH and its current status, and MUST list the referenced EV/DEC ids under their sections.
 
 ## Common failure modes (avoid)
 

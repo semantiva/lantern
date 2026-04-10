@@ -1,6 +1,6 @@
 [
   {
-    "content_hash": "2477a05e14ef7635c1d0349d482f866df7729b02f540c183df1016debfc3ff18",
+    "content_hash": "484f3a69b2d4dff744df3bab73c655bcc68cce8c4b6bcffe3984a2a61076cedf",
     "kind": "authoring_contract",
     "path": "lantern/authoring_contracts/change_intention_refinement_guide_v0.2.1.md",
     "projection_trace": {
@@ -66,7 +66,7 @@
     "workbench_id": "ch_and_td_readiness"
   },
   {
-    "content_hash": "c6695503ece98cfbc244a62ff772a0e79dc2a478a9460f1c18facb0ee0fbf6eb",
+    "content_hash": "afb6f8eaf9e163bc66cf3dbfaff9bc6be37833fc4a75a26ef8f614ee420cf06b",
     "kind": "authoring_contract",
     "path": "lantern/authoring_contracts/change_increment_authoring_guide_v0.2.1.md",
     "projection_trace": {
@@ -132,7 +132,7 @@
     "workbench_id": "ci_authoring"
   },
   {
-    "content_hash": "f5fdcf739b26b8e67d31d733204b36a0dfd19c5352bde0ceebfcd08a4754fe94",
+    "content_hash": "a99069702528a66f3584a14f1d52292814e6f57872e342cce706643008a0eaf4",
     "kind": "administration_guide",
     "path": "lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION_v0.2.1.md",
     "projection_trace": {
@@ -154,7 +154,7 @@
     "workbench_id": "ci_selection"
   },
   {
-    "content_hash": "fa80abc9861c72cd0e0f77dc2b92e1649a2fbd9b285fee44499f833ef4fa44ac",
+    "content_hash": "e08c5a62dbe4e2e73c91596031f4a60c2159fdb624255d133c5c05659c287cf2",
     "kind": "authoring_contract",
     "path": "lantern/authoring_contracts/change_increment_selection_guide_v0.2.1.md",
     "projection_trace": {
@@ -562,7 +562,7 @@
     "workbench_id": "issue_operations"
   },
   {
-    "content_hash": "f5fdcf739b26b8e67d31d733204b36a0dfd19c5352bde0ceebfcd08a4754fe94",
+    "content_hash": "a99069702528a66f3584a14f1d52292814e6f57872e342cce706643008a0eaf4",
     "kind": "administration_guide",
     "path": "lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION_v0.2.1.md",
     "projection_trace": {
@@ -584,7 +584,7 @@
     "workbench_id": "selected_ci_application"
   },
   {
-    "content_hash": "018daab5c7ab462c41887e2229fdbb45ae863498a10566b311200301159cd616",
+    "content_hash": "861b0aba12286ccb058cebebae7aff045301a8bc944418adb5fbd45e6e3dddf7",
     "kind": "administration_guide",
     "path": "lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION_v0.1.0.md",
     "projection_trace": {
@@ -764,7 +764,7 @@
     "workbench_id": "upstream_intake_and_baselines"
   },
   {
-    "content_hash": "018daab5c7ab462c41887e2229fdbb45ae863498a10566b311200301159cd616",
+    "content_hash": "861b0aba12286ccb058cebebae7aff045301a8bc944418adb5fbd45e6e3dddf7",
     "kind": "administration_guide",
     "path": "lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION_v0.1.0.md",
     "projection_trace": {

@@ -72,7 +72,7 @@ A) Status transitions are correct
 B) Audit trail exists (stored under canonical paths)
 - One Evidence record exists with real verification evidence: `ev/EV-####.md`
 - One Decision record exists for the GT-130 outcome: `dec/DEC-####.md`
-- `Lantern/change/INDEX.md` reflects the updated CI and CH statuses.
+- `INDEX.md` (governance repository root) reflects the updated CI and CH statuses.
 
 ### FAIL outcome
 
@@ -86,7 +86,7 @@ A) Status transitions are correct
 B) Audit trail exists
 - One Evidence record with the failure evidence: `ev/EV-####.md`
 - One Decision record: `dec/DEC-####.md`
-- `Lantern/change/INDEX.md` reflects any status changes.
+- `INDEX.md` (governance repository root) reflects any status changes.
 
 ---
 
@@ -196,7 +196,7 @@ Rule: status changes MUST be limited to the YAML `status:` field only.
 
 Rule: no other CH fields may be modified in this step.
 
-### Step 8 — Update `Lantern/change/INDEX.md` (registry update)
+### Step 8 — Update `INDEX.md` (governance repository root, registry update)
 
 Update three sections:
 
@@ -218,13 +218,13 @@ If CH status changed to `Addressed`, also update:
 
 Before considering GT-130 closed, verify:
 
-- `CI_ID` header `status` matches the registry entry in `Lantern/change/INDEX.md`.
+- `CI_ID` header `status` matches the registry entry in `INDEX.md` (governance repository root).
 - `CH_ID` header `status` matches the registry entry if a transition occurred.
 - The EV record contains real (non-aspirational) verification evidence.
 - The DEC record references the correct EV id.
 - If PASS: exactly one CI for `CH_ID` has `status: "Verified"`.
 - If PASS: `CH_ID` has `status: "Addressed"`.
-- All file links in `Lantern/change/INDEX.md` resolve and point to existing files.
+- All file links in `INDEX.md` (governance repository root) resolve and point to existing files.
 
 If any check fails, treat GT-130 as incomplete.
 
@@ -261,7 +261,7 @@ Use this when you want an assistant to generate the exact file edits (without re
 - the full contents for EV-#### and DEC-#### (allocate ids using `python tools/allocate_lantern_id.py`)
 - a unified diff for CI header `status` update (Selected → Verified on PASS; Selected → Candidate/Rejected on demotion)
 - a unified diff for CH header `status` update (Ready → Addressed on PASS only)
-- a unified diff patch for `Lantern/change/INDEX.md` updates
+- a unified diff patch for `INDEX.md` (governance repository root) updates
 
 Hard rules:
 - Do not change any CI content outside the YAML `status:` field.

@@ -22,13 +22,13 @@ The companion governance workspace lives in a separate sibling repository and is
 
 ## Getting started
 
-Lantern's native MVP currently expects a manual `lantern_grammar` install before startup. In a multi-repository workspace the supported runtime bootstrap paths are:
+Lantern requires `lantern_grammar` to be installed before startup. Install it as a managed package.
 
 ### Installed-package mode
 
 ```bash
 cd /path/to/lantern
-pip install -e ../lantern-grammar
+pip install lantern-grammar
 pip install -e ".[dev]"
 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -q
 ```
@@ -37,8 +37,9 @@ PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -q
 
 ```bash
 cd /path/to/lantern
-pip install -e ../lantern-grammar
-PYTHONPATH=/path/to/lantern python -m lantern.mcp.server   --product-root /path/to/product-repo   --governance-root /path/to/product-governance
+pip install lantern-grammar
+PYTHONPATH=/path/to/lantern python -m lantern.mcp.server  \
+  --product-root /path/to/product-repo   --governance-root /path/to/product-governance
 ```
 
 In both modes, Lantern resolves its workflow release surface from the executing `lantern` runtime environment. Governed product repositories must **not** vendor or copy a `lantern/` runtime tree as a startup prerequisite.
@@ -67,7 +68,7 @@ When Lantern governs an external product, `--product-root` must point at the gov
 
 ```bash
 python -m lantern.mcp.server \
-  --product-root /path/to/lantern/ \
+  --product-root /path/to/product-repo/ \
   --governance-root /path/to/governance-root/
 ```
 
@@ -86,7 +87,7 @@ Repo-local editor or MCP wiring such as `.vscode/mcp.json` should stay ignored a
 
 ```bash
 python -m lantern.mcp.server \
-  --product-root /path/to/lantern/
+  --product-root /path/to/product-repo/
 ```
 
 With product-only startup, `inspect(kind="workspace")` reports `missing_governance` posture. No sibling discovery or hidden fallback path is used.
@@ -105,7 +106,7 @@ Edit your VS Code user settings at `~/.config/Code/User/mcp.json` (create if mis
         "-m",
         "lantern.mcp.server",
         "--product-root",
-        "/path/to/lantern/",
+        "/path/to/product-repo/",
         "--governance-root",
         "/path/to/governance-root/"
       ]
@@ -131,7 +132,7 @@ args = [
   "-m",
   "lantern.mcp.server",
   "--product-root",
-  "/path/to/lantern/",
+  "/path/to/product-repo/",
   "--governance-root",
   "/path/to/governance-root/"
 ]

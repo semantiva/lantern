@@ -27,7 +27,7 @@ These are administrative requirements, not evaluation criteria.
 - If the DB or TD envelope is missing, GT-120 is blocked before status administration begins.
 
 2) Registry alignment:
-- Each Candidate CI MUST appear in `Lantern/change/INDEX.md` with status `Candidate` before the selection report is approved.
+- Each Candidate CI MUST appear in `INDEX.md` (governance repository root) with status `Candidate` before the selection report is approved.
 
 3) Stability:
 - Do not add/remove Candidate CIs during evaluation. If a Candidate becomes invalid, record an explicit exclusion rationale in the GT-120 decision record.
@@ -38,7 +38,7 @@ These are administrative requirements, not evaluation criteria.
 ## Definitions (for this procedure)
 
 - “Candidate pool”: the set of CI ids actively considered at GT-120 for a given `CH-####`.
-- “Selection report”: the human-readable evaluation output produced by running `Lantern/change_increment_selection_guide_v0.2.1.md`.
+- "Selection report": the human-readable evaluation output produced by running `lantern/authoring_contracts/change_increment_selection_guide_v0.2.1.md` (Lantern Runtime packaged resource).
 
 This procedure assumes the selection report already exists (as chat output or a draft file) and a human has approved the chosen candidate (or explicitly overridden the assistant’s recommendation).
 
@@ -69,7 +69,7 @@ A) SSOT statuses are coherent
 B) Audit trail exists (stored under canonical paths)
 - One Evidence record exists for the selection report: `ev/EV-####.md`
 - One Decision record exists for the GT-120 outcome: `dec/DEC-####.md`
-- `Lantern/change/INDEX.md` links both records and reflects updated CI statuses.
+- `INDEX.md` (governance repository root) links both records and reflects updated CI statuses.
 
 C) No CH status drift
 - The CH status MUST remain `Ready` after GT-120. (CH becomes `Addressed` only at GT-130.)
@@ -112,7 +112,7 @@ Header requirements:
 - `artifacts` MUST include at least:
   - `kind: "path"` pointing to the CH file path
   - `kind: "path"` pointing to each CI file path (candidate pool)
-  - `kind: "path"` pointing to `Lantern/change_increment_selection_guide_v0.2.1.md`
+  - `kind: "path"` pointing to `lantern/authoring_contracts/change_increment_selection_guide_v0.2.1.md` (Lantern Runtime packaged resource)
   - `kind: "path"` pointing to the Approved DB file
   - `kind: "path"` pointing to each Approved TD file used for the gate
 
@@ -156,7 +156,7 @@ If Outcome is `FAIL` (none selected):
 
 Rule: status changes must be limited to the YAML `status:` field only.
 
-### Step 6 — Update `Lantern/change/INDEX.md` (registry update)
+### Step 6 — Update `INDEX.md` (governance repository root, registry update)
 
 Update three sections:
 
@@ -177,7 +177,7 @@ Before considering GT-120 closed, verify:
 - The selected CI `design_baseline_ref` matches `DB_ID`.
 - The selected CI `test_definition_refs` are coherent with the Approved TD set used for the gate.
 - Exactly one CI for `CH_ID` has `status: "Selected"` (if Outcome is `PASS`).
-- All file links in `Lantern/change/INDEX.md` resolve and point to existing files.
+- All file links in `INDEX.md` (governance repository root) resolve and point to existing files.
 
 If any check fails, treat GT-120 as incomplete and do not proceed to GT-130.
 
@@ -198,7 +198,7 @@ Use this when you want an assistant to generate the exact file edits (without ev
 “Produce a GT-120 Administration Patch Pack:
 - the full contents for EV-#### and DEC-#### (allocate ids using `python tools/allocate_lantern_id.py`)
 - unified diffs for CI header `status` updates (candidate → selected/rejected)
-- a unified diff patch for `Lantern/change/INDEX.md` updates
+- a unified diff patch for `INDEX.md` (governance repository root) updates
 
 Hard rules:
 - Do not change any CI content outside the YAML `status:` field.

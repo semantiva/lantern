@@ -9,7 +9,7 @@ You may add repo-specific notes below the managed block.
 ## Workspace boundary
 
 - This repository is the **product workspace**.
-- Governed records live in the companion Lantern governance workspace and are authoritative there.
+- Governed records live in the companion governed product governance workspace and are authoritative there.
 - Never create or edit governed records or `binding_record.md` in this repository.
 - Reach governed SSOT only through the configured Lantern MCP server and the shipped Lantern skills.
 

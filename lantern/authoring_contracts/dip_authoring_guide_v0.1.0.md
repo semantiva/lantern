@@ -116,7 +116,7 @@ Hard rule:
 
 Canonical locations:
 - `dip/DIP-####.md`
-- `Lantern/change/INDEX.md` (via Initiative record)
+- `INDEX.md` (governance repository root, via Initiative record)
 
 Registry rules:
 - Every DIP MUST appear in its governing Initiative record under the `inputs.dips` header list.

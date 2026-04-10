@@ -20,8 +20,6 @@ artifacts:
     ref: "<commit-hash-or-tag>"
 ```
 
-> Path semantics: every `Lantern/...` path in this document is a logical governed-workspace path resolved relative to the governed product SSOT repository. It is not a writable local path inside the Lantern workflow product repository.
-
 ## Verification run
 
 <!--

@@ -71,7 +71,7 @@ AI authoring workflow (normative):
 3. Ensure the CI is deterministic: no placeholders, no unstated branch assumptions, no delegated design decisions.
 4. Set `status: "Candidate"` if the package is complete.
 5. If completion is blocked, set `status: "Draft"` and include `## Blocking Items`.
-6. Ensure the CI is listed in `Lantern/change/INDEX.md` and linked from the governing CH.
+6. Ensure the CI is listed in `INDEX.md` (governance repository root) and linked from the governing CH.
 
 Eligibility rule:
 - A CI MUST NOT be compared at GT-120 unless it has `status: "Candidate"`.
@@ -125,10 +125,10 @@ Canonical locations:
 - `db/DB-####.md`
 - `ev/EV-####.md`
 - `dec/DEC-####.md`
-- `Lantern/change/INDEX.md`
+- `INDEX.md` (governance repository root)
 
 Registry rules:
-- Every CI MUST appear exactly once under `## Change Increments` in `Lantern/change/INDEX.md`.
+- Every CI MUST appear exactly once under `## Change Increments` in `INDEX.md` (governance repository root).
 - Every CI MUST be referenced by its governing CH in the CH header `related_cis` list, if that header field exists in the local CH shape.
 - The CI header and registry status MUST match.
 

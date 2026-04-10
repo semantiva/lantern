@@ -390,7 +390,7 @@ def test_td0009_c06_gt130_docs_require_expectation_to_delivery_review() -> None:
 
 def test_td0009_c07_readme_documents_manual_install_and_native_smoke_path() -> None:
     content = (PRODUCT_ROOT / "README.md").read_text(encoding="utf-8")
-    assert "pip install -e ../lantern-grammar" in content
+    assert "pip install lantern-grammar" in content
     assert "python -m lantern.mcp.server" in content
     assert 'validate(scope="workspace")' in content
     assert "without `lantern-ops-bridge`" in content

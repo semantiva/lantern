@@ -110,7 +110,7 @@ Stop condition:
 Deliverables:
 - New `CH-####.md`
 - Updated `INI-####.md` candidate CH list
-- Updated `Lantern/change/INDEX.md`
+- Updated `INDEX.md` (governance repository root)
 ```
 
 ## Template A — Execute GT-110 (CH refinement to Ready)
@@ -121,7 +121,7 @@ We are working on CH-####.
 Your task is to execute `GT-110: Input Kit Readiness (Entry Gate)` for CH-####.
 
 Scope:
-- In scope: update the CH, create the required EV record(s), create the GT-110 DEC record, and update `Lantern/change/INDEX.md`.
+- In scope: update the CH, create the required EV record(s), create the GT-110 DEC record, and update `INDEX.md` (governance repository root).
 - Out of scope: drafting CI candidates, GT-120, GT-130, or any implementation work in product repositories.
 
 Authorization:
@@ -134,7 +134,7 @@ Deliverables:
 - Updated `CH-####.md`
 - New `EV-####.md` (GT-110 evidence; id allocated with `python tools/allocate_lantern_id.py`)
 - New `DEC-####.md` (GT-110 decision; id allocated with `python tools/allocate_lantern_id.py`)
-- Updated `Lantern/change/INDEX.md`
+- Updated `INDEX.md` (governance repository root)
 ```
 
 ## Template B — Execute GT-120 selection (analysis only; no administration)
@@ -167,7 +167,7 @@ We are working on CH-####.
 Your task is to execute `GT-120: Change Increment Selection (Selection Gate)` for the CI candidates for CH-#### and complete administration.
 
 Scope:
-- In scope: selection analysis, EV selection report, DEC selection decision, CI status updates, CH updates, and `Lantern/change/INDEX.md` updates.
+- In scope: selection analysis, EV selection report, DEC selection decision, CI status updates, CH updates, and `INDEX.md` (governance repository root) updates.
 - Out of scope: GT-130 verification and any implementation work.
 
 Authorization:
@@ -186,7 +186,7 @@ Deliverables:
 - New `DEC-####.md` (GT-120 decision; id allocated with `python tools/allocate_lantern_id.py`)
 - Updated CI candidate files (statuses)
 - Updated `CH-####.md` (references to selected CI + EV/DEC)
-- Updated `Lantern/change/INDEX.md`
+- Updated `INDEX.md` (governance repository root)
 ```
 
 ## Template D — Execute GT-030 (DIP lock)
@@ -214,7 +214,7 @@ Deliverables:
 - New `EV-####.md` (GT-030 evidence; id allocated with `python tools/allocate_lantern_id.py`)
 - New `DEC-####.md` (GT-030 decision; id allocated with `python tools/allocate_lantern_id.py`)
 - Updated DIP status (Draft -> Approved on PASS)
-- Updated `Lantern/change/INDEX.md`
+- Updated `INDEX.md` (governance repository root)
 ```
 
 ## Template E — Prepare SPEC/ARCH derivation packet for GT-050 and GT-060
@@ -301,5 +301,5 @@ Deliverables:
 - New `EV-####.md` + `DEC-####.md` for GT-050 (allocate ids with `python tools/allocate_lantern_id.py`)
 - New `EV-####.md` + `DEC-####.md` for GT-060 (allocate ids with `python tools/allocate_lantern_id.py`)
 - Updated ARCH/SPEC statuses (Draft -> Approved on PASS)
-- Updated `Lantern/change/INDEX.md`
+- Updated `INDEX.md` (governance repository root)
 ```

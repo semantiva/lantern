@@ -58,7 +58,7 @@ Authoring workflow (normative):
 2. Author TD cases that cover every criterion with non-shallow, structured case content.
 3. Set `status: "Approved"` when all required fields are non-empty and coverage is complete per Section 8.
 4. If authoring is blocked, set `status: "Draft"` and include `## Blocking Items`.
-5. Ensure the TD is listed in `Lantern/change/INDEX.md`.
+5. Ensure the TD is listed in `INDEX.md` (governance repository root).
 
 Eligibility rules:
 - A TD MUST be `Approved` to satisfy GT-110 readiness.
@@ -108,10 +108,10 @@ Hard rule:
 
 Canonical locations:
 - `td/TD-####.md`
-- `Lantern/change/INDEX.md`
+- `INDEX.md` (governance repository root)
 
 Registry rules:
-- Every TD MUST appear exactly once under `## Test Definitions` in `Lantern/change/INDEX.md`.
+- Every TD MUST appear exactly once under `## Test Definitions` in `INDEX.md` (governance repository root).
 - The TD header status and registry status MUST match.
 - When a TD is superseded, both the old TD (updated to `Superseded`) and the new TD (new file, `Approved`) MUST be reflected in the registry.
 
