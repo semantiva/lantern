@@ -6,7 +6,10 @@ import hashlib
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable, Mapping
+from typing import TYPE_CHECKING, Any, Iterable, Mapping
+
+if TYPE_CHECKING:
+    from lantern.workflow.merger import EffectiveLayer
 
 import yaml
 
@@ -766,3 +769,43 @@ def re_sub_multi_underscore(value: str) -> str:
     while "__" in value:
         value = value.replace("__", "_")
     return value
+
+
+
+def load_effective_layer(
+    *,
+    workflow_layer: WorkflowLayer,
+    configuration_root: Path | None = None,
+    launcher_overlay_root: Path | None = None,
+) -> "EffectiveLayer":
+    """Build an EffectiveLayer from a loaded WorkflowLayer and an optional configuration surface.
+
+    Imports merger components lazily to avoid circular imports at module load time.
+    """
+    from lantern.workflow.merger import (
+        ConfigurationLoader,
+        ConfigurationMerger,
+        EffectiveLayer,
+    )
+
+    loader = ConfigurationLoader()
+    merger = ConfigurationMerger()
+
+    config_surface = None
+    if configuration_root is not None:
+        config_folder = Path(configuration_root) / "workflow" / "configuration"
+        if config_folder.exists():
+            config_surface = loader.load_and_validate(config_folder)
+
+    overlay_surface = None
+    if launcher_overlay_root is not None:
+        overlay_folder = Path(launcher_overlay_root) / "workflow" / "configuration"
+        if overlay_folder.exists():
+            overlay_surface = loader.load_and_validate(overlay_folder)
+
+    return merger.merge(
+        baseline_surface_classification=workflow_layer.runtime_surface_classification,
+        baseline_version=workflow_layer.grammar_version or "unknown",
+        configuration_surface=config_surface,
+        launcher_overlay_surface=overlay_surface,
+    )

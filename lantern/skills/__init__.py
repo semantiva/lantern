@@ -1,0 +1,1 @@
+"""Skill projection generation for Lantern (CH-0005)."""

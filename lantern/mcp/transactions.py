@@ -12,6 +12,7 @@ from typing import Any, Mapping
 from uuid import uuid4
 
 from lantern.artifacts.allocator import allocate_artifact_id, artifact_path
+from lantern.workflow.merger import InterventionRestrictionGuard, PostureResult
 from lantern.artifacts.renderers import canonical_render_markdown, parse_header_block
 from lantern.artifacts.validator import (
     validate_artifact_file,
@@ -33,6 +34,18 @@ from lantern.mcp.topology import resolve_topology
 from lantern.workflow.loader import WorkflowLayer
 
 _TRANSACTION_LOCK = threading.Lock()
+_active_posture_result: PostureResult | None = None
+_intervention_guard = InterventionRestrictionGuard()
+
+
+def configure_posture_result(posture_result: PostureResult | None) -> None:
+    """Set the session-scoped PostureResult for all subsequent transaction-engine operations.
+
+    Called by server.py during the startup sequence after posture validation completes.
+    Must be called before any MCP tool handles a request.
+    """
+    global _active_posture_result
+    _active_posture_result = posture_result
 
 
 class TransactionError(RuntimeError):
@@ -178,6 +191,10 @@ class TransactionEngine:
         actor: str,
         hold_lock_seconds: float = 0.0,
     ) -> dict[str, Any]:
+        _intervention_guard.check(
+            posture_result=_active_posture_result,
+            transaction_kind="write_binding_record",
+        )
         findings = validate_commit_request(draft_id)
         if findings:
             return {"status": "invalid", "findings": findings}
@@ -262,6 +279,10 @@ class TransactionEngine:
         payload: Mapping[str, Any] | None,
         actor: str,
     ) -> dict[str, Any]:
+        _intervention_guard.check(
+            posture_result=_active_posture_result,
+            transaction_kind="write_binding_record",
+        )
         findings = validate_selected_ci_commit_request(payload)
         if findings:
             return {"status": "invalid", "findings": findings}

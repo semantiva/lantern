@@ -12,6 +12,7 @@ from lantern.mcp.catalog import build_catalog_response, build_contract_response
 from lantern.mcp.topology import TopologyPosture, resolve_topology
 from lantern.mcp.transactions import ChangeSurface, TransactionEngine, TransactionError
 from lantern.workflow.loader import WorkflowLayer
+from lantern.workflow.merger import PostureResult, build_runtime_posture_label
 
 
 class InspectError(ValueError):
@@ -25,6 +26,7 @@ class InspectCatalogResult:
     runtime_surface_classification: str
     workbench_count: int
     contract_refs: tuple[str, ...]
+    runtime_posture: dict[str, Any]
 
 
 @dataclass(frozen=True)
@@ -40,6 +42,7 @@ class InspectContractResult:
     response_surface_bindings: tuple[dict[str, Any], ...]
     server_owned_contract: dict[str, Any]
     workflow_owned_contract: dict[str, Any]
+    runtime_posture: dict[str, Any]
 
 
 @dataclass(frozen=True)
@@ -51,6 +54,7 @@ class InspectWorkspaceResult:
     consistency_state: str
     startup_issues: tuple[str, ...]
     read_only: bool
+    runtime_posture: dict[str, Any]
 
 
 @dataclass(frozen=True)
@@ -60,6 +64,7 @@ class InspectStatusContractResult:
     authoritative_source_path: str
     projection_sha256: str
     families: dict[str, Any]
+    runtime_posture: dict[str, Any]
 
 
 @dataclass(frozen=True)
@@ -73,6 +78,7 @@ class InspectChangeSurfaceResult:
     allowed_change_surface: tuple[str, ...]
     runtime_managed_change_surface: tuple[str, ...]
     change_surface_hash: str
+    runtime_posture: dict[str, Any]
 
 
 def handle_inspect(
@@ -84,15 +90,17 @@ def handle_inspect(
     product_root: Optional[Path] = None,
     governance_root: Optional[Path] = None,
     ci_path: Optional[str] = None,
+    posture_result: Optional[PostureResult] = None,
 ) -> InspectCatalogResult | InspectContractResult | InspectWorkspaceResult | InspectStatusContractResult | InspectChangeSurfaceResult:
+    _rp = _default_runtime_posture_label(workflow_layer, posture_result)
     if kind == "catalog":
-        return _handle_catalog(workflow_layer)
+        return _handle_catalog(workflow_layer, _rp)
     if kind == "contract":
-        return _handle_contract(workflow_layer, contract_ref)
+        return _handle_contract(workflow_layer, contract_ref, _rp)
     if kind == "workspace":
-        return _handle_workspace(product_root, governance_root)
+        return _handle_workspace(product_root, governance_root, _rp)
     if kind == "status_contract":
-        return _handle_status_contract()
+        return _handle_status_contract(_rp)
     if kind == "change_surface":
         return _handle_change_surface(
             workflow_layer=workflow_layer,
@@ -100,6 +108,7 @@ def handle_inspect(
             product_root=product_root,
             governance_root=governance_root,
             ci_path=ci_path,
+            runtime_posture=_rp,
         )
 
     declared_views: set[str] = set()
@@ -112,7 +121,7 @@ def handle_inspect(
     )
 
 
-def _handle_catalog(workflow_layer: WorkflowLayer) -> InspectCatalogResult:
+def _handle_catalog(workflow_layer: WorkflowLayer, runtime_posture: dict[str, Any]) -> InspectCatalogResult:
     resp = build_catalog_response(workflow_layer)
     return InspectCatalogResult(
         kind="catalog",
@@ -120,12 +129,14 @@ def _handle_catalog(workflow_layer: WorkflowLayer) -> InspectCatalogResult:
         runtime_surface_classification=resp.runtime_surface_classification,
         workbench_count=resp.workbench_count,
         contract_refs=resp.contract_refs,
+        runtime_posture=runtime_posture,
     )
 
 
 def _handle_contract(
     workflow_layer: WorkflowLayer,
     contract_ref: Optional[str],
+    runtime_posture: dict[str, Any],
 ) -> InspectContractResult:
     if not contract_ref:
         raise InspectError("inspect(kind='contract') requires a non-empty contract_ref")
@@ -148,12 +159,14 @@ def _handle_contract(
         response_surface_bindings=resp.response_surface_bindings,
         server_owned_contract=layers["server_owned_contract"],
         workflow_owned_contract=layers["workflow_owned_contract"],
+        runtime_posture=runtime_posture,
     )
 
 
 def _handle_workspace(
     product_root: Optional[Path],
-    governance_root: Optional[Path] = None,
+    governance_root: Optional[Path],
+    runtime_posture: dict[str, Any],
 ) -> InspectWorkspaceResult:
     if product_root is None:
         raise InspectError(
@@ -172,10 +185,11 @@ def _handle_workspace(
         consistency_state=posture.consistency_state,
         startup_issues=posture.startup_issues,
         read_only=posture.read_only,
+        runtime_posture=runtime_posture,
     )
 
 
-def _handle_status_contract() -> InspectStatusContractResult:
+def _handle_status_contract(runtime_posture: dict[str, Any]) -> InspectStatusContractResult:
     payload = load_status_contract()
     raw = DEFAULT_STATUS_CONTRACT_PATH.read_text(encoding="utf-8")
     return InspectStatusContractResult(
@@ -184,6 +198,7 @@ def _handle_status_contract() -> InspectStatusContractResult:
         authoritative_source_path=str(payload["generated_from"]["authoritative_path"]),
         projection_sha256=sha256(raw.encode("utf-8")).hexdigest(),
         families=dict(payload["families"]),
+        runtime_posture=runtime_posture,
     )
 
 
@@ -194,6 +209,7 @@ def _handle_change_surface(
     product_root: Optional[Path],
     governance_root: Optional[Path],
     ci_path: Optional[str],
+    runtime_posture: dict[str, Any],
 ) -> InspectChangeSurfaceResult:
     if product_root is None:
         raise InspectError("inspect(kind='change_surface') requires an explicit product_root")
@@ -223,4 +239,28 @@ def _handle_change_surface(
         allowed_change_surface=posture.allowed_change_surface,
         runtime_managed_change_surface=posture.runtime_managed_change_surface,
         change_surface_hash=posture.change_surface_hash,
+        runtime_posture=runtime_posture,
     )
+
+
+def _default_runtime_posture_label(
+    workflow_layer: WorkflowLayer,
+    posture_result: Optional[PostureResult],
+) -> dict[str, Any]:
+    """Return a runtime_posture block from posture_result, or a minimal default block."""
+    if posture_result is not None:
+        return build_runtime_posture_label(posture_result)
+    from lantern.workflow.merger import MergeProvenance, PostureResult as _PostureResult
+    default_pr = _PostureResult(
+        classification=workflow_layer.runtime_surface_classification,
+        bounded_scope_markers=(),
+        restricted_capabilities=(),
+        provenance=MergeProvenance(
+            baseline_version=workflow_layer.grammar_version or "unknown",
+            configuration_folder=None,
+            main_yaml_hash=None,
+            launcher_overlay_folder=None,
+            launcher_overlay_hash=None,
+        ),
+    )
+    return build_runtime_posture_label(default_pr)

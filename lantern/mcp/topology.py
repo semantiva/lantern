@@ -77,3 +77,21 @@ def _read_runtime_surface(registry_path: Path) -> str:
         return str(payload.get("runtime_surface_classification", "unknown"))
     except Exception:
         return "unknown"
+
+
+def resolve_configuration_surface(
+    *,
+    governance_root: Optional[Path],
+) -> Optional[Path]:
+    """Return the product-governance configuration folder path if it exists.
+
+    Returns None when governance_root is None or the configuration folder is absent.
+    The returned path is the directory containing main.yaml, i.e.
+    <governance_root>/workflow/configuration/.
+    """
+    if governance_root is None:
+        return None
+    config_folder = Path(governance_root).resolve() / "workflow" / "configuration"
+    if config_folder.is_dir() and (config_folder / "main.yaml").exists():
+        return config_folder
+    return None

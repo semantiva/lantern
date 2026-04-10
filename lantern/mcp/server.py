@@ -37,10 +37,22 @@ from lantern.mcp.draft import handle_draft
 from lantern.mcp.inspect import handle_inspect
 from lantern.mcp.orient import handle_orient
 from lantern.mcp.validate import handle_validate
-from lantern.workflow.loader import WorkflowLayer, load_workflow_layer
+from lantern.mcp.transactions import configure_posture_result as _configure_posture_result
+from lantern.workflow.loader import WorkflowLayer, load_effective_layer, load_workflow_layer
+from lantern.workflow.merger import (
+    ConfigurationMerger,
+    EffectiveLayer,
+    PostureResult,
+    PostureValidationError,
+    PostureValidator,
+    build_runtime_posture_label,
+)
+from lantern.skills.generator import SkillGenerator, compute_workflow_layer_hash
 
 mcp = FastMCP("lantern")
 _workflow_layer: Optional[WorkflowLayer] = None
+_effective_layer: Optional[EffectiveLayer] = None
+_posture_result: Optional[PostureResult] = None
 _product_root: Optional[Path] = None
 _governance_root: Optional[Path] = None
 
@@ -50,18 +62,82 @@ def configure_server_paths(
     product_root: Path,
     governance_root: Optional[Path] = None,
 ) -> None:
-    global _product_root, _governance_root
+    global _product_root, _governance_root, _workflow_layer, _effective_layer, _posture_result
     _product_root = Path(product_root).resolve()
     _governance_root = (
         Path(governance_root).resolve() if governance_root is not None else None
     )
+    _workflow_layer = None
+    _effective_layer = None
+    _posture_result = None
 
 
 def _get_workflow_layer() -> WorkflowLayer:
-    global _workflow_layer
+    global _workflow_layer, _effective_layer, _posture_result
     if _workflow_layer is None:
         _workflow_layer = load_workflow_layer()
+        _effective_layer, _posture_result = _run_startup_sequence(_workflow_layer)
+        _configure_posture_result(_posture_result)
     return _workflow_layer
+
+
+def _run_startup_sequence(
+    workflow_layer: WorkflowLayer,
+) -> tuple[EffectiveLayer, PostureResult]:
+    """Execute the ordered startup validation sequence before any MCP tool responds."""
+    from lantern.artifacts.validator import load_status_contract
+
+    effective_layer = load_effective_layer(
+        workflow_layer=workflow_layer,
+        configuration_root=_governance_root,
+    )
+
+    status_contract = load_status_contract()
+    validator = PostureValidator()
+    posture_result = validator.validate(
+        effective_layer=effective_layer,
+        workflow_layer=workflow_layer,
+        status_contract=status_contract,
+    )
+
+    merger = ConfigurationMerger()
+    merger.validate_guide_consistency(
+        effective_layer=effective_layer,
+        workflow_layer=workflow_layer,
+    )
+
+    if effective_layer.configuration_surface is not None:
+        wl_hash = compute_workflow_layer_hash(workflow_layer)
+        gen = SkillGenerator()
+        freshness = gen.check_freshness(
+            configuration_surface=effective_layer.configuration_surface,
+            workflow_layer_hash=wl_hash,
+        )
+        if not freshness.fresh:
+            if posture_result.classification == "full_governed_surface":
+                raise PostureValidationError(
+                    "Startup aborted: generated skill projections are stale under "
+                    "full_governed_surface. "
+                    + " ".join(freshness.reasons)
+                    + " Run SkillGenerator.generate() and commit the outputs to governance."
+                )
+            else:
+                import warnings
+                for reason in freshness.reasons:
+                    warnings.warn(
+                        f"[lantern] Stale generated projection (non-fatal under "
+                        f"{posture_result.classification}): {reason}",
+                        stacklevel=2,
+                    )
+
+    return effective_layer, posture_result
+
+
+def _get_posture_result() -> PostureResult:
+    """Return the current session PostureResult; triggers startup sequence if not yet run."""
+    _get_workflow_layer()
+    assert _posture_result is not None
+    return _posture_result
 
 
 def _require_product_root() -> Path:
@@ -85,6 +161,7 @@ def inspect(
         product_root=_product_root,
         governance_root=_governance_root,
         ci_path=ci_path or None,
+        posture_result=_get_posture_result(),
     )
     return _to_dict(result)
 
@@ -103,6 +180,7 @@ def orient(
         governance_state=governance_state,
         intent=intent or None,
         ch_id=ch_id or None,
+        posture_result=_get_posture_result(),
     )
     return _to_dict(result)
 

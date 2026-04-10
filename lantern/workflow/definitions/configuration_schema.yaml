@@ -1,0 +1,56 @@
+# Authoritative schema declaration for product-governance main.yaml (configuration_version: 1)
+# Consumed by ConfigurationLoader.load_and_validate() and by tests.
+# Do not hand-edit generated_skill/ or generated_artifact_templates/ targets.
+schema_id: lantern.workflow.configuration_schema.v1
+
+# Valid values for main.yaml declared_posture
+declared_posture_values:
+  - full_governed_surface
+  - partial_governed_surface
+  - intervention_surface
+
+# Required top-level fields in main.yaml
+required_main_yaml_fields:
+  - configuration_version
+  - declared_posture
+
+# Required authored subfolders under workflow/configuration/
+required_authored_subfolders:
+  - instructions
+  - workbenches
+  - guides
+
+# Required generated projection subfolders (must exist before startup for full_governed_surface)
+required_generated_subfolders:
+  - generated_skill
+  - generated_artifact_templates
+
+# Required files inside generated_skill/
+generated_skill_required_files:
+  - SKILL.md
+  - skill_manifest.json
+
+# Required top-level fields in generated_skill/skill_manifest.json
+required_skill_manifest_fields:
+  - generation_timestamp
+  - configuration_hash
+  - workflow_layer_hash
+  - modes
+
+# Gates that must be covered by the merged workbench set for full_governed_surface to be valid
+# (authoritative source: workbench_schema.yaml required_full_governed_gates)
+required_full_governed_gates:
+  - GT-030
+  - GT-050
+  - GT-060
+  - GT-110
+  - GT-115
+  - GT-120
+  - GT-130
+
+# Transaction kinds that are forbidden under intervention_surface posture
+intervention_forbidden_transaction_kinds:
+  - claim_governed_closure
+  - advance_status_to_terminal
+  - write_binding_record
+  - emit_gate_evidence

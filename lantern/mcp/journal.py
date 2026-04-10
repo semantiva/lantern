@@ -26,7 +26,16 @@ def write_journal_record(
     runtime_root: Path,
     transaction_id: str,
     record: dict[str, Any],
+    posture_label: dict[str, Any] | None = None,
 ) -> Path:
+    """Persist a journal record, optionally injecting a runtime_posture header.
+
+    posture_label is the output of build_runtime_posture_label(posture_result).
+    When provided, it is injected into the record under the key "runtime_posture".
+    When None (no configuration surface active), the key is absent.
+    """
+    if posture_label is not None:
+        record = {**record, "runtime_posture": posture_label}
     journal_dir = runtime_root / "journal" / transaction_id
     journal_dir.mkdir(parents=True, exist_ok=True)
     journal_path = journal_dir / "journal.json"

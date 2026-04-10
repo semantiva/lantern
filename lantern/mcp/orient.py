@@ -9,6 +9,7 @@ from lantern.mcp.catalog import (
     get_allowed_roles_for_transaction,
 )
 from lantern.workflow.loader import WorkflowLayer
+from lantern.workflow.merger import PostureResult, build_runtime_posture_label
 from lantern.workflow.resolver import (
     ResolvedWorkbenchSet,
     ResolverAmbiguityError,
@@ -28,6 +29,7 @@ class OrientResponse:
     runtime_exposure_posture: dict[str, Any]
     next_valid_actions: tuple[str, ...]
     ambiguity: Optional[dict[str, Any]]
+    runtime_posture: dict[str, Any]
 
 
 def handle_orient(
@@ -36,7 +38,9 @@ def handle_orient(
     governance_state: dict[str, Any],
     intent: Optional[str] = None,
     ch_id: Optional[str] = None,
+    posture_result: Optional[PostureResult] = None,
 ) -> OrientResponse:
+    rp = _orient_runtime_posture_label(workflow_layer, posture_result)
     try:
         resolved: ResolvedWorkbenchSet = resolve_active_workbenches(
             workflow_layer=workflow_layer,
@@ -58,6 +62,7 @@ def handle_orient(
                 "detail": str(exc),
                 "resolution": "provide explicit ch_id to orient",
             },
+            runtime_posture=rp,
         )
 
     runtime_exposure = _build_runtime_exposure(
@@ -74,6 +79,7 @@ def handle_orient(
         runtime_exposure_posture=runtime_exposure,
         next_valid_actions=resolved.next_valid_actions,
         ambiguity=None,
+        runtime_posture=rp,
     )
 
 
@@ -105,3 +111,25 @@ def _build_runtime_exposure(
             }
         )
     return exposure
+
+
+def _orient_runtime_posture_label(
+    workflow_layer: WorkflowLayer,
+    posture_result: Optional[PostureResult],
+) -> dict[str, Any]:
+    if posture_result is not None:
+        return build_runtime_posture_label(posture_result)
+    from lantern.workflow.merger import MergeProvenance, PostureResult as _PostureResult
+    default_pr = _PostureResult(
+        classification=workflow_layer.runtime_surface_classification,
+        bounded_scope_markers=(),
+        restricted_capabilities=(),
+        provenance=MergeProvenance(
+            baseline_version="unknown",
+            configuration_folder=None,
+            main_yaml_hash=None,
+            launcher_overlay_folder=None,
+            launcher_overlay_hash=None,
+        ),
+    )
+    return build_runtime_posture_label(default_pr)
