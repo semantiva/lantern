@@ -151,6 +151,15 @@ resolution against the validated workflow layer:
 
 `draft`, `commit`, and `validate` mutation behavior is delivered in CH-0004.
 
+### Packaged operator surface
+
+Lantern ships one package-owned thin operator surface under `lantern/skills/packaged_default/`:
+
+- `SKILL.md` — applicability, the first MCP move, the universal discovery sequence, and immutable safety rules only.
+- `skill-manifest.json` — mode-first routing keyed by stable logical refs.
+
+The packaged pair does not embed guide or template bodies. Live authoritative content is delivered dynamically through inline `resource_packets` on `orient(...)` and `inspect(kind="contract")`.
+
 ## Native MVP smoke path
 
 Use this bridge-free smoke path after the manual `lantern_grammar` install is complete:

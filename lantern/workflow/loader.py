@@ -37,7 +37,12 @@ DEFAULT_WORKFLOW_MAP_PATH = DEFAULT_DEFINITIONS_ROOT / "workflow_map.md"
 DEFAULT_WORKBENCH_BINDINGS_PATH = DEFAULT_DEFINITIONS_ROOT / "workbench_resource_bindings.md"
 DEFAULT_RELOCATION_MANIFEST_PATH = Path(__file__).resolve().parents[1] / "preservation" / "relocation_manifest.yaml"
 
-_ALLOWED_RESOURCE_ROLES = {"instruction_resource", "authoritative_guides", "administration_guides"}
+_ALLOWED_RESOURCE_ROLES = {
+    "instruction_resource",
+    "authoritative_guides",
+    "administration_guides",
+    "artifact_templates",
+}
 _REQUIRED_ARTIFACT_FAMILIES = {"DIP", "SPEC", "ARCH", "INI", "CH", "TD", "DC", "DB", "CI", "EV", "DEC", "IS"}
 _PRIMARY_TRANSACTION_KIND = {
     "upstream_intake_and_baselines": "draft",

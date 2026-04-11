@@ -1,221 +1,297 @@
-"""Authoritative generated-projection generator for product-governance configuration folders.
+"""Package-owned thin operator skill-surface generation for CH-0006.
 
-SkillGenerator writes generated_skill/SKILL.md and generated_skill/skill_manifest.json
-into a product's governance repository configuration folder.  It also writes
-generated_artifact_templates/ entries sourced from the packaged Lantern templates.
-
-Generation is an explicit maintainer action, not an automatic startup side-effect.
-At runtime startup, only SkillGenerator.check_freshness() is called to verify that
-the committed projections are current relative to the authored configuration inputs.
+This module owns the committed package-default `SKILL.md` and `skill-manifest.json`
+under `lantern/skills/packaged_default/`. It does not manage governance-folder
+freshness checks or generated template mirrors.
 """
 from __future__ import annotations
 
 import hashlib
 import json
-from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
-from lantern.workflow.merger import (
-    ConfigurationSurface,
-    FreshnessResult,
-)
+from lantern.mcp.catalog import filter_resources_for_workbench
+from lantern.workflow.loader import WorkflowLayer, load_workflow_layer
 
-# Packaged Lantern template directory (source for generated_artifact_templates/)
-_LANTERN_TEMPLATES_ROOT = Path(__file__).resolve().parents[1] / "templates"
+PACKAGED_DEFAULT_ROOT = Path(__file__).resolve().parent / "packaged_default"
+PACKAGED_SKILL_MD_PATH = PACKAGED_DEFAULT_ROOT / "SKILL.md"
+PACKAGED_SKILL_MANIFEST_PATH = PACKAGED_DEFAULT_ROOT / "skill-manifest.json"
 
-# Template filenames to include in generated_artifact_templates/
-_TEMPLATE_FILENAMES = (
-    "TEMPLATE__DIP.md",
-    "TEMPLATE__SPEC.md",
-    "TEMPLATE__ARCH.md",
-    "TEMPLATE__INI.md",
-    "TEMPLATE__CH.md",
-    "TEMPLATE__TD.md",
-    "TEMPLATE__DC.md",
-    "TEMPLATE__DB.md",
-    "TEMPLATE__CI.md",
-    "TEMPLATE__EV.md",
-    "TEMPLATE__DEC.md",
-    "TEMPLATE__IS.md",
-)
 
-_SKILL_MD_TEMPLATE = """\
-# Lantern Governed Workflow Runtime — AI Operator Skill
+def _canonical_json(payload: Any) -> str:
+    return json.dumps(payload, indent=2, sort_keys=True) + "\n"
 
-**Configuration:** {configuration_id}  
-**Declared posture:** {declared_posture}  
-**Generated:** {generation_timestamp}
 
-## Discovery sequence
+def _sha256_text(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
-Always follow inspect → orient → transaction to operate safely:
 
-1. `inspect(kind="catalog")` — list available tools and contracts.
-2. `inspect(kind="workspace")` — confirm product and governance roots and posture.
-3. `orient(intent="...", ch_statuses="...", active_gates="...", passed_gates="...")` — resolve active workbench and next valid actions.
-4. `inspect(kind="contract", contract_ref="...")` — load the active workbench contract.
-5. Execute the appropriate transaction (`draft`, `commit`, or `validate`).
+def compute_workflow_layer_hash(workflow_layer: WorkflowLayer) -> str:
+    payload = {
+        "grammar_version": workflow_layer.grammar_version,
+        "grammar_package_version": workflow_layer.grammar_package_version,
+        "workbench_ids": [workbench.workbench_id for workbench in workflow_layer.workbenches],
+        "contract_refs": [entry.contract_ref for entry in workflow_layer.contract_catalog],
+        "resource_ids": [entry.resource_id for entry in workflow_layer.resource_manifest],
+    }
+    return _sha256_text(_canonical_json(payload))
 
-## Workflow modes
 
-{modes_section}
+def _contract_catalog_hash(workflow_layer: WorkflowLayer) -> str:
+    payload = [
+        {
+            "contract_ref": entry.contract_ref,
+            "request_schema_ref": entry.request_schema_ref,
+            "transaction_kind": entry.transaction_kind,
+            "workbench_refs": list(entry.workbench_refs),
+            "family_binding": list(entry.family_binding),
+            "gate_binding": list(entry.gate_binding),
+            "response_surface_bindings": [
+                {
+                    "transaction_kind": binding.transaction_kind,
+                    "response_envelope": binding.response_envelope,
+                    "allowed_resource_roles": list(binding.allowed_resource_roles),
+                }
+                for binding in entry.response_surface_bindings
+            ],
+        }
+        for entry in workflow_layer.contract_catalog
+    ]
+    return _sha256_text(_canonical_json(payload))
 
-## Generated projection provenance
 
-- configuration_hash: {configuration_hash}
-- workflow_layer_hash: {workflow_layer_hash}
-- generation_timestamp: {generation_timestamp}
+def _resource_manifest_hash(workflow_layer: WorkflowLayer) -> str:
+    payload = [
+        {
+            "resource_id": entry.resource_id,
+            "kind": entry.kind,
+            "workbench_id": entry.workbench_id,
+            "content_hash": entry.content_hash,
+            "roles": list(entry.roles),
+        }
+        for entry in workflow_layer.resource_manifest
+    ]
+    return _sha256_text(_canonical_json(payload))
 
-Do not hand-edit this file. Regenerate by running `SkillGenerator.generate()` after
-updating main.yaml or workbench declarations.
+
+def _mode_id_for_workbench(workbench: Any) -> str:
+    if workbench.intent_classes:
+        return workbench.intent_classes[0]
+    return workbench.workbench_id
+
+
+def _build_mode_entries(workflow_layer: WorkflowLayer) -> list[dict[str, Any]]:
+    seen_mode_ids: set[str] = set()
+    modes: list[dict[str, Any]] = []
+    for workbench in workflow_layer.workbenches:
+        mode_id = _mode_id_for_workbench(workbench)
+        if mode_id in seen_mode_ids:
+            raise AssertionError(
+                f"Duplicate packaged mode_id {mode_id!r}; CH-0006 packaged routing must stay unambiguous"
+            )
+        seen_mode_ids.add(mode_id)
+        inspect_roles = tuple(
+            role
+            for role in next(
+                (
+                    binding.allowed_resource_roles
+                    for binding in workbench.response_surface_bindings
+                    if binding.transaction_kind == "inspect"
+                ),
+                (),
+            )
+            if role
+            in {
+                "instruction_resource",
+                "authoritative_guides",
+                "administration_guides",
+                "artifact_templates",
+            }
+        )
+        resource_refs = [
+            item["resource_id"]
+            for item in filter_resources_for_workbench(
+                workflow_layer=workflow_layer,
+                workbench_id=workbench.workbench_id,
+                allowed_roles=inspect_roles,
+            )
+        ]
+        modes.append(
+            {
+                "mode_id": mode_id,
+                "entry_workbench_id": workbench.workbench_id,
+                "entry_contract_refs": list(workbench.contract_refs),
+                "resource_refs": resource_refs,
+            }
+        )
+    return modes
+
+
+def _workflow_mode_ids(workflow_layer: WorkflowLayer) -> list[str]:
+    return [entry["mode_id"] for entry in _build_mode_entries(workflow_layer)]
+
+
+def build_packaged_skill_md(workflow_layer: WorkflowLayer) -> str:
+    workflow_modes = "\n".join(
+        f"- `{mode_id}`" for mode_id in _workflow_mode_ids(workflow_layer)
+    )
+    return f"""---
+name: lantern
+description: Use this skill when the task involves Lantern-governed workflow work. This includes authoring or assessing change handlers (CH, TD, DB, CI), upstream baseline intake (DIP, SPEC, ARCH), design candidate or design selection steps, CI authoring or selection, applying a selected CI, verification or closure, issue intake, governance onboarding, or bootstrap. Triggers on any mention of Lantern gates (GT-030, GT-050, GT-060, GT-110, GT-115, GT-120, GT-130), Lantern MCP tools (inspect, orient, draft, commit, validate), Lantern artifact families, or requests to operate through Lantern workflow procedures rather than direct repository editing.
+---
+
+# Lantern Operator Skill
+
+Lantern is a governed workflow runtime for work that is controlled by formal artifacts, lifecycle states, gates, and workbench procedures.
+
+Use this skill to decide whether Lantern applies, and to route into the correct MCP discovery path. This skill is intentionally thin: it gives the operator the right mindset and the first moves, but live MCP resources remain authoritative.
+
+## Use Lantern when
+
+Use Lantern when the request is about any of the following:
+
+- governed change work, such as CH, TD, DB, CI, verification, or closure
+- baseline or upstream intake work, such as SPEC, ARCH, or DIP intake and baseline preparation
+- issue intake or governed problem handling
+- governance onboarding or bootstrap
+- Lantern workflow gates, statuses, dependencies, required evidence, or required decisions
+- choosing the correct workbench, contract, guide, or template for governed work
+- operating through Lantern MCP procedures rather than direct repository spelunking
+
+Typical examples:
+
+- “Prepare or assess a CH/TD for readiness”
+- “Work a design candidate or design selection step”
+- “Author or select a CI”
+- “Apply a selected CI and move toward verification/closure”
+- “Handle an issue through the governed workflow”
+- “Bootstrap or onboard a governed product into Lantern”
+- “Explain which Lantern workflow mode or workbench applies”
+
+## Do not use Lantern as
+
+Do not treat Lantern as:
+
+- a raw repository search tool
+- a general file browser
+- a substitute for live MCP discovery packets
+- a place to invent workflow meaning from filenames or repository paths
+- an authority over mutable guides, templates, or workbench details
+
+If the task is ordinary repo editing with no Lantern governance context, Lantern may not be the right first tool.
+
+## What Lantern gives you
+
+Lantern gives you a governed routing layer over workflow truth.
+
+It helps you:
+
+- determine whether a governed workflow applies
+- identify the right workflow mode and entry workbench
+- inspect the authoritative contract for that workbench
+- consume live guides, instructions, and templates through MCP before any write
+- stay on the fixed public tool surface
+
+## First MCP move
+
+Call:
+
+`inspect(kind="catalog")`
+
+Then call:
+
+`inspect(kind="workspace")`
+
+These two calls establish the governed vocabulary and the active runtime/workspace posture before you choose a mode.
+
+## Universal discovery sequence
+
+1. `inspect(kind="catalog")`
+2. `inspect(kind="workspace")`
+3. read `skill-manifest.json`
+4. choose the most relevant workflow mode and entry workbench
+5. `orient(...)`
+6. `inspect(kind="contract", contract_ref="...")`
+7. consume the returned live `resource_packets`
+8. only then consider `draft`, `commit`, or `validate`
+
+## Workflow modes currently exposed
+
+Use the manifest to choose among these mode families:
+
+{workflow_modes}
+
+When unsure, do not guess from names alone. Use the manifest entry workbench and contract refs, then confirm through `orient(...)` and `inspect(kind="contract", ...)`.
+
+## Minimal routing hints
+
+- If the user is preparing or assessing governed change work, start by checking `change_readiness`.
+- If the user is working from upstream baseline artifacts, check `baseline_intake`.
+- If the user is handling a reported problem or issue, check `issue_intake`.
+- If the user is onboarding or setting up governance, check `bootstrap`.
+- If the user is in the middle of design, CI, application, or closure work, use the corresponding mode from the manifest rather than inferring from repository layout.
+
+## Immutable safety rules
+
+- Treat this skill and manifest as routing only; live MCP resources remain authoritative.
+- Stay on the fixed public tool surface: `inspect`, `orient`, `draft`, `commit`, `validate`.
+- Do not rely on raw repository paths as the operator contract.
+- Do not require local skill regeneration or generated guide/template folders before source-tree discovery.
+- Do not skip `inspect(kind="contract", ...)` before acting on a workbench.
+- Do not invent gate semantics, status meaning, or workflow transitions from memory when MCP can resolve them.
+
+## Operating posture
+
+This skill is meant to create the right initial mindset:
+
+- first identify whether the request is governed by Lantern
+- then route to the correct mode/workbench
+- then read authoritative live packets
+- then act
+
+Lantern is strongest when used as governed routing and inspection, not as opportunistic repo search.
 """
 
 
-class SkillGenerator:
-    """Generate and freshness-check authoritative AI-facing projections for a product-governance folder."""
-
-    def generate(
-        self,
-        *,
-        product_governance_root: Path,
-        configuration_surface: ConfigurationSurface,
-        workflow_layer_hash: str,
-    ) -> None:
-        """Write generated_skill/ and generated_artifact_templates/ into the configuration folder.
-
-        product_governance_root: the governed product's governance repository root.
-        configuration_surface: loaded ConfigurationSurface for this product.
-        workflow_layer_hash: SHA-256 of the merged workflow layer (caller computes this).
-
-        The generated files are committed to governance by the maintainer after generation.
-        They are never auto-regenerated at runtime startup.
-        """
-        config_folder = configuration_surface.folder
-        configuration_hash = configuration_surface.main_yaml_hash
-        generation_timestamp = datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
-
-        # Build modes section for SKILL.md
-        modes_lines: list[str] = []
-        for mode in configuration_surface.workflow_modes:
-            modes_lines.append(f"### {mode.mode_id}")
-            modes_lines.append(f"- Entry workbench: `{mode.entry_workbench}`")
-            if mode.guide_refs:
-                modes_lines.append("- Guides: " + ", ".join(f"`{g}`" for g in mode.guide_refs))
-            modes_lines.append("")
-        modes_section = "\n".join(modes_lines).rstrip()
-
-        configuration_id = str(config_folder.relative_to(product_governance_root))
-
-        skill_md = _SKILL_MD_TEMPLATE.format(
-            configuration_id=configuration_id,
-            declared_posture=configuration_surface.declared_posture,
-            generation_timestamp=generation_timestamp,
-            modes_section=modes_section or "(no workflow modes declared)",
-            configuration_hash=configuration_hash,
-            workflow_layer_hash=workflow_layer_hash,
-        )
-
-        modes_payload = [
-            {
-                "mode_id": mode.mode_id,
-                "entry_workbench": mode.entry_workbench,
-                "guide_refs": list(mode.guide_refs),
-            }
-            for mode in configuration_surface.workflow_modes
-        ]
-
-        manifest = {
-            "generation_timestamp": generation_timestamp,
-            "configuration_hash": configuration_hash,
-            "workflow_layer_hash": workflow_layer_hash,
-            "declared_posture": configuration_surface.declared_posture,
-            "modes": modes_payload,
-        }
-
-        # Write generated_skill/
-        skill_dir = config_folder / "generated_skill"
-        skill_dir.mkdir(parents=True, exist_ok=True)
-        (skill_dir / "SKILL.md").write_text(skill_md, encoding="utf-8")
-        (skill_dir / "skill_manifest.json").write_text(
-            json.dumps(manifest, indent=2, sort_keys=True) + "\n",
-            encoding="utf-8",
-        )
-
-        # Write generated_artifact_templates/
-        templates_dir = config_folder / "generated_artifact_templates"
-        templates_dir.mkdir(parents=True, exist_ok=True)
-        for filename in _TEMPLATE_FILENAMES:
-            source = _LANTERN_TEMPLATES_ROOT / filename
-            if source.exists():
-                dest = templates_dir / filename
-                dest.write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
-
-    def check_freshness(
-        self,
-        *,
-        configuration_surface: ConfigurationSurface,
-        workflow_layer_hash: str,
-    ) -> FreshnessResult:
-        """Check whether the committed generated projections are current.
-
-        Returns a FreshnessResult.  Callers apply the fatal/warning distinction:
-        - full_governed_surface: stale projections are a fatal startup error.
-        - partial_governed_surface / intervention_surface: stale projections are a warning only.
-        """
-        config_folder = configuration_surface.folder
-        reasons: list[str] = []
-
-        skill_manifest_path = config_folder / "generated_skill" / "skill_manifest.json"
-        skill_md_path = config_folder / "generated_skill" / "SKILL.md"
-
-        if not skill_manifest_path.exists():
-            reasons.append(
-                f"generated_skill/skill_manifest.json is missing at {skill_manifest_path}. "
-                f"Run SkillGenerator.generate() to produce authoritative projections."
-            )
-        else:
-            try:
-                manifest = json.loads(skill_manifest_path.read_text(encoding="utf-8"))
-            except (json.JSONDecodeError, OSError) as exc:
-                reasons.append(f"generated_skill/skill_manifest.json is unreadable: {exc}")
-            else:
-                committed_config_hash = manifest.get("configuration_hash", "")
-                committed_wl_hash = manifest.get("workflow_layer_hash", "")
-                if committed_config_hash != configuration_surface.main_yaml_hash:
-                    reasons.append(
-                        f"generated_skill/skill_manifest.json configuration_hash "
-                        f"{committed_config_hash!r} does not match current main.yaml hash "
-                        f"{configuration_surface.main_yaml_hash!r}. "
-                        f"main.yaml has changed since the last generation run."
-                    )
-                if committed_wl_hash != workflow_layer_hash:
-                    reasons.append(
-                        f"generated_skill/skill_manifest.json workflow_layer_hash "
-                        f"{committed_wl_hash!r} does not match current workflow layer hash "
-                        f"{workflow_layer_hash!r}. "
-                        f"The packaged workflow layer has changed since the last generation run."
-                    )
-
-        if not skill_md_path.exists():
-            reasons.append(
-                f"generated_skill/SKILL.md is missing at {skill_md_path}. "
-                f"Run SkillGenerator.generate() to produce authoritative projections."
-            )
-
-        return FreshnessResult(fresh=not reasons, reasons=tuple(reasons))
-
-
-def compute_workflow_layer_hash(workflow_layer: object) -> str:
-    """Compute a deterministic hash of the workflow layer for freshness tracking.
-
-    Uses grammar_version + grammar_package_version + sorted workbench_id list as the
-    hash input.  This is stable across runs as long as the workflow layer inputs are unchanged.
-    """
-    payload = {
-        "grammar_version": getattr(workflow_layer, "grammar_version", ""),
-        "grammar_package_version": getattr(workflow_layer, "grammar_package_version", ""),
-        "workbench_ids": sorted(
-            w.workbench_id for w in getattr(workflow_layer, "workbenches", [])
-        ),
+def build_packaged_skill_manifest(workflow_layer: WorkflowLayer) -> dict[str, Any]:
+    return {
+        "skill_schema_version": "1",
+        "workflow_release": {
+            "grammar_version": workflow_layer.grammar_version,
+            "grammar_package_version": workflow_layer.grammar_package_version,
+            "workflow_layer_hash": compute_workflow_layer_hash(workflow_layer),
+            "contract_catalog_hash": _contract_catalog_hash(workflow_layer),
+            "resource_manifest_hash": _resource_manifest_hash(workflow_layer),
+        },
+        "workflow_modes": _build_mode_entries(workflow_layer),
     }
-    return hashlib.sha256(json.dumps(payload, sort_keys=True).encode("utf-8")).hexdigest()
+
+
+class SkillGenerator:
+    """Generate and verify the package-owned thin CH-0006 skill surface."""
+
+    def render(self, workflow_layer: WorkflowLayer | None = None) -> tuple[str, dict[str, Any]]:
+        layer = workflow_layer or load_workflow_layer()
+        return build_packaged_skill_md(layer), build_packaged_skill_manifest(layer)
+
+    def write_packaged_surface(self, workflow_layer: WorkflowLayer | None = None) -> None:
+        skill_md, manifest = self.render(workflow_layer)
+        PACKAGED_DEFAULT_ROOT.mkdir(parents=True, exist_ok=True)
+        PACKAGED_SKILL_MD_PATH.write_text(skill_md, encoding="utf-8")
+        PACKAGED_SKILL_MANIFEST_PATH.write_text(_canonical_json(manifest), encoding="utf-8")
+
+    def assert_current(self, workflow_layer: WorkflowLayer | None = None) -> None:
+        skill_md, manifest = self.render(workflow_layer)
+        assert PACKAGED_SKILL_MD_PATH.exists(), f"missing packaged skill file: {PACKAGED_SKILL_MD_PATH}"
+        assert PACKAGED_SKILL_MANIFEST_PATH.exists(), f"missing packaged manifest file: {PACKAGED_SKILL_MANIFEST_PATH}"
+        assert PACKAGED_SKILL_MD_PATH.read_text(encoding="utf-8") == skill_md
+        assert json.loads(PACKAGED_SKILL_MANIFEST_PATH.read_text(encoding="utf-8")) == manifest
+
+
+def write_packaged_skill_surface(workflow_layer: WorkflowLayer | None = None) -> None:
+    SkillGenerator().write_packaged_surface(workflow_layer)
+
+
+def assert_packaged_skill_surface_current(workflow_layer: WorkflowLayer | None = None) -> None:
+    SkillGenerator().assert_current(workflow_layer)

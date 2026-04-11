@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Any, Optional
 
 from lantern.mcp.catalog import (
+    build_resource_packets_for_workbench,
     filter_resources_for_workbench,
     get_allowed_roles_for_transaction,
 )
@@ -17,6 +18,9 @@ from lantern.workflow.resolver import (
 )
 
 _ORIENT_TRANSACTION_KIND = "orient"
+_ORIENT_DISCOVERY_SAFE_ROLES = frozenset(
+    {"instruction_resource", "authoritative_guides", "artifact_templates"}
+)
 
 
 @dataclass(frozen=True)
@@ -98,14 +102,25 @@ def _build_runtime_exposure(
         except KeyError:
             continue
         allowed_roles = get_allowed_roles_for_transaction(workbench, _ORIENT_TRANSACTION_KIND)
+        if not allowed_roles:
+            allowed_roles = get_allowed_roles_for_transaction(workbench, "inspect")
+        allowed_roles = tuple(
+            role for role in allowed_roles if role in _ORIENT_DISCOVERY_SAFE_ROLES
+        )
         resources = filter_resources_for_workbench(
             workflow_layer, workbench_id, allowed_roles
+        )
+        resource_packets = build_resource_packets_for_workbench(
+            workflow_layer=workflow_layer,
+            workbench_id=workbench_id,
+            allowed_roles=allowed_roles,
         )
         exposure["workbenches"].append(
             {
                 "workbench_id": workbench_id,
                 "allowed_roles": list(allowed_roles),
                 "resources": resources,
+                "resource_packets": resource_packets,
                 "contract_refs": list(workbench.contract_refs),
                 "inspect_views": list(workbench.inspect_views),
             }

@@ -1,0 +1,131 @@
+{
+  "skill_schema_version": "1",
+  "workflow_modes": [
+    {
+      "entry_contract_refs": [
+        "contract.upstream_intake.v1"
+      ],
+      "entry_workbench_id": "upstream_intake_and_baselines",
+      "mode_id": "baseline_intake",
+      "resource_refs": [
+        "resource.authoritative_guide.upstream_intake_and_baselines_authoritative_guides_upstream_intake_and_baselines",
+        "resource.instruction.upstream_intake_and_baselines_instruction_resource_upstream_intake_and_baselines",
+        "resource.template.upstream_intake_and_baselines_artifact_templates_template_arch",
+        "resource.template.upstream_intake_and_baselines_artifact_templates_template_dip",
+        "resource.template.upstream_intake_and_baselines_artifact_templates_template_spec"
+      ]
+    },
+    {
+      "entry_contract_refs": [
+        "contract.ch_td_readiness.v1"
+      ],
+      "entry_workbench_id": "ch_and_td_readiness",
+      "mode_id": "change_readiness",
+      "resource_refs": [
+        "resource.authoritative_guide.ch_and_td_readiness_authoritative_guides_ch_and_td_readiness",
+        "resource.instruction.ch_and_td_readiness_instruction_resource_ch_and_td_readiness",
+        "resource.template.ch_and_td_readiness_artifact_templates_template_td"
+      ]
+    },
+    {
+      "entry_contract_refs": [
+        "contract.design_candidate_authoring.v1"
+      ],
+      "entry_workbench_id": "design_candidate_authoring",
+      "mode_id": "design_candidate_authoring",
+      "resource_refs": [
+        "resource.authoritative_guide.design_candidate_authoring_authoritative_guides_design_candidate_authoring",
+        "resource.instruction.design_candidate_authoring_instruction_resource_design_candidate_authoring",
+        "resource.template.design_candidate_authoring_artifact_templates_template_dc"
+      ]
+    },
+    {
+      "entry_contract_refs": [
+        "contract.design_selection.v1"
+      ],
+      "entry_workbench_id": "design_selection",
+      "mode_id": "design_selection",
+      "resource_refs": [
+        "resource.authoritative_guide.design_selection_authoritative_guides_design_selection",
+        "resource.instruction.design_selection_instruction_resource_design_selection",
+        "resource.template.design_selection_artifact_templates_template_db"
+      ]
+    },
+    {
+      "entry_contract_refs": [
+        "contract.ci_authoring.v1"
+      ],
+      "entry_workbench_id": "ci_authoring",
+      "mode_id": "ci_authoring",
+      "resource_refs": [
+        "resource.authoritative_guide.ci_authoring_authoritative_guides_ci_authoring",
+        "resource.instruction.ci_authoring_instruction_resource_ci_authoring",
+        "resource.template.ci_authoring_artifact_templates_template_ci"
+      ]
+    },
+    {
+      "entry_contract_refs": [
+        "contract.ci_selection.v1"
+      ],
+      "entry_workbench_id": "ci_selection",
+      "mode_id": "ci_selection",
+      "resource_refs": [
+        "resource.authoritative_guide.ci_selection_authoritative_guides_ci_selection",
+        "resource.instruction.ci_selection_instruction_resource_ci_selection"
+      ]
+    },
+    {
+      "entry_contract_refs": [
+        "contract.selected_ci_application.v1"
+      ],
+      "entry_workbench_id": "selected_ci_application",
+      "mode_id": "selected_ci_application",
+      "resource_refs": [
+        "resource.authoritative_guide.selected_ci_application_authoritative_guides_selected_ci_application",
+        "resource.instruction.selected_ci_application_instruction_resource_selected_ci_application"
+      ]
+    },
+    {
+      "entry_contract_refs": [
+        "contract.verification_and_closure.v1"
+      ],
+      "entry_workbench_id": "verification_and_closure",
+      "mode_id": "verification_and_closure",
+      "resource_refs": [
+        "resource.authoritative_guide.verification_and_closure_authoritative_guides_verification_and_closure",
+        "resource.instruction.verification_and_closure_instruction_resource_verification_and_closure"
+      ]
+    },
+    {
+      "entry_contract_refs": [
+        "contract.issue_operations.v1"
+      ],
+      "entry_workbench_id": "issue_operations",
+      "mode_id": "issue_intake",
+      "resource_refs": [
+        "resource.authoritative_guide.issue_operations_authoritative_guides_issue_operations",
+        "resource.instruction.issue_operations_instruction_resource_issue_operations",
+        "resource.template.issue_operations_artifact_templates_template_is"
+      ]
+    },
+    {
+      "entry_contract_refs": [
+        "contract.governance_onboarding.v1"
+      ],
+      "entry_workbench_id": "governance_onboarding",
+      "mode_id": "bootstrap",
+      "resource_refs": [
+        "resource.authoritative_guide.governance_onboarding_authoritative_guides_governance_onboarding",
+        "resource.instruction.governance_onboarding_instruction_resource_governance_onboarding",
+        "resource.template.governance_onboarding_artifact_templates_template_td"
+      ]
+    }
+  ],
+  "workflow_release": {
+    "contract_catalog_hash": "5ff5781dc573b5ce144a21099771945958af9d54f7fe7a9f5ed7ad1cef455cdd",
+    "grammar_package_version": "0.3.0",
+    "grammar_version": "0.3.0",
+    "resource_manifest_hash": "13785e302386bdda1730d530bddecddead43a63705b3c4898301df7da57ac15b",
+    "workflow_layer_hash": "841d1dcba79e46b13d9962b521bee2172b452e510cbc236ee50af8b3b020e23e"
+  }
+}

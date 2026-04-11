@@ -1,201 +1,120 @@
-"""Tests for TD-0005-C10 (AI-agent projection consistency) and TD-0005-C11 (freshness checks).
-
-C10: SkillGenerator.generate() produces skill_manifest.json with mode/guide agreement.
-C11: SkillGenerator.check_freshness() is fatal for full_governed_surface when stale.
-"""
+"""TD-0006 packaged thin-skill and discovery-manifest tests."""
 from __future__ import annotations
 
 import json
-from pathlib import Path
+from typing import Any
 
-import pytest
-import yaml
-
-from lantern.workflow.merger import (
-    ConfigurationLoader,
-    FreshnessResult,
+from lantern.skills.generator import (
+    PACKAGED_SKILL_MANIFEST_PATH,
+    PACKAGED_SKILL_MD_PATH,
+    assert_packaged_skill_surface_current,
+    build_packaged_skill_manifest,
+    build_packaged_skill_md,
 )
-from lantern.skills.generator import SkillGenerator, compute_workflow_layer_hash
+from lantern.workflow.loader import load_workflow_layer
 
 
-def _make_config_folder_with_modes(tmp_path: Path) -> Path:
-    cfg = tmp_path / "workflow" / "configuration"
-    for sub in ("instructions", "workbenches", "guides"):
-        (cfg / sub).mkdir(parents=True, exist_ok=True)
-    (cfg / "instructions" / "onboarding.md").write_text("# onboarding", encoding="utf-8")
-    (cfg / "guides" / "README.md").write_text("# guide README", encoding="utf-8")
-    (cfg / "guides" / "feature_delivery.md").write_text("# feature_delivery guide", encoding="utf-8")
-    main_yaml = {
-        "configuration_version": "1",
-        "declared_posture": "full_governed_surface",
-        "workflow_modes": [
-            {
-                "mode_id": "feature_delivery",
-                "entry_workbench": "ch_and_td_readiness",
-                "guide_refs": ["guides/README.md", "guides/feature_delivery.md"],
-            },
-            {
-                "mode_id": "bug_fix",
-                "entry_workbench": "issue_operations",
-                "guide_refs": ["guides/README.md"],
-            },
-        ],
-    }
-    (cfg / "main.yaml").write_text(yaml.safe_dump(main_yaml), encoding="utf-8")
-    return cfg
+def _contains_forbidden_path_key(value: Any) -> bool:
+    if isinstance(value, dict):
+        if "path" in value:
+            return True
+        return any(_contains_forbidden_path_key(item) for item in value.values())
+    if isinstance(value, list):
+        return any(_contains_forbidden_path_key(item) for item in value)
+    return False
 
 
-# ---------------------------------------------------------------------------
-# C10 — AI-agent projection consistency
-# ---------------------------------------------------------------------------
-
-def test_c10_generate_produces_skill_manifest_with_correct_modes(tmp_path: Path) -> None:
-    cfg = _make_config_folder_with_modes(tmp_path)
-    loader = ConfigurationLoader()
-    surface = loader.load_and_validate(cfg)
-
-    generator = SkillGenerator()
-    generator.generate(
-        product_governance_root=tmp_path,
-        configuration_surface=surface,
-        workflow_layer_hash="deadbeef0123456789",
-    )
-
-    manifest_path = cfg / "generated_skill" / "skill_manifest.json"
-    assert manifest_path.exists(), "skill_manifest.json must exist after generation"
-
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    assert manifest["configuration_hash"] == surface.main_yaml_hash
-    assert manifest["workflow_layer_hash"] == "deadbeef0123456789"
-    assert "generation_timestamp" in manifest
-
-    mode_ids = {m["mode_id"] for m in manifest["modes"]}
-    assert mode_ids == {"feature_delivery", "bug_fix"}
-
-    feature_mode = next(m for m in manifest["modes"] if m["mode_id"] == "feature_delivery")
-    assert "guides/README.md" in feature_mode["guide_refs"]
-    assert "guides/feature_delivery.md" in feature_mode["guide_refs"]
-
-
-def test_c10_generated_skill_md_exists_after_generation(tmp_path: Path) -> None:
-    cfg = _make_config_folder_with_modes(tmp_path)
-    loader = ConfigurationLoader()
-    surface = loader.load_and_validate(cfg)
-    generator = SkillGenerator()
-    generator.generate(
-        product_governance_root=tmp_path,
-        configuration_surface=surface,
-        workflow_layer_hash="hash_abc",
-    )
-    assert (cfg / "generated_skill" / "SKILL.md").exists()
-
-
-def test_c10_manifest_modes_match_main_yaml(tmp_path: Path) -> None:
-    cfg = _make_config_folder_with_modes(tmp_path)
-    loader = ConfigurationLoader()
-    surface = loader.load_and_validate(cfg)
-    generator = SkillGenerator()
-    generator.generate(
-        product_governance_root=tmp_path,
-        configuration_surface=surface,
-        workflow_layer_hash="hash_abc",
-    )
-    manifest = json.loads(
-        (cfg / "generated_skill" / "skill_manifest.json").read_text(encoding="utf-8")
-    )
-    # Every mode in main.yaml must appear in the manifest
-    main_mode_ids = {m.mode_id for m in surface.workflow_modes}
-    manifest_mode_ids = {m["mode_id"] for m in manifest["modes"]}
-    assert main_mode_ids == manifest_mode_ids
-    for mode in surface.workflow_modes:
-        manifest_mode = next(m for m in manifest["modes"] if m["mode_id"] == mode.mode_id)
-        assert set(manifest_mode["guide_refs"]) == set(mode.guide_refs)
-
-
-# ---------------------------------------------------------------------------
-# C11 — freshness checks
-# ---------------------------------------------------------------------------
-
-def test_c11_fresh_manifest_returns_fresh_true(tmp_path: Path) -> None:
-    cfg = _make_config_folder_with_modes(tmp_path)
-    loader = ConfigurationLoader()
-    surface = loader.load_and_validate(cfg)
-    generator = SkillGenerator()
-    workflow_hash = "abc123"
-    generator.generate(
-        product_governance_root=tmp_path,
-        configuration_surface=surface,
-        workflow_layer_hash=workflow_hash,
-    )
-    result = generator.check_freshness(
-        configuration_surface=surface,
-        workflow_layer_hash=workflow_hash,
-    )
-    assert result.fresh is True
-    assert result.reasons == ()
-
-
-def test_c11_stale_configuration_hash_returns_not_fresh(tmp_path: Path) -> None:
-    cfg = _make_config_folder_with_modes(tmp_path)
-    loader = ConfigurationLoader()
-    surface = loader.load_and_validate(cfg)
-    generator = SkillGenerator()
-    generator.generate(
-        product_governance_root=tmp_path,
-        configuration_surface=surface,
-        workflow_layer_hash="original_hash",
-    )
-    # Mutate main.yaml to change its hash
-    raw = yaml.safe_load((cfg / "main.yaml").read_text())
-    raw["configuration_version"] = "2"
-    (cfg / "main.yaml").write_text(yaml.safe_dump(raw), encoding="utf-8")
-    # Reload surface to get updated hash
-    surface2 = loader.load_and_validate(cfg)
-    result = generator.check_freshness(
-        configuration_surface=surface2,
-        workflow_layer_hash="original_hash",
-    )
-    assert result.fresh is False
-    assert any("configuration_hash" in r for r in result.reasons)
-
-
-def test_c11_stale_workflow_layer_hash_returns_not_fresh(tmp_path: Path) -> None:
-    cfg = _make_config_folder_with_modes(tmp_path)
-    loader = ConfigurationLoader()
-    surface = loader.load_and_validate(cfg)
-    generator = SkillGenerator()
-    generator.generate(
-        product_governance_root=tmp_path,
-        configuration_surface=surface,
-        workflow_layer_hash="original_hash",
-    )
-    result = generator.check_freshness(
-        configuration_surface=surface,
-        workflow_layer_hash="different_hash",  # workflow layer changed
-    )
-    assert result.fresh is False
-    assert any("workflow_layer_hash" in r for r in result.reasons)
-
-
-def test_c11_missing_manifest_returns_not_fresh(tmp_path: Path) -> None:
-    cfg = _make_config_folder_with_modes(tmp_path)
-    loader = ConfigurationLoader()
-    surface = loader.load_and_validate(cfg)
-    generator = SkillGenerator()
-    # Do not generate — manifest is absent
-    result = generator.check_freshness(
-        configuration_surface=surface,
-        workflow_layer_hash="any_hash",
-    )
-    assert result.fresh is False
-    assert any("missing" in r.lower() for r in result.reasons)
-
-
-def test_c11_compute_workflow_layer_hash_is_deterministic() -> None:
-    from lantern.workflow.loader import load_workflow_layer
-
+def test_td0006_c01_packaged_skill_has_mandatory_header_and_routing_content() -> None:
     layer = load_workflow_layer()
-    h1 = compute_workflow_layer_hash(layer)
-    h2 = compute_workflow_layer_hash(layer)
-    assert h1 == h2
-    assert len(h1) == 64  # SHA-256 hex digest
+    skill = build_packaged_skill_md(layer)
+
+    assert skill.startswith("---\nname: lantern\ndescription: Use this skill when the task involves Lantern-governed workflow work.")
+    assert "---\n\n# Lantern Operator Skill\n" in skill
+    assert "## Use Lantern when" in skill
+    assert "## Do not use Lantern as" in skill
+    assert "## What Lantern gives you" in skill
+    assert "## First MCP move" in skill
+    assert "`inspect(kind=\"catalog\")`" in skill
+    assert "`inspect(kind=\"workspace\")`" in skill
+    assert "## Universal discovery sequence" in skill
+    assert "## Workflow modes currently exposed" in skill
+    assert "## Minimal routing hints" in skill
+    assert "## Immutable safety rules" in skill
+    assert "## Operating posture" in skill
+
+    for mode_id in [item["mode_id"] for item in build_packaged_skill_manifest(layer)["workflow_modes"]]:
+        assert f"- `{mode_id}`" in skill
+
+    for forbidden in (
+        "Operator instruction resource for workbench",
+        "GT-120__CI_SELECTION_ADMINISTRATION",
+        "TEMPLATE__CI",
+        "lantern/resources/",
+        "lantern/templates/",
+    ):
+        assert forbidden not in skill
+
+
+def test_td0006_c02_manifest_is_mode_first_and_path_free() -> None:
+    layer = load_workflow_layer()
+    manifest = build_packaged_skill_manifest(layer)
+
+    assert manifest["skill_schema_version"] == "1"
+    assert manifest["workflow_release"]["workflow_layer_hash"]
+    assert manifest["workflow_release"]["contract_catalog_hash"]
+    assert manifest["workflow_release"]["resource_manifest_hash"]
+    assert manifest["workflow_modes"]
+    assert not _contains_forbidden_path_key(manifest)
+
+    for item in manifest["workflow_modes"]:
+        assert item["mode_id"]
+        assert item["entry_workbench_id"]
+        assert item["entry_contract_refs"]
+        assert item["resource_refs"]
+
+
+def test_td0006_c02_manifest_carries_template_refs_for_draftable_modes() -> None:
+    manifest = build_packaged_skill_manifest(load_workflow_layer())
+    assert any(
+        ref.startswith("resource.template.")
+        for item in manifest["workflow_modes"]
+        for ref in item["resource_refs"]
+    )
+    selected_ci_mode = next(
+        item
+        for item in manifest["workflow_modes"]
+        if item["entry_workbench_id"] == "selected_ci_application"
+    )
+    assert all(
+        not ref.startswith("resource.template.")
+        for ref in selected_ci_mode["resource_refs"]
+    )
+
+
+def test_td0006_c03_packaged_first_touch_route_is_mechanically_derivable() -> None:
+    layer = load_workflow_layer()
+    manifest = build_packaged_skill_manifest(layer)
+    workbench_ids = {workbench.workbench_id for workbench in layer.workbenches}
+    contract_lookup = {
+        workbench.workbench_id: set(workbench.contract_refs) for workbench in layer.workbenches
+    }
+
+    assert "inspect(kind=\"catalog\")" in build_packaged_skill_md(layer)
+    assert "inspect(kind=\"workspace\")" in build_packaged_skill_md(layer)
+
+    for mode in manifest["workflow_modes"]:
+        assert mode["entry_workbench_id"] in workbench_ids
+        assert set(mode["entry_contract_refs"]) == contract_lookup[mode["entry_workbench_id"]]
+
+
+def test_td0006_c06_committed_packaged_surface_matches_packaged_truth() -> None:
+    assert_packaged_skill_surface_current()
+
+
+def test_td0006_c07_packaged_manifest_matches_source_tree_routing() -> None:
+    layer = load_workflow_layer()
+    committed = json.loads(PACKAGED_SKILL_MANIFEST_PATH.read_text(encoding="utf-8"))
+    built = build_packaged_skill_manifest(layer)
+
+    assert committed == built
+    assert PACKAGED_SKILL_MD_PATH.read_text(encoding="utf-8") == build_packaged_skill_md(layer)

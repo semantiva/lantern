@@ -38,6 +38,7 @@ allowed_resource_roles:
 - instruction_resource
 - authoritative_guides
 - administration_guides
+- artifact_templates
 required_full_governed_gates:
 - GT-030
 - GT-050

@@ -19,7 +19,7 @@ from lantern.mcp.inspect import (
     handle_inspect,
 )
 from lantern.mcp.orient import OrientResponse, handle_orient
-from lantern.mcp.server import mcp as mcp_server
+from lantern.mcp.server import configure_server_paths, inspect as server_inspect, mcp as mcp_server
 from lantern.workflow.loader import load_workflow_layer
 
 PRODUCT_ROOT = Path(__file__).resolve().parents[1]
@@ -135,7 +135,8 @@ def test_c02_contract_response_keeps_server_and_workflow_layers_distinct(workflo
     assert isinstance(result, InspectContractResult)
     assert result.server_owned_contract["change_surface_preflight"] is True
     assert result.workflow_owned_contract["contract_ref"] == "contract.selected_ci_application.v1"
-    assert result.workflow_owned_contract["guide_refs"]
+    assert result.workflow_owned_contract["resource_refs"]
+    assert result.resource_packets
     assert result.server_owned_contract != result.workflow_owned_contract
 
 
@@ -293,13 +294,17 @@ def test_c08_orient_resources_limited_to_allowed_roles(workflow_layer) -> None:
     )
     for wb_entry in result.runtime_exposure_posture.get("workbenches", []):
         workbench = workflow_layer.get_workbench(wb_entry["workbench_id"])
-        allowed = set(get_allowed_roles_for_transaction(workbench, "orient"))
+        allowed = set(
+            get_allowed_roles_for_transaction(workbench, "orient")
+            or get_allowed_roles_for_transaction(workbench, "inspect")
+        )
+        allowed.discard("administration_guides")
         for resource in wb_entry.get("resources", []):
             for role in resource["roles"]:
                 assert role in allowed
 
 
-def test_c08_all_emitted_resource_ids_resolve_in_manifest(workflow_layer) -> None:
+def test_c08_all_emitted_resource_ids_resolve_in_manifest_or_inline_packets(workflow_layer) -> None:
     result = handle_orient(
         workflow_layer=workflow_layer,
         governance_state=_GT110_ACTIVE,
@@ -307,8 +312,68 @@ def test_c08_all_emitted_resource_ids_resolve_in_manifest(workflow_layer) -> Non
     )
     manifest_ids = {entry.resource_id for entry in workflow_layer.resource_manifest}
     for wb_entry in result.runtime_exposure_posture.get("workbenches", []):
+        packet_ids = {packet["resource_id"] for packet in wb_entry.get("resource_packets", [])}
         for resource in wb_entry.get("resources", []):
-            assert resource["resource_id"] in manifest_ids
+            assert resource["resource_id"] in manifest_ids or resource["resource_id"] in packet_ids
+
+
+def test_td0006_c04_contract_inspect_surfaces_logical_refs_and_inline_packets(workflow_layer) -> None:
+    result = handle_inspect(
+        kind="contract",
+        workflow_layer=workflow_layer,
+        contract_ref="contract.ch_td_readiness.v1",
+    )
+
+    assert result.resource_refs
+    assert result.resource_packets
+    assert any(ref.startswith("resource.template.") for ref in result.resource_refs)
+    assert all(ref.startswith("resource.") for ref in result.resource_refs)
+    assert all("path" not in packet for packet in result.resource_packets)
+    assert any("artifact_templates" in packet["roles"] for packet in result.resource_packets)
+    assert {packet["resource_id"] for packet in result.resource_packets}.issuperset(
+        set(result.resource_refs)
+    )
+
+
+def test_td0006_c04_orient_surfaces_logical_refs_and_inline_packets(workflow_layer) -> None:
+    result = handle_orient(
+        workflow_layer=workflow_layer,
+        governance_state=_GT110_ACTIVE,
+        ch_id="CH-0003",
+    )
+
+    for wb_entry in result.runtime_exposure_posture.get("workbenches", []):
+        packet_ids = {packet["resource_id"] for packet in wb_entry.get("resource_packets", [])}
+        assert any("artifact_templates" in resource["roles"] for resource in wb_entry.get("resources", []))
+        assert any(
+            "artifact_templates" in packet["roles"]
+            for packet in wb_entry.get("resource_packets", [])
+        )
+        for resource in wb_entry.get("resources", []):
+            assert "path" not in resource
+            assert resource["resource_id"] in packet_ids
+
+
+def test_td0006_c05_source_tree_startup_does_not_require_generated_skill_folders(tmp_path) -> None:
+    product_root = tmp_path / "product"
+    governance_root = tmp_path / "governance"
+    config_root = governance_root / "workflow" / "configuration"
+
+    product_root.mkdir()
+    (config_root / "instructions").mkdir(parents=True)
+    (config_root / "workbenches").mkdir()
+    (config_root / "guides").mkdir()
+    (config_root / "main.yaml").write_text(
+        "configuration_version: '1'\ndeclared_posture: full_governed_surface\n",
+        encoding="utf-8",
+    )
+
+    configure_server_paths(product_root=product_root, governance_root=governance_root)
+    result = server_inspect(kind="catalog")
+
+    assert result["kind"] == "catalog"
+    assert not (config_root / "generated_skill").exists()
+    assert not (config_root / "generated_artifact_templates").exists()
 
 
 def test_c09_inspect_catalog_does_not_surface_administration_guides(

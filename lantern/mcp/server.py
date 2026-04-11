@@ -47,7 +47,6 @@ from lantern.workflow.merger import (
     PostureValidator,
     build_runtime_posture_label,
 )
-from lantern.skills.generator import SkillGenerator, compute_workflow_layer_hash
 
 mcp = FastMCP("lantern")
 _workflow_layer: Optional[WorkflowLayer] = None
@@ -105,30 +104,6 @@ def _run_startup_sequence(
         effective_layer=effective_layer,
         workflow_layer=workflow_layer,
     )
-
-    if effective_layer.configuration_surface is not None:
-        wl_hash = compute_workflow_layer_hash(workflow_layer)
-        gen = SkillGenerator()
-        freshness = gen.check_freshness(
-            configuration_surface=effective_layer.configuration_surface,
-            workflow_layer_hash=wl_hash,
-        )
-        if not freshness.fresh:
-            if posture_result.classification == "full_governed_surface":
-                raise PostureValidationError(
-                    "Startup aborted: generated skill projections are stale under "
-                    "full_governed_surface. "
-                    + " ".join(freshness.reasons)
-                    + " Run SkillGenerator.generate() and commit the outputs to governance."
-                )
-            else:
-                import warnings
-                for reason in freshness.reasons:
-                    warnings.warn(
-                        f"[lantern] Stale generated projection (non-fatal under "
-                        f"{posture_result.classification}): {reason}",
-                        stacklevel=2,
-                    )
 
     return effective_layer, posture_result
 

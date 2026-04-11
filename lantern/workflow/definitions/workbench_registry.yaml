@@ -39,19 +39,16 @@ workbenches:
     response_surface_bindings:
     - transaction_kind: inspect
       response_envelope: catalog
-      allowed_resource_roles:
+      allowed_resource_roles: &id004
       - instruction_resource
       - authoritative_guides
+      - artifact_templates
     - transaction_kind: inspect
       response_envelope: baselines
-      allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
+      allowed_resource_roles: *id004
     - transaction_kind: inspect
       response_envelope: lineage
-      allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
+      allowed_resource_roles: *id004
     - transaction_kind: draft
       response_envelope: default
       allowed_resource_roles:
@@ -118,19 +115,13 @@ workbenches:
     response_surface_bindings:
     - transaction_kind: inspect
       response_envelope: catalog
-      allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
+      allowed_resource_roles: *id004
     - transaction_kind: inspect
       response_envelope: readiness
-      allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
+      allowed_resource_roles: *id004
     - transaction_kind: inspect
       response_envelope: lineage
-      allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
+      allowed_resource_roles: *id004
     - transaction_kind: draft
       response_envelope: default
       allowed_resource_roles: &id001
@@ -186,14 +177,10 @@ workbenches:
     response_surface_bindings:
     - transaction_kind: inspect
       response_envelope: catalog
-      allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
+      allowed_resource_roles: *id004
     - transaction_kind: inspect
       response_envelope: design_candidates
-      allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
+      allowed_resource_roles: *id004
     - transaction_kind: draft
       response_envelope: default
       allowed_resource_roles: *id001
@@ -245,14 +232,10 @@ workbenches:
     response_surface_bindings:
     - transaction_kind: inspect
       response_envelope: catalog
-      allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
+      allowed_resource_roles: *id004
     - transaction_kind: inspect
       response_envelope: design_selection
-      allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
+      allowed_resource_roles: *id004
     - transaction_kind: draft
       response_envelope: default
       allowed_resource_roles: *id001
@@ -302,14 +285,10 @@ workbenches:
     response_surface_bindings:
     - transaction_kind: inspect
       response_envelope: catalog
-      allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
+      allowed_resource_roles: *id004
     - transaction_kind: inspect
       response_envelope: implementation_scope
-      allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
+      allowed_resource_roles: *id004
     - transaction_kind: draft
       response_envelope: default
       allowed_resource_roles: *id001
@@ -359,14 +338,10 @@ workbenches:
     response_surface_bindings:
     - transaction_kind: inspect
       response_envelope: catalog
-      allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
+      allowed_resource_roles: *id004
     - transaction_kind: inspect
       response_envelope: ci_selection
-      allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
+      allowed_resource_roles: *id004
     - transaction_kind: draft
       response_envelope: default
       allowed_resource_roles: *id001
@@ -474,19 +449,13 @@ workbenches:
     response_surface_bindings:
     - transaction_kind: inspect
       response_envelope: catalog
-      allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
+      allowed_resource_roles: *id004
     - transaction_kind: inspect
       response_envelope: verification
-      allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
+      allowed_resource_roles: *id004
     - transaction_kind: inspect
       response_envelope: closure
-      allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
+      allowed_resource_roles: *id004
     - transaction_kind: draft
       response_envelope: default
       allowed_resource_roles: *id001
@@ -535,14 +504,10 @@ workbenches:
     response_surface_bindings:
     - transaction_kind: inspect
       response_envelope: catalog
-      allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
+      allowed_resource_roles: *id004
     - transaction_kind: inspect
       response_envelope: issues
-      allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
+      allowed_resource_roles: *id004
     - transaction_kind: draft
       response_envelope: default
       allowed_resource_roles: *id001
@@ -594,14 +559,10 @@ workbenches:
     response_surface_bindings:
     - transaction_kind: inspect
       response_envelope: catalog
-      allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
+      allowed_resource_roles: *id004
     - transaction_kind: inspect
       response_envelope: onboarding
-      allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
+      allowed_resource_roles: *id004
     - transaction_kind: draft
       response_envelope: default
       allowed_resource_roles: *id001

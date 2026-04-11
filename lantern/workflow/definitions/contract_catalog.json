@@ -62,7 +62,8 @@
       {
         "allowed_resource_roles": [
           "instruction_resource",
-          "authoritative_guides"
+          "authoritative_guides",
+          "artifact_templates"
         ],
         "response_envelope": "catalog",
         "transaction_kind": "inspect"
@@ -70,7 +71,8 @@
       {
         "allowed_resource_roles": [
           "instruction_resource",
-          "authoritative_guides"
+          "authoritative_guides",
+          "artifact_templates"
         ],
         "response_envelope": "readiness",
         "transaction_kind": "inspect"
@@ -78,7 +80,8 @@
       {
         "allowed_resource_roles": [
           "instruction_resource",
-          "authoritative_guides"
+          "authoritative_guides",
+          "artifact_templates"
         ],
         "response_envelope": "lineage",
         "transaction_kind": "inspect"
@@ -208,7 +211,8 @@
       {
         "allowed_resource_roles": [
           "instruction_resource",
-          "authoritative_guides"
+          "authoritative_guides",
+          "artifact_templates"
         ],
         "response_envelope": "catalog",
         "transaction_kind": "inspect"
@@ -216,7 +220,8 @@
       {
         "allowed_resource_roles": [
           "instruction_resource",
-          "authoritative_guides"
+          "authoritative_guides",
+          "artifact_templates"
         ],
         "response_envelope": "implementation_scope",
         "transaction_kind": "inspect"
@@ -309,7 +314,8 @@
       {
         "allowed_resource_roles": [
           "instruction_resource",
-          "authoritative_guides"
+          "authoritative_guides",
+          "artifact_templates"
         ],
         "response_envelope": "catalog",
         "transaction_kind": "inspect"
@@ -317,7 +323,8 @@
       {
         "allowed_resource_roles": [
           "instruction_resource",
-          "authoritative_guides"
+          "authoritative_guides",
+          "artifact_templates"
         ],
         "response_envelope": "ci_selection",
         "transaction_kind": "inspect"
@@ -445,7 +452,8 @@
       {
         "allowed_resource_roles": [
           "instruction_resource",
-          "authoritative_guides"
+          "authoritative_guides",
+          "artifact_templates"
         ],
         "response_envelope": "catalog",
         "transaction_kind": "inspect"
@@ -453,7 +461,8 @@
       {
         "allowed_resource_roles": [
           "instruction_resource",
-          "authoritative_guides"
+          "authoritative_guides",
+          "artifact_templates"
         ],
         "response_envelope": "design_candidates",
         "transaction_kind": "inspect"
@@ -549,7 +558,8 @@
       {
         "allowed_resource_roles": [
           "instruction_resource",
-          "authoritative_guides"
+          "authoritative_guides",
+          "artifact_templates"
         ],
         "response_envelope": "catalog",
         "transaction_kind": "inspect"
@@ -557,7 +567,8 @@
       {
         "allowed_resource_roles": [
           "instruction_resource",
-          "authoritative_guides"
+          "authoritative_guides",
+          "artifact_templates"
         ],
         "response_envelope": "design_selection",
         "transaction_kind": "inspect"
@@ -627,7 +638,8 @@
       {
         "allowed_resource_roles": [
           "instruction_resource",
-          "authoritative_guides"
+          "authoritative_guides",
+          "artifact_templates"
         ],
         "response_envelope": "catalog",
         "transaction_kind": "inspect"
@@ -635,7 +647,8 @@
       {
         "allowed_resource_roles": [
           "instruction_resource",
-          "authoritative_guides"
+          "authoritative_guides",
+          "artifact_templates"
         ],
         "response_envelope": "onboarding",
         "transaction_kind": "inspect"
@@ -693,7 +706,8 @@
       {
         "allowed_resource_roles": [
           "instruction_resource",
-          "authoritative_guides"
+          "authoritative_guides",
+          "artifact_templates"
         ],
         "response_envelope": "catalog",
         "transaction_kind": "inspect"
@@ -701,7 +715,8 @@
       {
         "allowed_resource_roles": [
           "instruction_resource",
-          "authoritative_guides"
+          "authoritative_guides",
+          "artifact_templates"
         ],
         "response_envelope": "issues",
         "transaction_kind": "inspect"
@@ -970,7 +985,8 @@
       {
         "allowed_resource_roles": [
           "instruction_resource",
-          "authoritative_guides"
+          "authoritative_guides",
+          "artifact_templates"
         ],
         "response_envelope": "catalog",
         "transaction_kind": "inspect"
@@ -978,7 +994,8 @@
       {
         "allowed_resource_roles": [
           "instruction_resource",
-          "authoritative_guides"
+          "authoritative_guides",
+          "artifact_templates"
         ],
         "response_envelope": "baselines",
         "transaction_kind": "inspect"
@@ -986,7 +1003,8 @@
       {
         "allowed_resource_roles": [
           "instruction_resource",
-          "authoritative_guides"
+          "authoritative_guides",
+          "artifact_templates"
         ],
         "response_envelope": "lineage",
         "transaction_kind": "inspect"
@@ -1086,7 +1104,8 @@
       {
         "allowed_resource_roles": [
           "instruction_resource",
-          "authoritative_guides"
+          "authoritative_guides",
+          "artifact_templates"
         ],
         "response_envelope": "catalog",
         "transaction_kind": "inspect"
@@ -1094,7 +1113,8 @@
       {
         "allowed_resource_roles": [
           "instruction_resource",
-          "authoritative_guides"
+          "authoritative_guides",
+          "artifact_templates"
         ],
         "response_envelope": "verification",
         "transaction_kind": "inspect"
@@ -1102,7 +1122,8 @@
       {
         "allowed_resource_roles": [
           "instruction_resource",
-          "authoritative_guides"
+          "authoritative_guides",
+          "artifact_templates"
         ],
         "response_envelope": "closure",
         "transaction_kind": "inspect"

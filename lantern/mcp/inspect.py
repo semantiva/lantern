@@ -8,7 +8,13 @@ from typing import Any, Optional
 
 from lantern.artifacts.validator import DEFAULT_STATUS_CONTRACT_PATH, load_status_contract
 from lantern.artifacts.render_contracts import build_two_layer_contract
-from lantern.mcp.catalog import build_catalog_response, build_contract_response
+from lantern.mcp.catalog import (
+    build_catalog_response,
+    build_contract_response,
+    build_resource_packets_for_workbench,
+    filter_resources_for_workbench,
+    get_allowed_roles_for_transaction,
+)
 from lantern.mcp.topology import TopologyPosture, resolve_topology
 from lantern.mcp.transactions import ChangeSurface, TransactionEngine, TransactionError
 from lantern.workflow.loader import WorkflowLayer
@@ -38,7 +44,8 @@ class InspectContractResult:
     workbench_refs: tuple[str, ...]
     family_binding: tuple[str, ...]
     gate_binding: tuple[str, ...]
-    guide_refs: tuple[str, ...]
+    resource_refs: tuple[str, ...]
+    resource_packets: tuple[dict[str, Any], ...]
     response_surface_bindings: tuple[dict[str, Any], ...]
     server_owned_contract: dict[str, Any]
     workflow_owned_contract: dict[str, Any]
@@ -147,6 +154,24 @@ def _handle_contract(
     layers = build_two_layer_contract(
         next(entry for entry in workflow_layer.contract_catalog if entry.contract_ref == contract_ref)
     )
+    workbench = workflow_layer.get_workbench(resp.workbench_refs[0])
+    allowed_roles = get_allowed_roles_for_transaction(workbench, "inspect")
+    resources = filter_resources_for_workbench(
+        workflow_layer=workflow_layer,
+        workbench_id=workbench.workbench_id,
+        allowed_roles=allowed_roles,
+    )
+    resource_refs = tuple(item["resource_id"] for item in resources)
+    resource_packets = tuple(
+        build_resource_packets_for_workbench(
+            workflow_layer=workflow_layer,
+            workbench_id=workbench.workbench_id,
+            allowed_roles=allowed_roles,
+        )
+    )
+    workflow_owned_contract = dict(layers["workflow_owned_contract"])
+    workflow_owned_contract.pop("guide_refs", None)
+    workflow_owned_contract["resource_refs"] = list(resource_refs)
     return InspectContractResult(
         kind="contract",
         contract_ref=resp.contract_ref,
@@ -155,10 +180,11 @@ def _handle_contract(
         workbench_refs=resp.workbench_refs,
         family_binding=resp.family_binding,
         gate_binding=resp.gate_binding,
-        guide_refs=resp.guide_refs,
+        resource_refs=resource_refs,
+        resource_packets=resource_packets,
         response_surface_bindings=resp.response_surface_bindings,
         server_owned_contract=layers["server_owned_contract"],
-        workflow_owned_contract=layers["workflow_owned_contract"],
+        workflow_owned_contract=workflow_owned_contract,
         runtime_posture=runtime_posture,
     )
 
