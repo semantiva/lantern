@@ -459,7 +459,7 @@ Required fields:
 - product_repo_commit: <commit-hash-or-tag>
 
 Scope:
-- In scope: execute the CI verification plan against the product repo, collect evidence, create EV and DEC records, update CI and CH statuses on PASS, and update `INDEX.md` at the governance repo root.
+- In scope: execute the CI verification plan against the product repo, collect evidence, create EV and DEC records, update CI and CH statuses on PASS, update `INDEX.md` at the governance repo root, and update the governance binding record with the committed product SHA used for the delivered code.
 - Out of scope: any new implementation, CI authoring, GT-115/GT-120 re-execution, or changes to product repo content.
 
 Authorization:
@@ -471,7 +471,8 @@ Stop condition:
   - EV and DEC are created,
   - CI status is updated (Verified on PASS; or per-human disposition on FAIL),
   - CH status is updated to Addressed (on PASS only),
-  - registry is updated.
+  - registry is updated,
+  - the binding record is updated with the committed product SHA used for the delivered code.
 
 Deliverables:
 - New `EV-####.md` (GT-130 verification report; id allocated with `python tools/allocate_lantern_id.py`)
@@ -479,4 +480,8 @@ Deliverables:
 - Updated `CI-<CH_NUM>-<UUID>.md` (status: Verified on PASS)
 - Updated `CH-####.md` (status: Addressed on PASS only)
 - Updated `INDEX.md` at the governance repo root
+- Updated `binding_record.md` with the committed product SHA used for the delivered code
+
+Required note:
+- Do not close GT-130 until the product repository changes are committed and the binding record points at that committed product SHA.
 ```

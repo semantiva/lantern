@@ -33,6 +33,7 @@ These are administrative requirements, not evaluation criteria.
 3) Product repo state:
 - The Selected CI's `baseline.branch_or_commit` must resolve in the target product repository.
 - Verification is executed against the product repo, not the SSOT repo.
+- GT-130 PASS closure requires a committed product repository revision. If verification exposed a dirty worktree, commit the product repo changes before closing GT-130 and record that commit SHA in the governance binding record.
 
 4) Stability:
 - Do not modify the Selected CI, DB, or TD records during verification. All content must remain locked as at GT-120 selection.
@@ -73,6 +74,7 @@ B) Audit trail exists (stored under canonical paths)
 - One Evidence record exists with real verification evidence: `ev/EV-####.md`
 - One Decision record exists for the GT-130 outcome: `dec/DEC-####.md`
 - `INDEX.md` (governance repository root) reflects the updated CI and CH statuses.
+- The governance binding record captures the committed product SHA used for the delivered code.
 
 ### FAIL outcome
 
@@ -116,6 +118,7 @@ Additionally, for each TD case in the Approved TD set:
 Hard rules:
 - Aspirational or placeholder evidence is invalid. Real command output, test results, or artifact paths MUST appear in the EV record.
 - If the verification environment prevents a command from running, record this as a FAIL with the blocking reason; do not fabricate evidence.
+- The commit hash recorded in the EV and binding record MUST identify the committed product repository revision used for the delivered code; do not close GT-130 against an uncommitted dirty worktree.
 
 ### Step 3 — Allocate new EV and DEC ids
 
@@ -209,6 +212,10 @@ Update three sections:
 3) "Evidence"
 - Add the new `EV-####` entry (GT-130 verification report evidence).
 
+4) "Binding record"
+- Update `binding_record.md` in the governance repository with the committed product SHA used for the delivered code.
+- If verification was performed against a dirty worktree, commit the product repository changes first, then record the resulting commit SHA before closing GT-130.
+
 If CH status changed to `Addressed`, also update:
 
 4) "Change Intents (CH)"
@@ -222,6 +229,7 @@ Before considering GT-130 closed, verify:
 - `CH_ID` header `status` matches the registry entry if a transition occurred.
 - The EV record contains real (non-aspirational) verification evidence.
 - The DEC record references the correct EV id.
+- The binding record reflects the committed product SHA used for the delivered code.
 - If PASS: exactly one CI for `CH_ID` has `status: "Verified"`.
 - If PASS: `CH_ID` has `status: "Addressed"`.
 - All file links in `INDEX.md` (governance repository root) resolve and point to existing files.
