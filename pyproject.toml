@@ -3,14 +3,90 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "lantern"
+name = "lantern-runtime"
 version = "0.1.0"
 description = "Lantern governed workflow runtime"
+readme = "README.md"
+license = "Apache-2.0"
 requires-python = ">=3.11"
-dependencies = ["pyyaml", "jsonschema"]
+classifiers = [
+	"Programming Language :: Python :: 3",
+	"Programming Language :: Python :: 3.11",
+	"Programming Language :: Python :: 3.12",
+	"Programming Language :: Python :: 3.13",
+	"Typing :: Typed",
+]
+dependencies = [
+	"jsonschema",
+	"pyyaml",
+	"lantern-grammar>=0.3.0,<0.4.0",
+]
+
+[project.scripts]
+lantern = "lantern.cli.main:main"
+lantern-runtime = "lantern.cli.main:main"
+
+[project.optional-dependencies]
+dev = [
+	"black==24.1.1",
+	"coverage==7.6.10",
+	"mypy==1.14.1",
+	"pylint==3.3.4",
+	"pytest==8.3.4",
+	"ruff==0.1.13",
+	"tomli==2.0.1",
+]
+release = [
+	"build==1.2.2.post1",
+	"cyclonedx-bom==4.1.1",
+	"twine==6.0.1",
+]
+
+[tool.setuptools]
+include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["."]
 
+[tool.setuptools.package-data]
+"lantern" = [
+	"administration_procedures/*.md",
+	"artifacts/schemas/*.json",
+	"authoring_contracts/*.md",
+	"preservation/*.md",
+	"preservation/*.yaml",
+	"resources/guides/*.md",
+	"resources/instructions/*.md",
+	"skills/packaged_default/*.json",
+	"skills/packaged_default/*.md",
+	"templates/*.md",
+	"workflow/definitions/*.json",
+	"workflow/definitions/*.md",
+	"workflow/definitions/*.yaml",
+]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.pylint]
+max-line-length = 120
+fail-under = 7.5
+
+[tool.black]
+line-length = 120
+target-version = ["py311", "py312"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F"]
+extend-ignore = ["E501"]
+
+[tool.mypy]
+exclude = ["tests/", "build/", "dist/"]
+ignore_missing_imports = true
+
+[tool.coverage.run]
+source = ["lantern"]

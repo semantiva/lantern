@@ -318,14 +318,14 @@ def test_td0009_c01_missing_lantern_grammar_failure_names_manual_install_step(mo
 
     def _raise_missing_grammar():
         raise WorkflowLayerError(
-            "lantern_grammar public API import failed; install lantern_grammar before loading the workflow layer (for example from a sibling checkout: pip install -e ../lantern-grammar)"
+            "lantern_grammar public API import failed; install lantern-grammar into the active Python environment before loading the workflow layer (for example: pip install lantern-grammar)."
         )
 
     monkeypatch.setattr("lantern.workflow.loader._load_grammar", _raise_missing_grammar)
     findings = validate_workspace_readiness(product_root=Path(__file__).resolve().parents[1])
     assert findings
     assert findings[0]["path"] == "workspace.grammar"
-    assert "pip install -e ../lantern-grammar" in findings[0]["message"]
+    assert "pip install lantern-grammar" in findings[0]["message"]
 
 
 def test_td0009_c02_stale_generated_artifact_is_reported_with_path(tmp_path: Path) -> None:
@@ -423,7 +423,7 @@ def test_td0011_c04_runtime_install_failures_do_not_point_at_product_local_lante
 
     def _raise_missing_grammar():
         raise WorkflowLayerError(
-            "lantern_grammar public API import failed; install lantern_grammar before loading the workflow layer (for example from a sibling checkout: pip install -e ../lantern-grammar)"
+            "lantern_grammar public API import failed; install lantern-grammar into the active Python environment before loading the workflow layer (for example: pip install lantern-grammar)."
         )
 
     monkeypatch.setattr("lantern.workflow.loader._load_grammar", _raise_missing_grammar)
@@ -435,4 +435,4 @@ def test_td0011_c04_runtime_install_failures_do_not_point_at_product_local_lante
     assert findings
     assert findings[0]["path"] == "workspace.grammar"
     assert "product_root/lantern" not in findings[0]["message"]
-    assert "pip install -e ../lantern-grammar" in findings[0]["message"]
+    assert "pip install lantern-grammar" in findings[0]["message"]

@@ -13,6 +13,7 @@ if TYPE_CHECKING:
 
 import yaml
 
+from lantern._compat import GrammarCompatibilityError, require_supported_grammar
 from lantern.registry.loader import (
     DEFAULT_SCHEMA_JSON_PATH,
     _build_projected_workbench_registry,
@@ -313,7 +314,7 @@ def _load_grammar():
     if Grammar is None:
         error_detail = f": {_GRAMMAR_IMPORT_ERROR}" if _GRAMMAR_IMPORT_ERROR else ""
         raise WorkflowLayerError(
-            f"lantern_grammar public API import failed{error_detail}. Install lantern_grammar before loading the workflow layer (for example from a sibling checkout: pip install -e ../lantern-grammar)"
+            f"lantern_grammar public API import failed{error_detail}. Install lantern-grammar into the active Python environment before loading the workflow layer (for example: pip install lantern-grammar)."
         ) from _GRAMMAR_IMPORT_ERROR
     try:
         grammar = Grammar.load()
@@ -324,6 +325,10 @@ def _load_grammar():
     report = grammar.validate_integrity()
     if not report.get("ok", False):
         raise WorkflowLayerError(f"lantern_grammar integrity validation failed: {report.get('errors', [])}")
+    try:
+        require_supported_grammar(grammar)
+    except GrammarCompatibilityError as exc:
+        raise WorkflowLayerError(str(exc)) from exc
     return grammar
 
 

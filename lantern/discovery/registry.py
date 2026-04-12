@@ -254,7 +254,9 @@ def _mode_records(product_root: Path, config_surface: ConfigurationSurface | Non
       for mode in config_surface.workflow_modes
     ]
 
-  manifest_path = product_root / "lantern" / "skills" / "packaged_default" / "skill-manifest.json"
+  from lantern._compat import get_package_resource_path
+
+  manifest_path = get_package_resource_path("skills/packaged_default/skill-manifest.json")
   payload = json.loads(manifest_path.read_text(encoding="utf-8"))
   return [
     {

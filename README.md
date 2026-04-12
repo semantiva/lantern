@@ -1,4 +1,4 @@
-# Lantern
+# Lantern Runtime
 
 Lantern is a governed workflow runtime that provides a discovery-first MCP
 execution surface for AI-assisted development on top of a machine-readable
@@ -11,44 +11,25 @@ It combines:
 - **Discovery spine** — `inspect` and `orient` MCP tools for runtime posture and resource discovery
 - **MCP server interface** — five-tool public surface (`inspect`, `orient`, `draft`, `commit`, `validate`) for AI-assisted execution
 
-## Repository contents
+This is the **product repository**. It contains the `lantern/` Python package and the product-local test suite. The companion governance workspace remains authoritative for governed artifacts.
 
-This is the **product repository**. It contains:
+## Operator guide
 
-- `lantern/` — the Lantern Python package
-- `tests/` — the test suite
-
-The companion governance workspace lives in a separate sibling repository and remains authoritative for governed artifacts. Keep governed artifact maintenance in that repository.
-
-## Getting started
-
-Lantern requires `lantern_grammar` to be installed before startup. Install it as a managed package.
-
-### Installed-package mode
+Install Lantern Runtime as the published package:
 
 ```bash
-cd /path/to/lantern
-pip install lantern-grammar
-pip install -e ".[dev]"
-PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -q
+pip install lantern-runtime
 ```
 
-### Source-checkout mode for an external product workspace
+Lantern Runtime requires a compatible `lantern-grammar` package. Install it as a managed package:
 
 ```bash
-cd /path/to/lantern
-pip install lantern-grammar
-PYTHONPATH=/path/to/lantern python -m lantern.mcp.server  \
-  --product-root /path/to/product-repo   --governance-root /path/to/product-governance
+pip install "lantern-grammar>=0.3.0,<0.4.0"
 ```
 
-In both modes, Lantern resolves its workflow release surface from the executing `lantern` runtime environment. Governed product repositories must **not** vendor or copy a `lantern/` runtime tree as a startup prerequisite.
+The documented primary command is `lantern`. `lantern-runtime` is an explicit package-identity alias.
 
-If `lantern_grammar` is not installed, Lantern fails descriptively at startup and tells the operator to complete the prerequisite step before loading the workflow layer.
-
-## Operational CLI
-
-Lantern also ships a bounded operator CLI for startup, diagnostics, bootstrap, and flat discovery over the governed workspace.
+Lantern ships a bounded operator CLI for startup, diagnostics, bootstrap, and flat discovery over the governed workspace.
 
 - `serve` starts the MCP server with explicit workspace roots.
 - `doctor` reports runtime, workspace, bootstrap, and discovery posture.
@@ -56,16 +37,14 @@ Lantern also ships a bounded operator CLI for startup, diagnostics, bootstrap, a
 - `list` filters the flat discovery registry by bounded metadata fields.
 - `show` resolves one exact record from that same registry.
 
-From this repository checkout, use repository-relative paths instead of machine-specific absolute paths:
+Typical installed-package commands:
 
 ```bash
-python -m lantern.cli doctor --governance-root ../governance-root --product-root . --json
-python -m lantern.cli bootstrap-product \
-  --product-root ../example-product \
-  --governance-root ../example-product-governance
-python -m lantern.cli serve --governance-root ../governance-root --product-root .
-python -m lantern.cli list --governance-root ../governance-root --product-root . --family CH --status Ready --json
-python -m lantern.cli show ch_and_td_readiness --entity-kind workbench --governance-root ../governance-root --product-root .
+lantern doctor --governance-root /path/to/governance-root --product-root /path/to/product-repo --json
+lantern bootstrap-product --governance-root /path/to/governance-root --product-root /path/to/product-repo
+lantern serve --governance-root /path/to/governance-root --product-root /path/to/product-repo
+lantern list --governance-root /path/to/governance-root --product-root /path/to/product-repo --family CH --status Ready --json
+lantern show ch_and_td_readiness --entity-kind workbench --governance-root /path/to/governance-root --product-root /path/to/product-repo
 ```
 
 Operational rules:
@@ -75,51 +54,69 @@ Operational rules:
 - `doctor`, `list`, and `show` can emit machine-readable JSON with `--json`.
 - `list` and `show` stay inside exact-token lookup and bounded metadata filtering; they do not run free-form text search or graph traversal.
 
-## Packaged skill surface
+If `lantern_grammar` is missing or unsupported, Lantern fails descriptively at startup and tells the operator to install a compatible published package before loading the workflow layer.
 
-Lantern generates a committed package-default skill surface from the workflow layer. When you modify workflow declarations (workbenches, transaction profiles, or resource manifests), regenerate the skill surface:
+## Maintainer guide
+
+Lantern Runtime reuses the `lantern-grammar` `linting -> test -> build -> publish` topology under one pinned local/CI posture.
+
+Install the local release toolchain:
+
+```bash
+pip install -e ".[dev,release]"
+```
+
+Run the authoritative local release gate:
+
+```bash
+python scripts/check_version_alignment.py --require-grammar-first-release-equality
+python scripts/check_repo_hygiene.py
+pylint --fail-under=7.5 lantern/
+ruff check lantern/ tests/ scripts/
+mypy lantern/
+black --check lantern/ tests/ scripts/
+python scripts/check_license_headers.py
+coverage run -m pytest --maxfail=1 -q
+coverage report
+python scripts/build_runtime_release.py
+python -m twine check dist/*
+python scripts/check_artifact_hygiene.py
+```
+
+The build job also performs a clean-environment install smoke, license report generation, and CycloneDX SBOM generation. The tag used for publication must match `[project].version` in `pyproject.toml`.
+
+Lantern generates a committed package-default skill surface from the workflow layer. When workflow declarations change, regenerate the packaged surface:
 
 ```bash
 python -c "from lantern.skills.generator import write_packaged_skill_surface; write_packaged_skill_surface()"
 ```
 
-Or use the provided installation script to set up git hooks that enforce skill freshness on commit:
+## Contributor guide
+
+> This section is for source-checkout development. Normal operators should use the installed-package workflow above.
+
+Clone the repository and install the dev environment:
 
 ```bash
-cd /path/to/lantern
-bash scripts/install_git_hooks.sh
+git clone https://github.com/lantern-authors/lantern.git
+cd lantern
+pip install -e ".[dev]"
+pip install lantern-grammar
 ```
 
-The pre-commit hook will:
-- Run the full pytest suite
-- Regenerate committed skill artifacts if any workflow declarations changed
-- Reject commits that would leave skill artifacts stale
+Use the workflow-layer README for the authored-vs-generated boundary and runtime surface details:
 
-## Workflow layer
+- `lantern/workflow/README.md`
 
-The machine-readable workflow layer lives under `lantern/workflow/`. See
-[`lantern/workflow/README.md`](lantern/workflow/README.md) for a detailed explanation of:
-
-- Which files are authored inputs vs. generated aids
-- The layering of Lantern Grammar, workflow declarations, and runtime execution
-- Workbench and transaction profile semantics
-- How the layer is validated on every load
-
-## MCP server startup
-
-The Lantern MCP server exposes exactly five tools: `inspect`, `orient`, `draft`, `commit`, and `validate`.
-
-The server does not assume a default product path or governance path. Start it with an explicit product root. Pass a governance root when you want companion-governance posture and resource discovery; omitting it keeps the product runnable and surfaces a `missing_governance` workspace posture instead of creating a hard dependency.
-
-When Lantern governs an external product, `--product-root` must point at the governed product repository, not at the Lantern checkout. The executing Lantern package or source checkout provides the workflow release surface; the product repository should carry only product-local identity, local operator contract, bounded launcher scripts, and ignored local MCP wiring.
-
-### Basic startup
+Start the runtime directly from a source checkout when you are developing Lantern itself:
 
 ```bash
 python -m lantern.mcp.server \
   --product-root /path/to/product-repo/ \
   --governance-root /path/to/governance-root/
 ```
+
+When Lantern governs an external product, `--product-root` must point at the governed product repository, not at the Lantern checkout. The executing Lantern package or source checkout provides the workflow release surface; governed product repositories must **not** vendor or copy a `lantern/` runtime tree as a startup prerequisite.
 
 ### Minimal tracked bootstrap surface for an external product repo
 
@@ -131,15 +128,6 @@ A fresh governed product repository may contain only the following Lantern-relat
 - minimal `.gitignore` entries for Python/test/cache artifacts when needed
 
 Repo-local editor or MCP wiring such as `.vscode/mcp.json` should stay ignored and must not be used to vendor Lantern into the product repository.
-
-### Product-only startup
-
-```bash
-python -m lantern.mcp.server \
-  --product-root /path/to/product-repo/
-```
-
-With product-only startup, `inspect(kind="workspace")` reports `missing_governance` posture. No sibling discovery or hidden fallback path is used.
 
 ### VS Code + GitHub Copilot
 
@@ -165,8 +153,6 @@ Edit your VS Code user settings at `~/.config/Code/User/mcp.json` (create if mis
 }
 ```
 
-Adapt the absolute paths to your local setup and ensure the Python environment can import the `lantern` package.
-
 ### CODEX
 
 Use the following configuration in your CODEX settings:
@@ -188,28 +174,7 @@ args = [
 enabled = true
 ```
 
-### Tool surface
-
-`inspect` and `orient` provide read-only discovery and posture
-resolution against the validated workflow layer:
-
-- `inspect(kind="catalog")` — enumeration of five tools and contract references
-- `inspect(kind="contract", contract_ref="...")` — scoped contract definition for a transaction kind
-- `inspect(kind="workspace")` — read-only topology and startup-validation posture
-- `orient(governance_state, intent, ch_id)` — active workbench set, blockers, and next valid actions
-
-`draft`, `commit`, and `validate` cover governed mutation and verification over the same runtime contract.
-
-### Packaged operator surface
-
-Lantern ships one package-owned thin operator surface under `lantern/skills/packaged_default/`:
-
-- `SKILL.md` — applicability, the first MCP move, the universal discovery sequence, and immutable safety rules only.
-- `skill-manifest.json` — mode-first routing keyed by stable logical refs.
-
-The packaged pair does not embed guide or template bodies. Live authoritative content is delivered dynamically through inline `resource_packets` on `orient(...)` and `inspect(kind="contract")`.
-
-## Native MVP smoke path
+### Native MVP smoke path
 
 Use this bridge-free smoke path after the manual `lantern_grammar` install is complete:
 

@@ -82,22 +82,27 @@ def _probe_mcp_runtime(findings: list[dict[str, str]]) -> str:
 
 
 def _probe_grammar(findings: list[dict[str, str]]) -> dict[str, Any]:
-  try:
-    import lantern_grammar
-  except Exception as exc:
+  from lantern._compat import check_grammar_compatibility
+
+  result = check_grammar_compatibility()
+  if result["status"] in {"missing", "unsupported"}:
     findings.append(
       _finding(
         category="grammar_compatibility",
         classification="blocker",
         subject="lantern_grammar",
-        message=f"lantern_grammar is not importable: {exc}",
-        remediation="Install lantern-grammar into the active Python environment.",
+        message=result["message"],
+        remediation=(
+          "Install a compatible published lantern-grammar package into the active Python "
+          f"environment: pip install 'lantern-grammar{result['supported_range']}'"
+        ),
       )
     )
-    return {"status": "missing", "package_version": None}
   return {
-    "status": "ok",
-    "package_version": getattr(lantern_grammar, "__version__", "unknown"),
+    "status": result["status"],
+    "supported_range": result["supported_range"],
+    "installed_package_version": result["installed_package_version"],
+    "installed_model_version": result["installed_model_version"],
   }
 
 
