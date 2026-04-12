@@ -25,16 +25,13 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
-import yaml
 
 from lantern.workflow.merger import (
     ConfigurationLoadError,
-    ConfigurationLoader,
     ConfigurationMerger,
     MergeProvenance,
     PostureResult,
     WorkflowMode,
-    build_runtime_posture_label,
 )
 
 

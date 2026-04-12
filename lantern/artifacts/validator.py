@@ -534,7 +534,16 @@ def validate_workspace_readiness(
         "relocation_manifest_path": DEFAULT_RELOCATION_MANIFEST_PATH,
     }
     try:
-        load_workflow_layer(**loader_kwargs)
+        load_workflow_layer(
+            registry_path=loader_kwargs["registry_path"],
+            schema_path=loader_kwargs["schema_path"],
+            transaction_profiles_path=loader_kwargs["transaction_profiles_path"],
+            contract_catalog_path=loader_kwargs["contract_catalog_path"],
+            resource_manifest_path=loader_kwargs["resource_manifest_path"],
+            workflow_map_path=loader_kwargs["workflow_map_path"],
+            workbench_resource_bindings_path=loader_kwargs["workbench_resource_bindings_path"],
+            relocation_manifest_path=loader_kwargs["relocation_manifest_path"],
+        )
     except WorkflowLayerError as exc:
         findings.extend(_map_workflow_layer_error(exc))
 
@@ -578,7 +587,7 @@ def _validate_governed_artifact(path: Path, contract: Mapping[str, Any]) -> list
 
     findings: list[ValidationFinding] = []
     header_key = _HEADER_ID_KEYS.get(family)
-    header_id = str(header.get(header_key, "")).strip()
+    header_id = str(header.get(header_key, "")).strip() if header_key is not None else ""
     if header_key and header_id and header_id != artifact_id:
         findings.append(
             _finding(

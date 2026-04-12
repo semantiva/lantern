@@ -31,7 +31,7 @@ except ImportError:  # pragma: no cover
             self.func = func
             self.name = func.__name__
 
-    class FastMCP:  # type: ignore[override]
+    class FastMCP:  # type: ignore[no-redef]
         def __init__(self, name: str):
             self.name = name
             self._tools: list[_Tool] = []
@@ -61,9 +61,7 @@ from lantern.workflow.merger import (
     ConfigurationMerger,
     EffectiveLayer,
     PostureResult,
-    PostureValidationError,
     PostureValidator,
-    build_runtime_posture_label,
 )
 
 mcp = FastMCP("lantern")
@@ -267,7 +265,7 @@ def _parse_payload(raw: str) -> Mapping[str, Any] | None:
 
 
 def _to_dict(obj: Any) -> dict[str, Any]:
-    if is_dataclass(obj):
+    if is_dataclass(obj) and not isinstance(obj, type):
         return asdict(obj)
     return dict(obj)
 

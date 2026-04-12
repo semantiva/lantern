@@ -20,7 +20,6 @@ C04: PostureValidator returns PostureResult with bounded_scope_markers for parti
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from unittest.mock import MagicMock
 
@@ -30,7 +29,6 @@ from lantern.workflow.merger import (
     ConfigurationLoader,
     ConfigurationMerger,
     MergeProvenance,
-    PostureResult,
     PostureValidationError,
     PostureValidator,
 )
@@ -107,7 +105,6 @@ def _make_effective_layer_from_merger(
     governance_modes: dict[str, str] | None = None,
     covered_gates: dict[str, list[str]] | None = None,
 ) -> object:
-    import textwrap
     import yaml as _yaml
     from lantern.workflow.merger import ConfigurationLoader, ConfigurationMerger
 
@@ -215,7 +212,6 @@ def test_c03_intervention_workbench_not_counted_toward_gate_coverage(tmp_path: P
 
 
 def test_c04_partial_governed_accepted_with_bounded_scope_markers(tmp_path: Path) -> None:
-    import textwrap
     import yaml as _yaml
 
     cfg = tmp_path / "workflow" / "configuration"

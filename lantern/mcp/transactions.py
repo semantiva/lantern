@@ -142,12 +142,15 @@ class TransactionEngine:
             "runtime_managed_change_surface": list(runtime_managed),
         }
         digest = sha256(json.dumps(token_payload, sort_keys=True).encode("utf-8")).hexdigest()
+        ci_path_str = str(Path(ci_path).resolve())
+        product_root_str = str(self.product_root)
+        governance_root_str = str(self.governance_root) if self.governance_root else None
         return ChangeSurface(
             workbench_id=workbench_id,
             contract_ref=workbench.contract_refs[0],
-            ci_path=token_payload["ci_path"],
-            product_root=token_payload["product_root"],
-            governance_root=token_payload["governance_root"],
+            ci_path=ci_path_str,
+            product_root=product_root_str,
+            governance_root=governance_root_str,
             allowed_change_surface=allowed_paths,
             gt130_extension_change_surface=extension_paths,
             runtime_managed_change_surface=runtime_managed,

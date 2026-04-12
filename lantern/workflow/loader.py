@@ -33,6 +33,8 @@ from lantern.registry.loader import (
     _build_projected_workbench_registry,
 )
 
+_GRAMMAR_IMPORT_ERROR: Exception | None = None
+
 try:
     from lantern_grammar import Grammar, LanternGrammarLoadError
 except Exception as exc:  # pragma: no cover - exercised in runtime environments missing the package
@@ -834,7 +836,6 @@ def load_effective_layer(
     from lantern.workflow.merger import (
         ConfigurationLoader,
         ConfigurationMerger,
-        EffectiveLayer,
     )
 
     loader = ConfigurationLoader()

@@ -169,7 +169,6 @@ def test_td0002_c18_recomputed_resource_projection_matches_committed_manifest() 
 
 def test_generated_markdown_aids_reference_every_workbench() -> None:
     layer = load_workflow_layer()
-    workflow_map_path = layer.workbenches[0].__class__.__module__.rsplit(".", 1)[0]
     # The loader already validates committed generated files for exact concordance.
     # This test asserts the maintainer-facing markdown artifacts enumerate the full workbench set.
     from lantern.workflow.loader import DEFAULT_WORKBENCH_BINDINGS_PATH, DEFAULT_WORKFLOW_MAP_PATH
