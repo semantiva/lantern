@@ -584,7 +584,7 @@
     "workbench_id": "selected_ci_application"
   },
   {
-    "content_hash": "861b0aba12286ccb058cebebae7aff045301a8bc944418adb5fbd45e6e3dddf7",
+    "content_hash": "30b6641f5da39701af480cf455aac82e86bed6f58670bef4bc9fa5b49ca6eddd",
     "kind": "administration_guide",
     "path": "lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION_v0.1.0.md",
     "projection_trace": {
@@ -764,7 +764,7 @@
     "workbench_id": "upstream_intake_and_baselines"
   },
   {
-    "content_hash": "861b0aba12286ccb058cebebae7aff045301a8bc944418adb5fbd45e6e3dddf7",
+    "content_hash": "30b6641f5da39701af480cf455aac82e86bed6f58670bef4bc9fa5b49ca6eddd",
     "kind": "administration_guide",
     "path": "lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION_v0.1.0.md",
     "projection_trace": {

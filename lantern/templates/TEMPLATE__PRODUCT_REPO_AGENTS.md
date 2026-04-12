@@ -51,6 +51,7 @@ You may add repo-specific notes below the managed block.
 - Do not tell the user to drive the workflow by gate number.
 - Do not leave the repo dirty while claiming the governed closure is complete.
 - If a blocking ambiguity remains, ask the smallest possible question.
+- Do not commit stale packaged skill artifacts; regenerate them when workflow declarations change.
 <!-- LANTERN-MANAGED:END -->
 
 ## Project-specific notes
