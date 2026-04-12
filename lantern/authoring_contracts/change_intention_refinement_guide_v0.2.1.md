@@ -15,7 +15,7 @@ This guide is designed for **AI-assisted execution** with human review.
 
 ## Normative anchors
 
-- `change_increment_authoring_guide_v0.2.1.md` (record shapes + storage locations + boundaries)
+- `change_increment_authoring_guide.md` (record shapes + storage locations + boundaries)
 - `lantern/preservation/EPISTEMIC_FRAME.md` (record invariants)
 - `lantern/preservation/GATES.md` (GT-110 gate expectations)
 - `lantern/preservation/WORKSPACE_TOPOLOGY.md` (multi-repo posture)

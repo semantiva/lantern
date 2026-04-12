@@ -43,14 +43,14 @@ Until that point, do not update CI statuses and do not create DEC/EV records.
 
 - `lantern/preservation/EPISTEMIC_FRAME.md` (objects, IDs, statuses, anchoring)
 - `lantern/preservation/GATES.md` (GT-110/120/130 decision logic and GT-120 output semantics)
-- `Lantern/change_increment_authoring_guide_v0.2.1.md` (normative CI/CH record shape; required CI sections)
+- `lantern/authoring_contracts/change_increment_authoring_guide.md` (normative CI/CH record shape; required CI sections)
 - The provided CH file for `CH_ID`: `ch/CH-####.md` (authoritative assessment criteria, constraints, validation target)
 - The provided DB file for `CH_ID`: `db/DB-####.md` (authoritative design commitments and implementation latitude)
 - The provided TD files for `CH_ID`: `td/TD-####.md` (authoritative test-definition coverage)
 
 This guide is intentionally paired with:
 - `change_intention_refinement_guide_v0.2.1.md` (how CH becomes `Ready` at GT-110 with approved TD coverage)
-- `change_increment_authoring_guide_v0.2.1.md` (what a CI must contain to be selection-eligible)
+- `change_increment_authoring_guide.md` (what a CI must contain to be selection-eligible)
 
 ## Hard anti-drift rules (apply regardless of stage)
 

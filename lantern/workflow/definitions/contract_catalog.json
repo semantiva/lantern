@@ -195,7 +195,8 @@
     ],
     "guide_refs": [
       "lantern/resources/instructions/ci_authoring.md",
-      "lantern/authoring_contracts/change_increment_authoring_guide_v0.2.1.md",
+      "lantern/authoring_contracts/change_increment_authoring_guide.md",
+      "lantern/authoring_contracts/allowed_change_surface_flexibilization.md",
       "lantern/resources/guides/ci_authoring.md"
     ],
     "provenance": {
@@ -829,7 +830,7 @@
     "guide_refs": [
       "lantern/resources/instructions/selected_ci_application.md",
       "lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION_v0.2.1.md",
-      "lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION_v0.1.0.md",
+      "lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md",
       "lantern/resources/guides/selected_ci_application.md"
     ],
     "provenance": {
@@ -1088,7 +1089,7 @@
     ],
     "guide_refs": [
       "lantern/resources/instructions/verification_and_closure.md",
-      "lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION_v0.1.0.md",
+      "lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md",
       "lantern/resources/guides/verification_and_closure.md"
     ],
     "provenance": {

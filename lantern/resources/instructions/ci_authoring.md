@@ -8,7 +8,8 @@ Lifecycle kind: lifecycle_span
 CI
 
 ## Key actions
-- Read and follow Lantern-local guidance in lantern/authoring_contracts/change_increment_authoring_guide_v0.2.1.md.
+- Read and follow Lantern-local guidance in lantern/authoring_contracts/change_increment_authoring_guide.md.
+- Apply the bounded surface rules in lantern/authoring_contracts/allowed_change_surface_flexibilization.md.
 - Keep all emitted references inside the approved Lantern-local corpus.
 
 ## MCP usage
@@ -22,4 +23,5 @@ CI
 - Keep the workbench guidance inside the approved CH-0007 change surface.
 
 Referenced Lantern-local guides:
-- lantern/authoring_contracts/change_increment_authoring_guide_v0.2.1.md
+- lantern/authoring_contracts/change_increment_authoring_guide.md
+- lantern/authoring_contracts/allowed_change_surface_flexibilization.md

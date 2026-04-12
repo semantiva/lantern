@@ -9,7 +9,8 @@ Purpose: execute integration verification for the Selected CI against the locked
 GT-130 is the final change-lifecycle gate. A PASS at GT-130 transitions the CI to `Verified` and the CH to `Addressed`.
 
 Normative anchors:
-- `change_increment_authoring_guide_v0.2.1.md` (CI record shapes + verification plan contract)
+- `change_increment_authoring_guide.md` (CI record shapes + verification plan contract)
+- `allowed_change_surface_flexibilization.md` (bounded GT-130 extension posture)
 - `lantern/preservation/EPISTEMIC_FRAME.md` (record invariants and status transitions)
 - `lantern/preservation/GATES.md` (GT-130 requirements)
 - `lantern/preservation/WORKSPACE_TOPOLOGY.md` (multi-repo posture)
@@ -45,6 +46,7 @@ These are administrative requirements, not evaluation criteria.
 - "Verification execution": running the commands declared in the Selected CI's `## Verification Plan` against the product repo at the declared baseline, and collecting actual outputs.
 - "Verification report": the human-readable record of the verification execution, including commands run, actual outputs, and PASS/FAIL status per TD case covered by the CI.
 - "Administrative demotion": a human decision to change a CI from `Selected` back to `Candidate` or to `Rejected` when GT-130 fails and the CI cannot be re-verified in its current form.
+- "Blocked integration-surface gap": a late-discovered workflow-integration consistency gap that prevents closure even though the Selected CI already satisfies the approved change truth.
 
 ---
 
@@ -119,6 +121,8 @@ Hard rules:
 - Aspirational or placeholder evidence is invalid. Real command output, test results, or artifact paths MUST appear in the EV record.
 - If the verification environment prevents a command from running, record this as a FAIL with the blocking reason; do not fabricate evidence.
 - The commit hash recorded in the EV and binding record MUST identify the committed product repository revision used for the delivered code; do not close GT-130 against an uncommitted dirty worktree.
+- If GT-130 discovers a blocked integration-surface gap, it may register a bounded extension only when all of the following are true: the gap was discovered during GT-130, the extra paths are enumerated explicitly, the extension closes only the integration-consistency gap, and the extension does not modify specifications, tests, design baselines, or architectural baselines.
+- GT-130 extension authority is recorded in EV and DEC evidence only. Do not modify the Selected CI to register the extension.
 
 ### Step 3 — Allocate new EV and DEC ids
 
@@ -141,6 +145,7 @@ Header requirements:
 - `applies_to_ch` MUST equal `CH_ID`
 - `evidence_type` MUST be `verification_report`
 - `references.ci` MUST equal `CI_ID`
+- If GT-130 uses a bounded extension, the EV header MUST also include a `gt130_extension` block with `allowed_paths`, `rationale`, and all required guardrail booleans set to `true`.
 - `artifacts` MUST include at least:
   - `kind: "path"` pointing to the CH file path
   - `kind: "path"` pointing to the CI file path
@@ -151,6 +156,7 @@ Header requirements:
 Body requirements:
 - Paste the full verification execution record (commands run, actual outputs, PASS/FAIL per verification item).
 - Include an explicit TD case coverage table: TD case id → oracle → actual result → PASS/FAIL.
+- If GT-130 uses a bounded extension, include a short section that lists the extra paths, explains why integration was blocked without them, and confirms that specifications, tests, design baselines, and architectural baselines remain unchanged.
 - Add a short "Human approval" section that states:
   - outcome: PASS or FAIL
   - if FAIL: the human-approved CI disposition (`Selected` / `Candidate` / `Rejected`) and rationale
@@ -168,6 +174,7 @@ Header requirements:
 - `decision_type` MUST be `gate`
 - `references.evidence` MUST include the EV id created in Step 4
 - `references.ci` MUST equal `CI_ID`
+- If GT-130 uses a bounded extension, the DEC header MUST also include a `gt130_extension` block with `evidence_ref` and `approved_paths`.
 
 Body requirements:
 - Gate: `GT-130`

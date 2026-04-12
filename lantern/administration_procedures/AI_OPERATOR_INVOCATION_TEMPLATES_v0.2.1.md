@@ -19,13 +19,13 @@ Normative anchors:
 - `lantern/authoring_contracts/test_definition_authoring_guide_v0.1.0.md`
 - `lantern/authoring_contracts/design_candidate_authoring_guide_v0.1.0.md`
 - `lantern/authoring_contracts/design_baseline_authoring_guide_v0.1.0.md`
-- `lantern/authoring_contracts/change_increment_authoring_guide_v0.2.1.md`
+- `lantern/authoring_contracts/change_increment_authoring_guide.md`
 - `lantern/authoring_contracts/change_increment_selection_guide_v0.2.1.md`
 - `lantern/administration_procedures/GT-030__DIP_LOCK_ADMINISTRATION_v0.1.0.md`
 - `lantern/administration_procedures/GT-050_GT-060__BASELINE_READINESS_ADMINISTRATION_v0.1.0.md`
 - `lantern/administration_procedures/GT-115__DESIGN_BASELINE_SELECTION_v0.1.0.md`
 - `lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION_v0.2.1.md`
-- `lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION_v0.1.0.md`
+- `lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md`
 
 ## Global invocation rules (normative)
 
@@ -50,7 +50,7 @@ When the task creates new Lantern artifacts, the invocation SHOULD require use o
 
 When the task creates downstream candidate artifacts, the invocation SHOULD lock the governing contract explicitly:
 - DC work -> `lantern/authoring_contracts/design_candidate_authoring_guide_v0.1.0.md`
-- CI work -> `lantern/authoring_contracts/change_increment_authoring_guide_v0.2.1.md`
+- CI work -> `lantern/authoring_contracts/change_increment_authoring_guide.md`
 
 ## Template 0 — Create Initiative + initial DIP draft
 
@@ -447,7 +447,7 @@ Deliverables:
 ```text
 We are working on CH-####.
 
-Your task is to execute `GT-130: Integration Verification` for CH-#### and complete administration using `lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION_v0.1.0.md`.
+Your task is to execute `GT-130: Integration Verification` for CH-#### and complete administration using `lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md`.
 
 Required fields:
 - governance_root: <path-to-ssot-repo-root>

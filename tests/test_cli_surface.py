@@ -40,18 +40,108 @@ from lantern.workflow.merger import ConfigurationLoadError
 
 PRODUCT_ROOT = Path(__file__).resolve().parents[1]
 CLI_MAIN_MODULE = importlib.import_module("lantern.cli.main")
+DISCOVERY_FIXTURE_CH_ID = "CH-0021"
+DISCOVERY_FIXTURE_CI_ID = "CI-9000-fixture"
+DISCOVERY_FIXTURE_CI_PATH = f"ci/{DISCOVERY_FIXTURE_CI_ID}.md"
 
 
-def _workspace_governance_root() -> Path:
-  for candidate in sorted(PRODUCT_ROOT.parent.iterdir()):
-    if not candidate.is_dir():
-      continue
-    if (candidate / "ch" / "CH-0021.md").exists() and (candidate / "INDEX.md").exists():
-      return candidate
-  raise AssertionError("workspace governance root not found")
+def _write_yaml(path: Path, payload: dict[str, object]) -> None:
+  path.parent.mkdir(parents=True, exist_ok=True)
+  path.write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
 
 
-GOVERNANCE_ROOT = _workspace_governance_root()
+def _write_governed_artifact(
+  path: Path,
+  *,
+  header: dict[str, object],
+  artifact_id: str,
+  title: str,
+  sections: tuple[tuple[str, str], ...],
+) -> None:
+  path.parent.mkdir(parents=True, exist_ok=True)
+  blocks = [
+    "```yaml",
+    yaml.safe_dump(header, sort_keys=False).rstrip(),
+    "```",
+    "",
+    f"# {artifact_id} — {title}",
+  ]
+  for heading, body in sections:
+    blocks.extend(["", f"## {heading}", "", body])
+  path.write_text("\n".join(blocks).rstrip() + "\n", encoding="utf-8")
+
+
+def _make_discovery_governance_root(root: Path) -> Path:
+  _write_governed_artifact(
+    root / "ch" / f"{DISCOVERY_FIXTURE_CH_ID}.md",
+    header={
+      "ch_id": DISCOVERY_FIXTURE_CH_ID,
+      "status": "Ready",
+      "title": "Operational CLI fixture",
+      "depends_on_ch": "CH-0006",
+      "allowed_change_surface": ["lantern/lantern/cli/", "lantern/tests/"],
+      "gates": "GT-110, GT-115, GT-120, GT-130",
+    },
+    artifact_id=DISCOVERY_FIXTURE_CH_ID,
+    title="Operational CLI fixture",
+    sections=(("Technical approach", "Synthetic governed discovery fixture."),),
+  )
+  _write_governed_artifact(
+    root / "ci" / f"{DISCOVERY_FIXTURE_CI_ID}.md",
+    header={
+      "ch_id": DISCOVERY_FIXTURE_CH_ID,
+      "ci_id": DISCOVERY_FIXTURE_CI_ID,
+      "status": "Candidate",
+      "title": "Synthetic CI fixture",
+      "design_baseline_ref": "DB-9000",
+      "test_definition_refs": ["TD-9000"],
+      "allowed_change_surface": ["src/allowed.txt"],
+    },
+    artifact_id=DISCOVERY_FIXTURE_CI_ID,
+    title="Synthetic CI fixture",
+    sections=(("Intent", "Synthetic governed discovery fixture."),),
+  )
+  _write_yaml(
+    root / "workflow" / "artifact_status_contract.yaml",
+    {
+      "families": [
+        {
+          "family": "CH",
+          "canonical_statuses": ["Proposed", "Ready", "Addressed"],
+          "grammar_mapping": {},
+        },
+        {
+          "family": "CI",
+          "canonical_statuses": ["Draft", "Candidate", "Selected", "Verified"],
+          "grammar_mapping": {},
+        },
+      ]
+    },
+  )
+  _write_yaml(
+    root / "workflow" / "gate_post_conditions.yaml",
+    {
+      "gates": [
+        {"gate": "GT-120", "summary": "selection"},
+        {"gate": "GT-130", "summary": "verification"},
+      ]
+    },
+  )
+  (root / "INDEX.md").write_text(
+    "# Governance Index\n\n"
+    "## Change Intents\n\n"
+    f"- [{DISCOVERY_FIXTURE_CH_ID}](ch/{DISCOVERY_FIXTURE_CH_ID}.md) — Status: Ready\n\n"
+    "## Change Increments\n\n"
+    f"- [{DISCOVERY_FIXTURE_CI_ID}]({DISCOVERY_FIXTURE_CI_PATH}) — Status: Candidate\n",
+    encoding="utf-8",
+  )
+  return root
+
+
+@pytest.fixture(scope="module")
+def discovery_governance_root(tmp_path_factory: pytest.TempPathFactory) -> Path:
+  root = tmp_path_factory.mktemp("cli-discovery-governance")
+  return _make_discovery_governance_root(root)
 
 
 def _subcommand_names() -> set[str]:
@@ -277,15 +367,17 @@ def test_bootstrap_helpers_cover_absent_plaintext_blank_and_invalid_actions(tmp_
     apply_bootstrap_plan(invalid_plan)
 
 
-def test_td0021_c06_discovery_registry_covers_artifacts_and_core_vocabularies() -> None:
+def test_td0021_c06_discovery_registry_covers_artifacts_and_core_vocabularies(
+  discovery_governance_root: Path,
+) -> None:
   registry = build_discovery_registry(
     product_root=PRODUCT_ROOT,
-    governance_root=GOVERNANCE_ROOT,
+    governance_root=discovery_governance_root,
   )
 
   entity_kinds = {record["entity_kind"] for record in registry["records"]}
   assert {"artifact", "status", "gate", "mode", "workbench", "guide", "template"} <= entity_kinds
-  assert any(record["token"] == "CH-0021" for record in registry["records"])
+  assert any(record["token"] == DISCOVERY_FIXTURE_CH_ID for record in registry["records"])
   assert any(record["token"] == "GT-120" for record in registry["records"])
   assert any(record["token"] == "Ready" for record in registry["records"])
 
@@ -355,16 +447,18 @@ def test_operational_context_rejects_invalid_configuration_documents(tmp_path: P
     resolve_operational_context(governance_root=governance_root)
 
 
-def test_td0021_c07_list_filters_are_bounded_and_deterministic() -> None:
+def test_td0021_c07_list_filters_are_bounded_and_deterministic(
+  discovery_governance_root: Path,
+) -> None:
   registry = build_discovery_registry(
     product_root=PRODUCT_ROOT,
-    governance_root=GOVERNANCE_ROOT,
+    governance_root=discovery_governance_root,
   )
 
   first = list_records(registry, family="CH", status="Ready", heading="Technical approach")
   second = list_records(registry, family="CH", status="Ready", heading="Technical approach")
   assert first == second
-  assert any(item["token"] == "CH-0021" for item in first)
+  assert any(item["token"] == DISCOVERY_FIXTURE_CH_ID for item in first)
 
   mode_rows = list_records(registry, mode="ci_authoring")
   workbench_rows = list_records(registry, workbench="ci_authoring")
@@ -385,13 +479,15 @@ def test_td0021_c07_list_filters_are_bounded_and_deterministic() -> None:
     list_records(registry, body="graph traversal")
 
 
-def test_td0021_c08_show_uses_exact_token_resolution_and_explicit_ambiguity_guidance() -> None:
+def test_td0021_c08_show_uses_exact_token_resolution_and_explicit_ambiguity_guidance(
+  discovery_governance_root: Path,
+) -> None:
   registry = build_discovery_registry(
     product_root=PRODUCT_ROOT,
-    governance_root=GOVERNANCE_ROOT,
+    governance_root=discovery_governance_root,
   )
 
-  assert show_record(registry, "CH-0021")["entity_kind"] == "artifact"
+  assert show_record(registry, DISCOVERY_FIXTURE_CH_ID)["entity_kind"] == "artifact"
   assert show_record(registry, "GT-120")["entity_kind"] == "gate"
   assert show_record(registry, "Ready")["entity_kind"] == "status"
 
@@ -400,16 +496,18 @@ def test_td0021_c08_show_uses_exact_token_resolution_and_explicit_ambiguity_guid
   assert {candidate["entity_kind"] for candidate in ambiguous["candidates"]} == {"mode", "workbench"}
 
 
-def test_td0021_c09_show_artifact_exposes_local_fields_and_direct_declared_refs_only() -> None:
+def test_td0021_c09_show_artifact_exposes_local_fields_and_direct_declared_refs_only(
+  discovery_governance_root: Path,
+) -> None:
   registry = build_discovery_registry(
     product_root=PRODUCT_ROOT,
-    governance_root=GOVERNANCE_ROOT,
+    governance_root=discovery_governance_root,
   )
 
-  payload = show_record(registry, "CH-0021")
+  payload = show_record(registry, DISCOVERY_FIXTURE_CH_ID)
 
   assert payload["entity_kind"] == "artifact"
-  assert payload["token"] == "CH-0021"
+  assert payload["token"] == DISCOVERY_FIXTURE_CH_ID
   assert payload["family"] == "CH"
   assert payload["status"] == "Ready"
   assert "allowed_change_surface" in payload["fields"]
@@ -419,28 +517,32 @@ def test_td0021_c09_show_artifact_exposes_local_fields_and_direct_declared_refs_
   assert "transitive_refs" not in payload
 
 
-def test_td0021_c10_index_inventory_diff_detects_missing_and_stale_entries(tmp_path: Path) -> None:
+def test_td0021_c10_index_inventory_diff_detects_missing_and_stale_entries(
+  tmp_path: Path,
+  discovery_governance_root: Path,
+) -> None:
   governance_copy = tmp_path / "governance"
-  for source in GOVERNANCE_ROOT.rglob("*"):
+  for source in discovery_governance_root.rglob("*"):
     if source.is_dir():
       continue
-    target = governance_copy / source.relative_to(GOVERNANCE_ROOT)
+    target = governance_copy / source.relative_to(discovery_governance_root)
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_bytes(source.read_bytes())
 
   index_path = governance_copy / "INDEX.md"
   original = index_path.read_text(encoding="utf-8")
   damaged = original.replace(
-    "ci/CI-0020-b4c6d8e0-2f1a-4c9b-8a7d-5e3f0c2b1d9e.md",
+    DISCOVERY_FIXTURE_CI_PATH,
     "ci/CI-9999-missing.md",
     1,
   )
-  damaged = damaged.replace("[CH-0021](ch/CH-0021.md) — Status: Ready\n", "", 1)
+  damaged = damaged.replace(f"[{DISCOVERY_FIXTURE_CH_ID}](ch/{DISCOVERY_FIXTURE_CH_ID}.md) — Status: Ready\n", "", 1)
   index_path.write_text(damaged, encoding="utf-8")
 
   diff = diff_index_inventory(governance_copy)
 
-  assert "ch/CH-0021.md" in diff["missing"]
+  assert f"ch/{DISCOVERY_FIXTURE_CH_ID}.md" in diff["missing"]
+  assert DISCOVERY_FIXTURE_CI_PATH in diff["missing"]
   assert "ci/CI-9999-missing.md" in diff["stale"]
 
 
@@ -774,14 +876,17 @@ def test_cli_main_wrapper_and_fake_unsupported_command_path(monkeypatch: pytest.
   assert parser.message == "unsupported command: unsupported"
 
 
-def test_discovery_helpers_cover_private_fallbacks_and_missing_index_cases(tmp_path: Path) -> None:
+def test_discovery_helpers_cover_private_fallbacks_and_missing_index_cases(
+  tmp_path: Path,
+  discovery_governance_root: Path,
+) -> None:
   registry = build_discovery_registry(
     product_root=PRODUCT_ROOT,
-    governance_root=GOVERNANCE_ROOT,
+    governance_root=discovery_governance_root,
   )
 
-  exact = list_records(registry, id="CH-0021")
-  assert [record["token"] for record in exact] == ["CH-0021"]
+  exact = list_records(registry, id=DISCOVERY_FIXTURE_CH_ID)
+  assert [record["token"] for record in exact] == [DISCOVERY_FIXTURE_CH_ID]
   assert list_records(registry, heading="heading-that-does-not-exist") == []
 
   assert _resource_title("plain text\n", "lantern/resources/guides/no-heading.md") == "no-heading"

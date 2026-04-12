@@ -3,7 +3,7 @@ workbench_id: verification_and_closure
 guide_role: authoritative
 provenance_type: lantern_authored_projection
 provenance_refs:
-- path: lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION_v0.1.0.md
+- path: lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md
   relocation_entry_id: AP-007
 ```
 
@@ -19,7 +19,7 @@ Stabilizes GT-130 verification and closure posture so verification evidence and 
 - The preserved source corpus remains input evidence only; this file is the workflow-facing authority for the workbench.
 
 ## Bound Lantern-local resources
-- `lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION_v0.1.0.md`
+- `lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md`
 
 ## Provenance
 This guide is a Lantern-authored projection over reviewed Lantern-local source material. The provenance block above records the reviewed inputs and relocation-manifest entry identifiers used for auditability.
@@ -32,4 +32,8 @@ A GT-130 PASS for MVP slices requires all of the following review anchors to be 
 - architectural fit against the approved ARCH baseline
 - local verification execution, clean-state evidence, and reproducibility evidence
 - workflow-maintainer guidance that makes the review checklist explicit rather than optional
+
+## Bounded extension posture
+- GT-130 may record a bounded integration-surface extension only when integration is blocked by a late-discovered workflow-consistency gap.
+- The approving EV and DEC records must carry the extension paths and the guardrail assertions that specifications, tests, design baselines, and architectural baselines remain unchanged.
 

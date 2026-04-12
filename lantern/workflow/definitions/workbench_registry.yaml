@@ -299,7 +299,8 @@ workbenches:
   authoritative_guides:
   - lantern/resources/guides/ci_authoring.md
   administration_guides:
-  - lantern/authoring_contracts/change_increment_authoring_guide_v0.2.1.md
+  - lantern/authoring_contracts/change_increment_authoring_guide.md
+  - lantern/authoring_contracts/allowed_change_surface_flexibilization.md
   entry_conditions:
   - GT-115 passed
   exit_conditions:
@@ -409,7 +410,7 @@ workbenches:
   - lantern/resources/guides/selected_ci_application.md
   administration_guides:
   - lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION_v0.2.1.md
-  - lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION_v0.1.0.md
+  - lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md
   entry_conditions:
   - GT-120 passed
   exit_conditions:
@@ -469,7 +470,7 @@ workbenches:
   authoritative_guides:
   - lantern/resources/guides/verification_and_closure.md
   administration_guides:
-  - lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION_v0.1.0.md
+  - lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md
   entry_conditions:
   - selected CI applied
   exit_conditions:

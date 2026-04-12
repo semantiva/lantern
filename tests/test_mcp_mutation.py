@@ -58,6 +58,70 @@ def _write_selected_ci(governance_root: Path, *, allowed_change_surface: list[st
     return ci_path
 
 
+def _write_gt130_extension_records(
+    governance_root: Path,
+    *,
+    ci_id: str,
+    allowed_paths: list[str],
+    approved_paths: list[str] | None = None,
+    decision_outcome: str = "PASS",
+) -> tuple[Path, Path]:
+    ev_path = governance_root / "ev" / "EV-0004-extension.md"
+    ev_path.parent.mkdir(parents=True, exist_ok=True)
+    ev_path.write_text(
+        canonical_render_markdown(
+            header={
+                "ev_id": "EV-0004-extension",
+                "applies_to_ch": "CH-0004",
+                "gate_id": "GT-130",
+                "evidence_type": "verification_report",
+                "title": "GT-130 extension evidence fixture",
+                "references": {"cis": [ci_id]},
+                "gt130_extension": {
+                    "allowed_paths": allowed_paths,
+                    "rationale": "Late-discovered workflow-integration consistency gap.",
+                    "discovered_during_gt130": True,
+                    "bounded_integration_gap": True,
+                    "no_spec_changes": True,
+                    "no_test_changes": True,
+                    "no_design_baseline_changes": True,
+                    "no_architectural_baseline_changes": True,
+                },
+            },
+            artifact_id="EV-0004-extension",
+            title="GT-130 extension evidence fixture",
+            sections=[{"heading": "Verification run", "body": "fixture"}],
+        ),
+        encoding="utf-8",
+    )
+
+    dec_path = governance_root / "dec" / "DEC-0004-extension.md"
+    dec_path.parent.mkdir(parents=True, exist_ok=True)
+    dec_path.write_text(
+        canonical_render_markdown(
+            header={
+                "dec_id": "DEC-0004-extension",
+                "applies_to_ch": "CH-0004",
+                "gate_id": "GT-130",
+                "decision_type": "gate",
+                "status": "Active",
+                "outcome": decision_outcome,
+                "title": "GT-130 extension decision fixture",
+                "references": {"cis": [ci_id], "evidence": ["EV-0004-extension"]},
+                "gt130_extension": {
+                    "evidence_ref": "EV-0004-extension",
+                    "approved_paths": approved_paths or allowed_paths,
+                },
+            },
+            artifact_id="DEC-0004-extension",
+            title="GT-130 extension decision fixture",
+            sections=[{"heading": "Decision", "body": "fixture"}],
+        ),
+        encoding="utf-8",
+    )
+    return ev_path, dec_path
+
+
 def _seed_runtime_hygiene_gitignore(product_root: Path) -> None:
     (product_root / ".gitignore").write_text(
         "__pycache__/\n*.py[cod]\n.pytest_cache/\n.mypy_cache/\n.ruff_cache/\n.venv/\nvenv/\n",
@@ -381,3 +445,84 @@ def test_td0009_c05_selected_ci_application_records_handoff_and_runtime_managed_
         governance_root=governance_root,
     )
     assert transaction_validation["application_handoff"]["post_application_state"] == "awaiting_gt130"
+
+
+def test_td0009_c06_selected_ci_application_accepts_gt130_extension_surface(
+    workflow_layer, tmp_path: Path
+) -> None:
+    product_root = tmp_path / "product"
+    governance_root = tmp_path / "governance"
+    product_root.mkdir()
+    governance_root.mkdir()
+    _seed_runtime_hygiene_gitignore(product_root)
+    ci_path = _write_selected_ci(
+        governance_root,
+        allowed_change_surface=["src/allowed.txt"],
+    )
+    ev_path, dec_path = _write_gt130_extension_records(
+        governance_root,
+        ci_id="CI-0004-selected",
+        allowed_paths=["docs/late.md"],
+    )
+
+    committed = handle_commit(
+        workflow_layer=workflow_layer,
+        workbench_id="selected_ci_application",
+        payload={
+            "ci_path": str(ci_path),
+            "extension_evidence_path": str(ev_path),
+            "extension_decision_path": str(dec_path),
+            "operations": [{"path": "docs/late.md", "content": "late integration write\n"}],
+        },
+        product_root=product_root,
+        governance_root=governance_root,
+        actor="ci-applicator",
+    )
+
+    assert committed["status"] == "committed"
+    assert committed["change_surface"]["gt130_extension_change_surface"] == ["docs/late.md"]
+    assert "docs/late.md" in committed["application_handoff"]["effective_change_surface"]
+    assert (product_root / "docs/late.md").read_text(encoding="utf-8") == "late integration write\n"
+
+
+def test_td0009_c07_selected_ci_application_rejects_invalid_gt130_extension_surface(
+    workflow_layer, tmp_path: Path
+) -> None:
+    product_root = tmp_path / "product"
+    governance_root = tmp_path / "governance"
+    product_root.mkdir()
+    governance_root.mkdir()
+    _seed_runtime_hygiene_gitignore(product_root)
+    ci_path = _write_selected_ci(
+        governance_root,
+        allowed_change_surface=["src/allowed.txt"],
+    )
+    ev_path, dec_path = _write_gt130_extension_records(
+        governance_root,
+        ci_id="CI-0004-selected",
+        allowed_paths=["docs/late.md"],
+        approved_paths=["docs/other.md"],
+    )
+
+    rejected = handle_commit(
+        workflow_layer=workflow_layer,
+        workbench_id="selected_ci_application",
+        payload={
+            "ci_path": str(ci_path),
+            "extension_evidence_path": str(ev_path),
+            "extension_decision_path": str(dec_path),
+            "operations": [{"path": "docs/late.md", "content": "late integration write\n"}],
+        },
+        product_root=product_root,
+        governance_root=governance_root,
+        actor="ci-applicator",
+    )
+
+    assert rejected["status"] == "invalid"
+    assert rejected["findings"] == [
+        {
+            "path": "payload.ci_path",
+            "message": "GT-130 extension decision 'DEC-0004-extension' approved paths do not match evidence 'EV-0004-extension'",
+            "anchor": "inspect.change_surface",
+        }
+    ]

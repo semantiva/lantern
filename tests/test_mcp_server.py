@@ -441,7 +441,7 @@ def test_server_registers_fixed_five_tool_names() -> None:
 
 def test_td0009_c06_gt130_docs_require_expectation_to_delivery_review() -> None:
     guide = (PRODUCT_ROOT / "lantern" / "resources" / "guides" / "verification_and_closure.md").read_text(encoding="utf-8")
-    admin = (PRODUCT_ROOT / "lantern" / "administration_procedures" / "GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION_v0.1.0.md").read_text(encoding="utf-8")
+    admin = (PRODUCT_ROOT / "lantern" / "administration_procedures" / "GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md").read_text(encoding="utf-8")
     for anchor in (
         "initiative objective",
         "roadmap role",

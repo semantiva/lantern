@@ -8,7 +8,7 @@ Supersedes: v0.2.0
 Purpose: complete the required administration tasks for a GT-120 selection decision, in a way that is reproducible and mechanically checkable.
 
 Normative anchors:
-- `change_increment_authoring_guide_v0.2.1.md` (record shapes + directory structure)
+- `change_increment_authoring_guide.md` (record shapes + directory structure)
 - `lantern/preservation/EPISTEMIC_FRAME.md` (record invariants)
 - `lantern/preservation/GATES.md` (GT-120 requirements)
 - `lantern/preservation/WORKSPACE_TOPOLOGY.md` (multi-repo posture)

@@ -18,6 +18,18 @@ artifacts:
   - kind: "commit"
     repo: "<product-repo-name>"
     ref: "<commit-hash-or-tag>"
+
+# Optional for a bounded GT-130 extension
+gt130_extension:
+  allowed_paths:
+    - "path/to/file"
+  rationale: "why integration was blocked without these paths"
+  discovered_during_gt130: true
+  bounded_integration_gap: true
+  no_spec_changes: true
+  no_test_changes: true
+  no_design_baseline_changes: true
+  no_architectural_baseline_changes: true
 ```
 
 ## Verification run
@@ -32,6 +44,10 @@ Required content:
 -->
 
 <paste verification execution evidence here>
+
+## Bounded integration-surface extension (optional)
+
+List the extra paths admitted at GT-130, why the integration was blocked without them, and why the approved change truth remains unchanged.
 
 ## TD case coverage
 

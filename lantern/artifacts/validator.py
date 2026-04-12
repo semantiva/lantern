@@ -40,6 +40,15 @@ _HEADER_ID_KEYS = {
 }
 DEFAULT_STATUS_CONTRACT_PATH = Path(__file__).resolve().parents[1] / "workflow" / "definitions" / "artifact_status_contract.json"
 _ISSUE_STATUS_RE = re.compile(r"^Status:\s*(?P<status>[A-Za-z_][A-Za-z_ ]*)\s*$", re.MULTILINE)
+_ACTIVE_CI_STATUSES = {"Draft", "Candidate", "Selected"}
+_GT130_EXTENSION_REQUIRED_FLAGS = (
+    "discovered_during_gt130",
+    "bounded_integration_gap",
+    "no_spec_changes",
+    "no_test_changes",
+    "no_design_baseline_changes",
+    "no_architectural_baseline_changes",
+)
 
 
 def _finding(path: str, message: str, *, anchor: str, artifact_id: str | None = None) -> ValidationFinding:
@@ -163,6 +172,28 @@ def validate_selected_ci_commit_request(payload: Mapping[str, Any] | None) -> li
             )
         )
         return findings
+    extension_evidence_path = payload.get("extension_evidence_path")
+    extension_decision_path = payload.get("extension_decision_path")
+    if bool(extension_evidence_path) != bool(extension_decision_path):
+        findings.append(
+            _finding(
+                "payload.extension_evidence_path",
+                "extension_evidence_path and extension_decision_path must be supplied together",
+                anchor="selected_ci_application.gt130_extension",
+            )
+        )
+    for field_name in ("extension_evidence_path", "extension_decision_path"):
+        value = payload.get(field_name)
+        if value is None:
+            continue
+        if not isinstance(value, str) or not value.strip():
+            findings.append(
+                _finding(
+                    f"payload.{field_name}",
+                    f"{field_name} must be a non-empty string when supplied",
+                    anchor="selected_ci_application.gt130_extension",
+                )
+            )
     for index, operation in enumerate(operations):
         path = f"payload.operations[{index}]"
         if not isinstance(operation, Mapping):
@@ -187,6 +218,67 @@ def validate_selected_ci_commit_request(payload: Mapping[str, Any] | None) -> li
                 )
             )
     return findings
+
+
+def extract_allowed_change_surface(header: Mapping[str, Any]) -> tuple[str, ...]:
+    allowed = header.get("allowed_change_surface")
+    if isinstance(allowed, str):
+        return tuple(part.strip() for part in allowed.split(",") if part.strip())
+    if isinstance(allowed, list):
+        return tuple(str(item).strip() for item in allowed if str(item).strip())
+    raise ValueError("selected CI artifact is missing allowed_change_surface")
+
+
+def resolve_gt130_extension_surface(
+    *,
+    evidence_path: Path,
+    decision_path: Path,
+    expected_ci_id: str | None = None,
+) -> tuple[str, ...]:
+    evidence_header = parse_header_block(Path(evidence_path).read_text(encoding="utf-8"))
+    evidence_id = str(evidence_header.get("ev_id") or Path(evidence_path).stem)
+    evidence_findings = _validate_gt130_extension_evidence(evidence_header, evidence_id)
+    if evidence_findings:
+        raise ValueError("; ".join(finding["message"] for finding in evidence_findings))
+
+    decision_header = parse_header_block(Path(decision_path).read_text(encoding="utf-8"))
+    decision_id = str(decision_header.get("dec_id") or Path(decision_path).stem)
+    decision_findings = _validate_gt130_extension_decision(decision_header, decision_id)
+    if decision_findings:
+        raise ValueError("; ".join(finding["message"] for finding in decision_findings))
+
+    allowed_paths = _normalize_string_list(evidence_header["gt130_extension"].get("allowed_paths"))
+    if expected_ci_id is not None:
+        ci_refs = _extract_reference_values(evidence_header.get("references"), "ci", "cis")
+        if expected_ci_id not in ci_refs:
+            raise ValueError(
+                f"GT-130 extension evidence {evidence_id!r} does not reference selected CI {expected_ci_id!r}"
+            )
+        decision_ci_refs = _extract_reference_values(decision_header.get("references"), "ci", "cis")
+        if decision_ci_refs and expected_ci_id not in decision_ci_refs:
+            raise ValueError(
+                f"GT-130 extension decision {decision_id!r} does not reference selected CI {expected_ci_id!r}"
+            )
+
+    decision_evidence_refs = _extract_reference_values(decision_header.get("references"), "evidence")
+    if evidence_id not in decision_evidence_refs:
+        raise ValueError(
+            f"GT-130 extension decision {decision_id!r} does not reference evidence {evidence_id!r}"
+        )
+
+    decision_extension = decision_header.get("gt130_extension")
+    if isinstance(decision_extension, Mapping):
+        approved_paths = _normalize_string_list(decision_extension.get("approved_paths"))
+        evidence_ref = str(decision_extension.get("evidence_ref", "")).strip()
+        if evidence_ref and evidence_ref != evidence_id:
+            raise ValueError(
+                f"GT-130 extension decision {decision_id!r} points to evidence {evidence_ref!r}, expected {evidence_id!r}"
+            )
+        if approved_paths and approved_paths != allowed_paths:
+            raise ValueError(
+                f"GT-130 extension decision {decision_id!r} approved paths do not match evidence {evidence_id!r}"
+            )
+    return allowed_paths
 
 
 
@@ -520,6 +612,12 @@ def _validate_governed_artifact(path: Path, contract: Mapping[str, Any]) -> list
             contract=contract,
         )
     )
+    if family == "ci":
+        findings.extend(_validate_ci_change_surface_justifications(header, artifact_id))
+    elif family == "ev":
+        findings.extend(_validate_gt130_extension_evidence(header, artifact_id))
+    elif family == "dec":
+        findings.extend(_validate_gt130_extension_decision(header, artifact_id))
     return findings
 
 
@@ -574,6 +672,251 @@ def _extract_h1(text: str) -> str:
         if stripped.startswith("# "):
             return stripped[2:].strip()
     return ""
+
+
+def _validate_ci_change_surface_justifications(
+    header: Mapping[str, Any],
+    artifact_id: str,
+) -> list[ValidationFinding]:
+    findings: list[ValidationFinding] = []
+    try:
+        allowed_paths = extract_allowed_change_surface(header)
+    except ValueError as exc:
+        return [
+            _finding(
+                f"{artifact_id}.allowed_change_surface",
+                str(exc),
+                anchor="governance_corpus.ci_change_surface",
+                artifact_id=artifact_id,
+            )
+        ]
+    init_paths = tuple(path for path in allowed_paths if path.endswith("__init__.py"))
+    if not init_paths:
+        return findings
+    if str(header.get("status", "")).strip() not in _ACTIVE_CI_STATUSES:
+        return findings
+
+    justifications = header.get("change_surface_justifications")
+    if not isinstance(justifications, list) or not justifications:
+        return [
+            _finding(
+                f"{artifact_id}.change_surface_justifications",
+                "active CI records that include __init__.py in allowed_change_surface must declare change_surface_justifications",
+                anchor="governance_corpus.ci_change_surface",
+                artifact_id=artifact_id,
+            )
+        ]
+
+    covered_paths: set[str] = set()
+    for index, justification in enumerate(justifications):
+        if not isinstance(justification, Mapping):
+            findings.append(
+                _finding(
+                    f"{artifact_id}.change_surface_justifications[{index}]",
+                    "change-surface justification entries must be mappings with path and rationale",
+                    anchor="governance_corpus.ci_change_surface",
+                    artifact_id=artifact_id,
+                )
+            )
+            continue
+        path = str(justification.get("path", "")).strip()
+        rationale = str(justification.get("rationale", "")).strip()
+        if not path:
+            findings.append(
+                _finding(
+                    f"{artifact_id}.change_surface_justifications[{index}].path",
+                    "change-surface justification path must be a non-empty string",
+                    anchor="governance_corpus.ci_change_surface",
+                    artifact_id=artifact_id,
+                )
+            )
+        if not rationale:
+            findings.append(
+                _finding(
+                    f"{artifact_id}.change_surface_justifications[{index}].rationale",
+                    "change-surface justification rationale must be a non-empty string",
+                    anchor="governance_corpus.ci_change_surface",
+                    artifact_id=artifact_id,
+                )
+            )
+        if path and rationale:
+            covered_paths.add(path)
+
+    for init_path in init_paths:
+        if init_path not in covered_paths:
+            findings.append(
+                _finding(
+                    f"{artifact_id}.change_surface_justifications",
+                    f"active CI records must justify __init__.py surface entry {init_path!r}",
+                    anchor="governance_corpus.ci_change_surface",
+                    artifact_id=artifact_id,
+                )
+            )
+    return findings
+
+
+def _validate_gt130_extension_evidence(
+    header: Mapping[str, Any],
+    artifact_id: str,
+) -> list[ValidationFinding]:
+    extension = header.get("gt130_extension")
+    if extension is None:
+        return []
+    if not isinstance(extension, Mapping):
+        return [
+            _finding(
+                f"{artifact_id}.gt130_extension",
+                "gt130_extension must be a mapping when present",
+                anchor="governance_corpus.gt130_extension",
+                artifact_id=artifact_id,
+            )
+        ]
+
+    findings: list[ValidationFinding] = []
+    if str(header.get("gate_id", "")).strip() != "GT-130":
+        findings.append(
+            _finding(
+                f"{artifact_id}.gt130_extension",
+                "gt130_extension is only valid on GT-130 evidence records",
+                anchor="governance_corpus.gt130_extension",
+                artifact_id=artifact_id,
+            )
+        )
+    if str(header.get("evidence_type", "")).strip() != "verification_report":
+        findings.append(
+            _finding(
+                f"{artifact_id}.gt130_extension",
+                "gt130_extension requires evidence_type 'verification_report'",
+                anchor="governance_corpus.gt130_extension",
+                artifact_id=artifact_id,
+            )
+        )
+    allowed_paths = _normalize_string_list(extension.get("allowed_paths"))
+    if not allowed_paths:
+        findings.append(
+            _finding(
+                f"{artifact_id}.gt130_extension.allowed_paths",
+                "gt130_extension.allowed_paths must declare at least one bounded product path",
+                anchor="governance_corpus.gt130_extension",
+                artifact_id=artifact_id,
+            )
+        )
+    rationale = str(extension.get("rationale", "")).strip()
+    if not rationale:
+        findings.append(
+            _finding(
+                f"{artifact_id}.gt130_extension.rationale",
+                "gt130_extension.rationale must be a non-empty string",
+                anchor="governance_corpus.gt130_extension",
+                artifact_id=artifact_id,
+            )
+        )
+    for flag_name in _GT130_EXTENSION_REQUIRED_FLAGS:
+        if extension.get(flag_name) is not True:
+            findings.append(
+                _finding(
+                    f"{artifact_id}.gt130_extension.{flag_name}",
+                    f"gt130_extension.{flag_name} must be true",
+                    anchor="governance_corpus.gt130_extension",
+                    artifact_id=artifact_id,
+                )
+            )
+    return findings
+
+
+def _validate_gt130_extension_decision(
+    header: Mapping[str, Any],
+    artifact_id: str,
+) -> list[ValidationFinding]:
+    extension = header.get("gt130_extension")
+    if extension is None:
+        return []
+    if not isinstance(extension, Mapping):
+        return [
+            _finding(
+                f"{artifact_id}.gt130_extension",
+                "gt130_extension must be a mapping when present",
+                anchor="governance_corpus.gt130_extension",
+                artifact_id=artifact_id,
+            )
+        ]
+
+    findings: list[ValidationFinding] = []
+    if str(header.get("gate_id", "")).strip() != "GT-130":
+        findings.append(
+            _finding(
+                f"{artifact_id}.gt130_extension",
+                "gt130_extension is only valid on GT-130 decision records",
+                anchor="governance_corpus.gt130_extension",
+                artifact_id=artifact_id,
+            )
+        )
+    if str(header.get("decision_type", "")).strip() != "gate":
+        findings.append(
+            _finding(
+                f"{artifact_id}.gt130_extension",
+                "gt130_extension requires decision_type 'gate'",
+                anchor="governance_corpus.gt130_extension",
+                artifact_id=artifact_id,
+            )
+        )
+    if str(header.get("outcome", "")).strip() != "PASS":
+        findings.append(
+            _finding(
+                f"{artifact_id}.gt130_extension",
+                "gt130_extension approval requires outcome 'PASS'",
+                anchor="governance_corpus.gt130_extension",
+                artifact_id=artifact_id,
+            )
+        )
+    evidence_ref = str(extension.get("evidence_ref", "")).strip()
+    if not evidence_ref:
+        findings.append(
+            _finding(
+                f"{artifact_id}.gt130_extension.evidence_ref",
+                "gt130_extension.evidence_ref must point to the approving EV record",
+                anchor="governance_corpus.gt130_extension",
+                artifact_id=artifact_id,
+            )
+        )
+    approved_paths = _normalize_string_list(extension.get("approved_paths"))
+    if not approved_paths:
+        findings.append(
+            _finding(
+                f"{artifact_id}.gt130_extension.approved_paths",
+                "gt130_extension.approved_paths must declare at least one bounded product path",
+                anchor="governance_corpus.gt130_extension",
+                artifact_id=artifact_id,
+            )
+        )
+    referenced_evidence = _extract_reference_values(header.get("references"), "evidence")
+    if evidence_ref and evidence_ref not in referenced_evidence:
+        findings.append(
+            _finding(
+                f"{artifact_id}.gt130_extension.evidence_ref",
+                f"gt130_extension.evidence_ref {evidence_ref!r} must appear in references.evidence",
+                anchor="governance_corpus.gt130_extension",
+                artifact_id=artifact_id,
+            )
+        )
+    return findings
+
+
+def _normalize_string_list(value: Any) -> tuple[str, ...]:
+    if isinstance(value, str):
+        return (value.strip(),) if value.strip() else ()
+    if isinstance(value, list):
+        return tuple(str(item).strip() for item in value if str(item).strip())
+    return ()
+
+
+def _extract_reference_values(references: Any, *keys: str) -> tuple[str, ...]:
+    if not isinstance(references, Mapping):
+        return ()
+    values: list[str] = []
+    for key in keys:
+        values.extend(_normalize_string_list(references.get(key)))
+    return tuple(dict.fromkeys(values))
 
 
 

@@ -7,6 +7,12 @@ status: "Active"
 references:
   ci: "CI-<CH_NUM>-<UUID>"
   evidence: ["EV-####"]
+
+# Optional for a bounded GT-130 extension
+gt130_extension:
+  evidence_ref: "EV-####"
+  approved_paths:
+    - "path/to/file"
 ```
 
 # GT-130 Decision

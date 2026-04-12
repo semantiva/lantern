@@ -3,7 +3,7 @@ workbench_id: selected_ci_application
 guide_role: authoritative
 provenance_type: lantern_authored_projection
 provenance_refs:
-- path: lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION_v0.1.0.md
+- path: lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md
   relocation_entry_id: AP-007
 ```
 
@@ -20,7 +20,7 @@ Stabilizes the post-GT-120, pre-GT-130 product-application posture and keeps it 
 
 ## Bound Lantern-local resources
 - `lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION_v0.2.1.md`
-- `lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION_v0.1.0.md`
+- `lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md`
 
 ## Provenance
 This guide is a Lantern-authored projection over reviewed Lantern-local source material. The provenance block above records the reviewed inputs and relocation-manifest entry identifiers used for auditability.
@@ -29,6 +29,7 @@ This guide is a Lantern-authored projection over reviewed Lantern-local source m
 ## Post-application posture
 - A successful `selected_ci_application` commit MUST emit runtime-managed `application_handoff` metadata.
 - The handoff records the applied CI id, contract ref, effective change surface, affected product paths, actor, timestamp, and the Lantern-local next-step anchors that govern GT-130 preparation.
+- When GT-130 records a bounded extension in EV and DEC, the effective change surface may include those approved paths without mutating the Selected CI.
 - Product bootstrap hygiene is runtime-managed and limited to a deterministic Python/test/cache `.gitignore` block when the target repository lacks the required ignore coverage.
 - The handoff posture is `awaiting_gt130`; it is not a new CI status and it does not create a new SSOT artifact family.
 

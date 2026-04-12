@@ -96,7 +96,10 @@ Every CI MUST declare an `allowed_change_surface`.
 
 Hard rule:
 - Anything outside the declared change surface is out of scope.
+- CI authoring MUST include a module `__init__.py` in the declared change surface when that file exposes or preserves the package surface for module files the CI is already changing.
+- Active CI records (`Draft`, `Candidate`, `Selected`) that include `__init__.py` in `allowed_change_surface` MUST declare a matching `change_surface_justifications` entry with the file path and the package-surface rationale.
 - If execution requires edits outside the declared surface, the CI is blocked until the CI or DB is explicitly revised.
+- Do not leave a foreseeable package-surface edit out of CI scope and assume GT-130 will repair it later.
 
 ### 3.3 Boundary between design and implementation
 A CI MUST NOT contain:
@@ -165,6 +168,10 @@ baseline:
 allowed_change_surface:
   - "<path-or-module-glob>"
 
+change_surface_justifications:
+  - path: "<.../__init__.py>"
+    rationale: "<package surface exposed or preserved by this CI>"
+
 verification:
   required_evidence:
     - kind: "test|artifact|report|command"
@@ -179,6 +186,7 @@ Header rules:
 - `design_baseline_ref` MUST reference exactly one Approved DB.
 - `test_definition_refs` MUST contain every TD needed to judge the CI.
 - `allowed_change_surface` MUST be explicit and non-empty.
+- If an active CI includes `__init__.py` in `allowed_change_surface`, `change_surface_justifications` MUST cover each such path.
 - `blocked_by` MUST be empty unless `status: "Draft"`.
 
 ---

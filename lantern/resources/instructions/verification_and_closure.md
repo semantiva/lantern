@@ -8,7 +8,7 @@ Lifecycle kind: covered_gates
 CI, EV, DEC
 
 ## Key actions
-- Read and follow Lantern-local guidance in lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION_v0.1.0.md.
+- Read and follow Lantern-local guidance in lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md.
 - Keep all emitted references inside the approved Lantern-local corpus.
 
 ## MCP usage
@@ -22,7 +22,7 @@ CI, EV, DEC
 - Keep the workbench guidance inside the approved CH-0007 change surface.
 
 Referenced Lantern-local guides:
-- lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION_v0.1.0.md
+- lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md
 
 
 ## Required GT-130 review anchors

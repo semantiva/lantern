@@ -15,6 +15,8 @@ from lantern.artifacts.allocator import allocate_artifact_id, artifact_path
 from lantern.workflow.merger import InterventionRestrictionGuard, PostureResult
 from lantern.artifacts.renderers import canonical_render_markdown, parse_header_block
 from lantern.artifacts.validator import (
+    extract_allowed_change_surface,
+    resolve_gt130_extension_surface,
     validate_artifact_file,
     validate_commit_request,
     validate_draft_request,
@@ -62,6 +64,11 @@ class ChangeSurface:
     allowed_change_surface: tuple[str, ...]
     runtime_managed_change_surface: tuple[str, ...]
     change_surface_hash: str
+    gt130_extension_change_surface: tuple[str, ...] = ()
+
+    @property
+    def effective_allowed_change_surface(self) -> tuple[str, ...]:
+        return tuple(dict.fromkeys(self.allowed_change_surface + self.gt130_extension_change_surface))
 
 
 class TransactionEngine:
@@ -80,18 +87,36 @@ class TransactionEngine:
             governance_root=self.governance_root,
         )
 
-    def inspect_change_surface(self, *, workbench_id: str, ci_path: str) -> ChangeSurface:
+    def inspect_change_surface(
+        self,
+        *,
+        workbench_id: str,
+        ci_path: str,
+        extension_evidence_path: str | None = None,
+        extension_decision_path: str | None = None,
+    ) -> ChangeSurface:
         workbench = self.workflow_layer.get_workbench(workbench_id)
         if workbench.workbench_id != "selected_ci_application":
             raise TransactionError("change_surface inspection is only supported for selected_ci_application in CH-0004")
         header = parse_header_block(Path(ci_path).read_text(encoding="utf-8"))
-        allowed = header.get("allowed_change_surface")
-        if isinstance(allowed, str):
-            allowed_paths = tuple(part.strip() for part in allowed.split(",") if part.strip())
-        elif isinstance(allowed, list):
-            allowed_paths = tuple(str(item).strip() for item in allowed if str(item).strip())
-        else:
-            raise TransactionError("selected CI artifact is missing allowed_change_surface")
+        try:
+            allowed_paths = extract_allowed_change_surface(header)
+        except ValueError as exc:
+            raise TransactionError(str(exc)) from exc
+        extension_paths: tuple[str, ...] = ()
+        if bool(extension_evidence_path) != bool(extension_decision_path):
+            raise TransactionError(
+                "extension_evidence_path and extension_decision_path must be supplied together"
+            )
+        if extension_evidence_path and extension_decision_path:
+            try:
+                extension_paths = resolve_gt130_extension_surface(
+                    evidence_path=Path(extension_evidence_path),
+                    decision_path=Path(extension_decision_path),
+                    expected_ci_id=str(header.get("ci_id") or Path(ci_path).stem),
+                )
+            except ValueError as exc:
+                raise TransactionError(str(exc)) from exc
         runtime_managed = (".gitignore",) if _gitignore_needs_hygiene_block(self.product_root) else ()
         token_payload = {
             "workbench_id": workbench_id,
@@ -100,6 +125,7 @@ class TransactionEngine:
             "product_root": str(self.product_root),
             "governance_root": str(self.governance_root) if self.governance_root else None,
             "allowed_change_surface": list(allowed_paths),
+            "gt130_extension_change_surface": list(extension_paths),
             "runtime_managed_change_surface": list(runtime_managed),
         }
         digest = sha256(json.dumps(token_payload, sort_keys=True).encode("utf-8")).hexdigest()
@@ -110,6 +136,7 @@ class TransactionEngine:
             product_root=token_payload["product_root"],
             governance_root=token_payload["governance_root"],
             allowed_change_surface=allowed_paths,
+            gt130_extension_change_surface=extension_paths,
             runtime_managed_change_surface=runtime_managed,
             change_surface_hash=digest,
         )
@@ -287,10 +314,24 @@ class TransactionEngine:
         if findings:
             return {"status": "invalid", "findings": findings}
         assert payload is not None
-        change_surface = self.inspect_change_surface(
-            workbench_id=workbench_id,
-            ci_path=str(payload["ci_path"]),
-        )
+        try:
+            change_surface = self.inspect_change_surface(
+                workbench_id=workbench_id,
+                ci_path=str(payload["ci_path"]),
+                extension_evidence_path=str(payload.get("extension_evidence_path") or "").strip() or None,
+                extension_decision_path=str(payload.get("extension_decision_path") or "").strip() or None,
+            )
+        except TransactionError as exc:
+            return {
+                "status": "invalid",
+                "findings": [
+                    {
+                        "path": "payload.ci_path",
+                        "message": str(exc),
+                        "anchor": "inspect.change_surface",
+                    }
+                ],
+            }
         operations = list(payload["operations"])
         acquired = _TRANSACTION_LOCK.acquire(blocking=False)
         if not acquired:
@@ -316,7 +357,7 @@ class TransactionEngine:
                             }
                         ],
                     }
-                if not _is_path_allowed(rel_path, change_surface.allowed_change_surface):
+                if not _is_path_allowed(rel_path, change_surface.effective_allowed_change_surface):
                     return {
                         "status": "invalid",
                         "findings": [
@@ -362,6 +403,7 @@ class TransactionEngine:
                     "workbench_id": workbench_id,
                     "contract_ref": change_surface.contract_ref,
                     "change_surface_hash": change_surface.change_surface_hash,
+                    "gt130_extension_change_surface": list(change_surface.gt130_extension_change_surface),
                     "validation_scope": "transaction",
                     "post_application_state": "awaiting_gt130",
                 },
@@ -392,6 +434,7 @@ class TransactionEngine:
                 "journal_path": str(journal_path),
                 "change_surface": {
                     "allowed_change_surface": list(change_surface.allowed_change_surface),
+                    "gt130_extension_change_surface": list(change_surface.gt130_extension_change_surface),
                     "runtime_managed_change_surface": list(change_surface.runtime_managed_change_surface),
                     "change_surface_hash": change_surface.change_surface_hash,
                 },
@@ -559,7 +602,10 @@ class TransactionEngine:
         return {
             "ci_id": str(ci_header.get("ci_id", ci_path.stem)),
             "contract_ref": change_surface.contract_ref,
-            "effective_change_surface": list(change_surface.allowed_change_surface + change_surface.runtime_managed_change_surface),
+            "effective_change_surface": list(
+                change_surface.effective_allowed_change_surface + change_surface.runtime_managed_change_surface
+            ),
+            "gt130_extension_change_surface": list(change_surface.gt130_extension_change_surface),
             "change_surface_hash": change_surface.change_surface_hash,
             "affected_product_paths": affected_paths,
             "applied_at_utc": _utc_now(),

@@ -8,7 +8,7 @@ Purpose:
 - Help operators size CHs so they can be refined to `Ready` (GT-110) and then authored as Change Increment (CI) candidates for GT-120 selection.
 
 Normative anchors (must not contradict):
-- `change_increment_authoring_guide_v0.2.1.md`
+- `change_increment_authoring_guide.md`
 - `change_intention_refinement_guide_v0.2.1.md`
 - `lantern/preservation/EPISTEMIC_FRAME.md`
 - `lantern/preservation/GATES.md`

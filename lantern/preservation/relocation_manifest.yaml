@@ -9,8 +9,8 @@ allowed_target_roots:
 entries:
 - entry_id: AC-001
   entry_class: bridge_copy
-  source: authoring_contracts/change_increment_authoring_guide_v0.2.1.md
-  target: lantern/authoring_contracts/change_increment_authoring_guide_v0.2.1.md
+  source: authoring_contracts/change_increment_authoring_guide.md
+  target: lantern/authoring_contracts/change_increment_authoring_guide.md
   adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
     normalized to Lantern.
   preservation_signature:
@@ -28,6 +28,17 @@ entries:
     - '## 10. Verification requirements (normative)'
     - '## 11. Gate-driven lifecycle implications'
     - '## 12. Common failure modes (avoid)'
+    required_header_keys: []
+- entry_id: AC-009
+  entry_class: product_owned
+  source: authoring_contracts/allowed_change_surface_flexibilization.md
+  target: lantern/authoring_contracts/allowed_change_surface_flexibilization.md
+  adaptation_notes: Lantern-authored bounded-surface policy guide for CI authoring and GT-130 closure.
+  preservation_signature:
+    required_headings:
+    - '# Allowed Change Surface Flexibilization'
+    - '## 1. CI authoring posture'
+    - '## 2. GT-130 bounded extension posture'
     required_header_keys: []
 - entry_id: AC-002
   entry_class: bridge_copy
@@ -277,8 +288,8 @@ entries:
     required_header_keys: []
 - entry_id: AP-007
   entry_class: bridge_copy
-  source: administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION_v0.1.0.md
-  target: lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION_v0.1.0.md
+  source: administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md
+  target: lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md
   adaptation_notes: Banner removed where present, legacy paths rewritten to Lantern-local paths, and prior-product markers
     normalized to Lantern.
   preservation_signature:

@@ -105,7 +105,8 @@ Not a gate phase, but a mandatory precondition for CI selection.
 **In-scope artifact families:** CI
 
 **Authoritative guides (`lantern/authoring_contracts/`):**
-- `change_increment_authoring_guide_v0.2.1.md`
+- `change_increment_authoring_guide.md`
+- `allowed_change_surface_flexibilization.md`
 
 **Blocked conditions:** GT-115 not passed; DB not approved
 
@@ -146,7 +147,7 @@ TD, and ARCH baselines and gather execution evidence. Product code changes happe
 **In-scope artifact families:** CI, EV
 
 **Authoritative guides (`lantern/authoring_contracts/`):**
-- `change_increment_authoring_guide_v0.2.1.md`
+- `change_increment_authoring_guide.md`
 
 **Blocked conditions:** CI not selected; GT-120 not passed
 
@@ -169,7 +170,7 @@ this gate closes.
 - `change_increment_selection_guide_v0.2.1.md`
 
 **Administration procedures (`lantern/administration_procedures/`):**
-- `GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION_v0.1.0.md`
+- `GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md`
 
 **Blocked conditions:** selected CI not applied; implementation evidence not gathered
 
