@@ -34,14 +34,16 @@ from lantern.registry.loader import (
 )
 
 _GRAMMAR_IMPORT_ERROR: Exception | None = None
+Grammar: Any = None
+LanternGrammarLoadError: type[Exception] = RuntimeError
 
 try:
-    from lantern_grammar import Grammar, LanternGrammarLoadError
+    from lantern_grammar import Grammar as ImportedGrammar, LanternGrammarLoadError as ImportedLoadError
 except Exception as exc:  # pragma: no cover - exercised in runtime environments missing the package
-    Grammar = None  # type: ignore[assignment]
-    LanternGrammarLoadError = RuntimeError  # type: ignore[assignment]
     _GRAMMAR_IMPORT_ERROR = exc
 else:
+    Grammar = ImportedGrammar
+    LanternGrammarLoadError = ImportedLoadError
     _GRAMMAR_IMPORT_ERROR = None
 
 DEFAULT_DEFINITIONS_ROOT = Path(__file__).resolve().parent / "definitions"

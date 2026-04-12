@@ -5,9 +5,29 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 cd "$repo_root"
 
-# Keep this hook product-local and non-mutating. CH-0012 owns future packaging
-# and packaged-surface alignment checks.
-echo "[1/1] Running lantern test suite..."
+echo "[1/8] Validating release contract..."
+python scripts/check_version_alignment.py
+
+echo "[2/8] Checking repository hygiene..."
+python scripts/check_repo_hygiene.py
+
+echo "[3/8] Checking license headers..."
+python scripts/check_license_headers.py
+
+echo "[4/8] Checking formatting..."
+python -m black --check lantern/ tests/ scripts/
+
+echo "[5/8] Running Ruff..."
+python -m ruff check lantern/ tests/ scripts/
+
+echo "[6/8] Running mypy..."
+python -m mypy lantern/
+
+echo "[7/8] Running pylint..."
+python -m pylint --fail-under=7.5 lantern/
+
+echo "[8/8] Verifying packaged surface and test suite..."
+python scripts/build_runtime_release.py --verify-only
 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest tests/ -q
 
 echo "✓ All pre-commit checks passed"
