@@ -1,4 +1,5 @@
 """Logical-ref-first contract and resource discovery for Lantern inspect and orient responses."""
+
 from __future__ import annotations
 
 import hashlib
@@ -51,9 +52,7 @@ def build_catalog_response(workflow_layer: WorkflowLayer) -> CatalogResponse:
     )
 
 
-def build_contract_response(
-    workflow_layer: WorkflowLayer, contract_ref: str
-) -> ContractResponse:
+def build_contract_response(workflow_layer: WorkflowLayer, contract_ref: str) -> ContractResponse:
     for entry in workflow_layer.contract_catalog:
         if entry.contract_ref == contract_ref:
             return ContractResponse(
@@ -78,9 +77,7 @@ def build_contract_response(
     raise KeyError(f"contract ref not found in catalog: {contract_ref!r}")
 
 
-def get_allowed_roles_for_transaction(
-    workbench: WorkflowWorkbench, transaction_kind: str
-) -> tuple[str, ...]:
+def get_allowed_roles_for_transaction(workbench: WorkflowWorkbench, transaction_kind: str) -> tuple[str, ...]:
     for binding in workbench.response_surface_bindings:
         if binding.transaction_kind == transaction_kind:
             return binding.allowed_resource_roles

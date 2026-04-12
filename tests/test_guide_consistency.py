@@ -4,6 +4,7 @@ C07: ConfigurationMerger.validate_guide_consistency raises on diverging guide re
 C08: handle_inspect adds a runtime_posture block to all response kinds.
 C09: handle_orient adds a runtime_posture block to OrientResponse.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -57,6 +58,7 @@ def _make_workflow_layer_with_guides(wb_id: str, guide_refs: list[str]) -> Magic
 # ---------------------------------------------------------------------------
 # C07 — mode/workbench guide consistency
 # ---------------------------------------------------------------------------
+
 
 def test_c07_consistent_guides_passes() -> None:
     from lantern.workflow.merger import EffectiveLayer, MergeProvenance, PostureResult
@@ -161,6 +163,7 @@ def test_c07_overridden_workbench_skips_guide_cross_check() -> None:
 # C08 — inspect runtime_posture block
 # ---------------------------------------------------------------------------
 
+
 def test_c08_inspect_catalog_includes_runtime_posture() -> None:
     from lantern.mcp.inspect import handle_inspect
     from lantern.workflow.loader import load_workflow_layer
@@ -203,6 +206,7 @@ def test_c08_inspect_status_contract_includes_runtime_posture() -> None:
 # ---------------------------------------------------------------------------
 # C09 — orient runtime_posture block
 # ---------------------------------------------------------------------------
+
 
 def test_c09_orient_includes_runtime_posture_block() -> None:
     from lantern.mcp.orient import handle_orient

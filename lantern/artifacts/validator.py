@@ -1,4 +1,5 @@
 """Validation helpers for CH-0004 requests and CH-0009 MVP-hardening checks."""
+
 from __future__ import annotations
 
 import json
@@ -38,7 +39,9 @@ _HEADER_ID_KEYS = {
     "spec": "spec_id",
     "td": "td_id",
 }
-DEFAULT_STATUS_CONTRACT_PATH = Path(__file__).resolve().parents[1] / "workflow" / "definitions" / "artifact_status_contract.json"
+DEFAULT_STATUS_CONTRACT_PATH = (
+    Path(__file__).resolve().parents[1] / "workflow" / "definitions" / "artifact_status_contract.json"
+)
 _ISSUE_STATUS_RE = re.compile(r"^Status:\s*(?P<status>[A-Za-z_][A-Za-z_ ]*)\s*$", re.MULTILINE)
 _ACTIVE_CI_STATUSES = {"Draft", "Candidate", "Selected"}
 _GT130_EXTENSION_REQUIRED_FLAGS = (
@@ -142,7 +145,6 @@ def validate_draft_request(
     return findings
 
 
-
 def validate_selected_ci_commit_request(payload: Mapping[str, Any] | None) -> list[ValidationFinding]:
     findings: list[ValidationFinding] = []
     if not isinstance(payload, Mapping):
@@ -198,7 +200,11 @@ def validate_selected_ci_commit_request(payload: Mapping[str, Any] | None) -> li
         path = f"payload.operations[{index}]"
         if not isinstance(operation, Mapping):
             findings.append(
-                _finding(path, "operation must be an object", anchor="server_owned_contract.request_schemas.commit.properties.operations.items")
+                _finding(
+                    path,
+                    "operation must be an object",
+                    anchor="server_owned_contract.request_schemas.commit.properties.operations.items",
+                )
             )
             continue
         if not isinstance(operation.get("path"), str) or not str(operation.get("path")).strip():
@@ -262,9 +268,7 @@ def resolve_gt130_extension_surface(
 
     decision_evidence_refs = _extract_reference_values(decision_header.get("references"), "evidence")
     if evidence_id not in decision_evidence_refs:
-        raise ValueError(
-            f"GT-130 extension decision {decision_id!r} does not reference evidence {evidence_id!r}"
-        )
+        raise ValueError(f"GT-130 extension decision {decision_id!r} does not reference evidence {evidence_id!r}")
 
     decision_extension = decision_header.get("gt130_extension")
     if isinstance(decision_extension, Mapping):
@@ -281,7 +285,6 @@ def resolve_gt130_extension_surface(
     return allowed_paths
 
 
-
 def validate_commit_request(draft_id: str | None) -> list[ValidationFinding]:
     if isinstance(draft_id, str) and draft_id.strip():
         return []
@@ -292,7 +295,6 @@ def validate_commit_request(draft_id: str | None) -> list[ValidationFinding]:
             anchor="server_owned_contract.request_schemas.commit.properties.draft_id",
         )
     ]
-
 
 
 def validate_artifact_file(path: Path) -> list[ValidationFinding]:
@@ -310,7 +312,6 @@ def validate_artifact_file(path: Path) -> list[ValidationFinding]:
     if "# " not in text:
         findings.append(_finding("body", "artifact body must contain a level-1 title", anchor="artifact.body"))
     return findings
-
 
 
 @lru_cache(maxsize=8)
@@ -536,7 +537,6 @@ def validate_workspace_readiness(
     return findings
 
 
-
 def validate_governance_corpus(governance_root: Path) -> list[ValidationFinding]:
     governance_root = Path(governance_root).resolve()
     contract = load_status_contract()
@@ -548,7 +548,6 @@ def validate_governance_corpus(governance_root: Path) -> list[ValidationFinding]
         for path in sorted(base.glob("*.md")):
             findings.extend(_validate_governed_artifact(path, contract))
     return findings
-
 
 
 def _validate_governed_artifact(path: Path, contract: Mapping[str, Any]) -> list[ValidationFinding]:
@@ -621,7 +620,6 @@ def _validate_governed_artifact(path: Path, contract: Mapping[str, Any]) -> list
     return findings
 
 
-
 def _validate_issue_record(path: Path, artifact_id: str, contract: Mapping[str, Any]) -> list[ValidationFinding]:
     text = path.read_text(encoding="utf-8")
     findings: list[ValidationFinding] = []
@@ -663,7 +661,6 @@ def _validate_issue_record(path: Path, artifact_id: str, contract: Mapping[str, 
         )
     )
     return findings
-
 
 
 def _extract_h1(text: str) -> str:
@@ -919,7 +916,6 @@ def _extract_reference_values(references: Any, *keys: str) -> tuple[str, ...]:
     return tuple(dict.fromkeys(values))
 
 
-
 def _map_workflow_layer_error(exc: Exception) -> list[ValidationFinding]:
     message = str(exc)
     if message.startswith("lantern_grammar"):
@@ -932,7 +928,6 @@ def _map_workflow_layer_error(exc: Exception) -> list[ValidationFinding]:
         _, _, raw_path = message.partition(": ")
         return [_finding(_runtime_relative_path(raw_path.strip()), message, anchor="workspace.readiness")]
     return [_finding("workspace.readiness", message, anchor="workspace.readiness")]
-
 
 
 def _runtime_relative_path(raw_path: str) -> str:

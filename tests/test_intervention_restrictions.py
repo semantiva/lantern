@@ -3,6 +3,7 @@
 C05: Configuration declared intervention_surface is resolved to intervention_surface classification.
 C06: InterventionRestrictionGuard raises InterventionRestrictionError for forbidden transaction kinds.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -46,6 +47,7 @@ def _make_intervention_posture_result() -> PostureResult:
 # ---------------------------------------------------------------------------
 # C05 — intervention_surface activation
 # ---------------------------------------------------------------------------
+
 
 def test_c05_intervention_declared_posture_resolved_correctly(tmp_path: Path) -> None:
     cfg = tmp_path / "workflow" / "configuration"
@@ -131,6 +133,7 @@ def test_c05_intervention_workbench_with_closure_gate_raises(tmp_path: Path) -> 
 # ---------------------------------------------------------------------------
 # C06 — intervention restriction enforcement
 # ---------------------------------------------------------------------------
+
 
 def test_c06_guard_blocks_write_binding_record_under_intervention() -> None:
     posture = _make_intervention_posture_result()

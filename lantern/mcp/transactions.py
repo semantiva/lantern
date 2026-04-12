@@ -1,4 +1,5 @@
 """Shared transaction engine for CH-0004 mutation flows."""
+
 from __future__ import annotations
 
 import json
@@ -105,9 +106,7 @@ class TransactionEngine:
             raise TransactionError(str(exc)) from exc
         extension_paths: tuple[str, ...] = ()
         if bool(extension_evidence_path) != bool(extension_decision_path):
-            raise TransactionError(
-                "extension_evidence_path and extension_decision_path must be supplied together"
-            )
+            raise TransactionError("extension_evidence_path and extension_decision_path must be supplied together")
         if extension_evidence_path and extension_decision_path:
             try:
                 extension_paths = resolve_gt130_extension_surface(
@@ -410,7 +409,9 @@ class TransactionEngine:
                 "touched_paths": affected_paths,
                 "created_paths": affected_paths,
                 "validation_snapshot": str((self.runtime_root / "validation" / f"{transaction_id}.json").resolve()),
-                "application_handoff": str((self.runtime_root / "journal" / transaction_id / "application_handoff.json").resolve()),
+                "application_handoff": str(
+                    (self.runtime_root / "journal" / transaction_id / "application_handoff.json").resolve()
+                ),
             }
             journal_path = write_journal_record(
                 runtime_root=self.runtime_root,
@@ -472,16 +473,26 @@ class TransactionEngine:
             posture = resolve_topology(product_root=self.product_root, governance_root=self.governance_root)
             findings = validate_workspace_readiness(
                 product_root=self.product_root,
-                governance_root=self.governance_root if self.governance_root and self.governance_root.is_dir() else None,
+                governance_root=(
+                    self.governance_root if self.governance_root and self.governance_root.is_dir() else None
+                ),
             )
             if self.governance_root is None:
                 findings = [
-                    {"path": "workspace.governance_root", "message": "governance root not configured", "anchor": "topology"},
+                    {
+                        "path": "workspace.governance_root",
+                        "message": "governance root not configured",
+                        "anchor": "topology",
+                    },
                     *findings,
                 ]
             elif not self.governance_root.is_dir():
                 findings = [
-                    {"path": "workspace.governance_root", "message": f"governance root not found: {self.governance_root}", "anchor": "topology"},
+                    {
+                        "path": "workspace.governance_root",
+                        "message": f"governance root not found: {self.governance_root}",
+                        "anchor": "topology",
+                    },
                     *findings,
                 ]
             return {
@@ -518,7 +529,9 @@ class TransactionEngine:
                 return {
                     "scope": "artifact",
                     "valid": False,
-                    "findings": [{"path": "artifact_path", "message": "artifact_path is required", "anchor": "validate.scope"}],
+                    "findings": [
+                        {"path": "artifact_path", "message": "artifact_path is required", "anchor": "validate.scope"}
+                    ],
                 }
             findings = validate_artifact_file(Path(artifact_path))
             return {
@@ -532,7 +545,9 @@ class TransactionEngine:
                 return {
                     "scope": "transaction",
                     "valid": False,
-                    "findings": [{"path": "transaction_id", "message": "transaction_id is required", "anchor": "validate.scope"}],
+                    "findings": [
+                        {"path": "transaction_id", "message": "transaction_id is required", "anchor": "validate.scope"}
+                    ],
                 }
             journal = load_journal_record(runtime_root=self.runtime_root, transaction_id=transaction_id)
             snapshot = load_validation_snapshot(runtime_root=self.runtime_root, transaction_id=transaction_id)
@@ -549,7 +564,9 @@ class TransactionEngine:
         return {
             "scope": scope,
             "valid": False,
-            "findings": [{"path": "scope", "message": f"unsupported validate scope: {scope}", "anchor": "validate.scope"}],
+            "findings": [
+                {"path": "scope", "message": f"unsupported validate scope: {scope}", "anchor": "validate.scope"}
+            ],
         }
 
     def _post_commit_product_validation(self, affected_paths: list[str]) -> list[dict[str, str]]:
@@ -573,7 +590,9 @@ class TransactionEngine:
         existing_lines = []
         if gitignore_path.exists():
             existing_lines = gitignore_path.read_text(encoding="utf-8").splitlines()
-        existing_entries = {line.strip() for line in existing_lines if line.strip() and not line.strip().startswith("#")}
+        existing_entries = {
+            line.strip() for line in existing_lines if line.strip() and not line.strip().startswith("#")
+        }
         missing_entries = [entry for entry in _MANAGED_GITIGNORE_ENTRIES if entry not in existing_entries]
         if not missing_entries:
             return None
@@ -656,5 +675,9 @@ def _gitignore_needs_hygiene_block(product_root: Path) -> bool:
     gitignore_path = product_root / ".gitignore"
     if not gitignore_path.exists():
         return True
-    existing_entries = {line.strip() for line in gitignore_path.read_text(encoding="utf-8").splitlines() if line.strip() and not line.strip().startswith("#")}
+    existing_entries = {
+        line.strip()
+        for line in gitignore_path.read_text(encoding="utf-8").splitlines()
+        if line.strip() and not line.strip().startswith("#")
+    }
     return any(entry not in existing_entries for entry in _MANAGED_GITIGNORE_ENTRIES)

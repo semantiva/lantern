@@ -1,4 +1,5 @@
 """Tests for Lantern MCP tool handlers and repo-local docs."""
+
 from __future__ import annotations
 
 import asyncio
@@ -122,7 +123,14 @@ def test_c01_status_contract_inspect_is_machine_readable(workflow_layer) -> None
     assert result.authoritative_source_path == "workflow/artifact_status_contract.yaml"
     assert len(result.projection_sha256) == 64
     assert result.families["CH"]["canonical_statuses"] == ["Proposed", "Ready", "Addressed"]
-    assert result.families["IS"]["canonical_statuses"] == ["NEW", "NEEDS_INFO", "ACCEPTED", "DEFERRED", "REJECTED", "RESOLVED"]
+    assert result.families["IS"]["canonical_statuses"] == [
+        "NEW",
+        "NEEDS_INFO",
+        "ACCEPTED",
+        "DEFERRED",
+        "REJECTED",
+        "RESOLVED",
+    ]
     assert result.families["EV"]["normal_path_policy"] == "statusless"
 
 
@@ -142,9 +150,7 @@ def test_c02_contract_response_keeps_server_and_workflow_layers_distinct(workflo
 
 def test_c05_contract_response_scoped_to_requested_ref(workflow_layer) -> None:
     first_ref = workflow_layer.contract_catalog[0].contract_ref
-    result = handle_inspect(
-        kind="contract", workflow_layer=workflow_layer, contract_ref=first_ref
-    )
+    result = handle_inspect(kind="contract", workflow_layer=workflow_layer, contract_ref=first_ref)
     assert isinstance(result, InspectContractResult)
     assert result.contract_ref == first_ref
 
@@ -152,9 +158,7 @@ def test_c05_contract_response_scoped_to_requested_ref(workflow_layer) -> None:
 def test_c05_contract_response_excludes_unrelated_contracts(workflow_layer) -> None:
     all_refs = list({entry.contract_ref for entry in workflow_layer.contract_catalog})
     assert len(all_refs) >= 2
-    result = handle_inspect(
-        kind="contract", workflow_layer=workflow_layer, contract_ref=all_refs[0]
-    )
+    result = handle_inspect(kind="contract", workflow_layer=workflow_layer, contract_ref=all_refs[0])
     body_str = str(vars(result))
     assert all_refs[1] not in body_str
 
@@ -187,9 +191,7 @@ def test_c05_change_surface_inspection_is_deterministic(workflow_layer, tmp_path
 
 
 def test_c06_workspace_response_has_all_required_anchors(workflow_layer, tmp_path) -> None:
-    result = handle_inspect(
-        kind="workspace", workflow_layer=workflow_layer, product_root=tmp_path
-    )
+    result = handle_inspect(kind="workspace", workflow_layer=workflow_layer, product_root=tmp_path)
     assert isinstance(result, InspectWorkspaceResult)
     result_dict = vars(result)
     for anchor in _REQUIRED_WORKSPACE_ANCHORS:
@@ -200,11 +202,10 @@ def test_c06_workspace_without_governance_reports_missing_governance(
     workflow_layer,
     tmp_path,
 ) -> None:
-    result = handle_inspect(
-        kind="workspace", workflow_layer=workflow_layer, product_root=tmp_path
-    )
+    result = handle_inspect(kind="workspace", workflow_layer=workflow_layer, product_root=tmp_path)
     assert result.governance_root is None
     assert result.consistency_state == "missing_governance"
+
 
 def test_td0011_c01_external_workspace_topology_is_valid_without_product_local_lantern_tree(
     workflow_layer,
@@ -228,18 +229,13 @@ def test_td0011_c01_external_workspace_topology_is_valid_without_product_local_l
     assert not (product_root / "lantern").exists()
 
 
-
 def test_c06_workspace_requires_explicit_product_root(workflow_layer) -> None:
     with pytest.raises(InspectError):
         handle_inspect(kind="workspace", workflow_layer=workflow_layer)
 
 
-def test_c06_workspace_read_only_is_true_and_no_mutation_affordance(
-    workflow_layer, tmp_path
-) -> None:
-    result = handle_inspect(
-        kind="workspace", workflow_layer=workflow_layer, product_root=tmp_path
-    )
+def test_c06_workspace_read_only_is_true_and_no_mutation_affordance(workflow_layer, tmp_path) -> None:
+    result = handle_inspect(kind="workspace", workflow_layer=workflow_layer, product_root=tmp_path)
     assert result.read_only is True
     result_dict = vars(result)
     for mutation_key in ("write", "delete", "create", "patch", "mutation_affordance", "mutate"):
@@ -330,9 +326,7 @@ def test_td0006_c04_contract_inspect_surfaces_logical_refs_and_inline_packets(wo
     assert all(ref.startswith("resource.") for ref in result.resource_refs)
     assert all("path" not in packet for packet in result.resource_packets)
     assert any("artifact_templates" in packet["roles"] for packet in result.resource_packets)
-    assert {packet["resource_id"] for packet in result.resource_packets}.issuperset(
-        set(result.resource_refs)
-    )
+    assert {packet["resource_id"] for packet in result.resource_packets}.issuperset(set(result.resource_refs))
 
 
 def test_td0006_c04_orient_surfaces_logical_refs_and_inline_packets(workflow_layer) -> None:
@@ -345,10 +339,7 @@ def test_td0006_c04_orient_surfaces_logical_refs_and_inline_packets(workflow_lay
     for wb_entry in result.runtime_exposure_posture.get("workbenches", []):
         packet_ids = {packet["resource_id"] for packet in wb_entry.get("resource_packets", [])}
         assert any("artifact_templates" in resource["roles"] for resource in wb_entry.get("resources", []))
-        assert any(
-            "artifact_templates" in packet["roles"]
-            for packet in wb_entry.get("resource_packets", [])
-        )
+        assert any("artifact_templates" in packet["roles"] for packet in wb_entry.get("resource_packets", []))
         for resource in wb_entry.get("resources", []):
             assert "path" not in resource
             assert resource["resource_id"] in packet_ids
@@ -440,8 +431,12 @@ def test_server_registers_fixed_five_tool_names() -> None:
 
 
 def test_td0009_c06_gt130_docs_require_expectation_to_delivery_review() -> None:
-    guide = (PRODUCT_ROOT / "lantern" / "resources" / "guides" / "verification_and_closure.md").read_text(encoding="utf-8")
-    admin = (PRODUCT_ROOT / "lantern" / "administration_procedures" / "GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md").read_text(encoding="utf-8")
+    guide = (PRODUCT_ROOT / "lantern" / "resources" / "guides" / "verification_and_closure.md").read_text(
+        encoding="utf-8"
+    )
+    admin = (
+        PRODUCT_ROOT / "lantern" / "administration_procedures" / "GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md"
+    ).read_text(encoding="utf-8")
     for anchor in (
         "initiative objective",
         "roadmap role",
@@ -464,7 +459,9 @@ def test_td0009_c07_readme_documents_manual_install_and_native_smoke_path() -> N
 def test_td0011_c03_bootstrap_docs_forbid_runtime_vendoring_and_define_minimal_product_surface() -> None:
     readme = (PRODUCT_ROOT / "README.md").read_text(encoding="utf-8")
     template = (PRODUCT_ROOT / "lantern" / "templates" / "TEMPLATE__PRODUCT_REPO_AGENTS.md").read_text(encoding="utf-8")
-    onboarding = (PRODUCT_ROOT / "lantern" / "resources" / "instructions" / "governance_onboarding.md").read_text(encoding="utf-8")
+    onboarding = (PRODUCT_ROOT / "lantern" / "resources" / "instructions" / "governance_onboarding.md").read_text(
+        encoding="utf-8"
+    )
 
     assert "must **not** vendor or copy a `lantern/` runtime tree" in readme
     assert "Minimal tracked bootstrap surface" in readme

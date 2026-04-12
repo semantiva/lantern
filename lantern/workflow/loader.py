@@ -229,10 +229,16 @@ def load_workflow_layer(
     )
 
     if enforce_generated_artifacts:
-        _assert_committed_json_matches(contract_catalog_file, generated.contract_catalog_payload, "contract_catalog.json")
-        _assert_committed_json_matches(resource_manifest_file, generated.resource_manifest_payload, "resource_manifest.json")
+        _assert_committed_json_matches(
+            contract_catalog_file, generated.contract_catalog_payload, "contract_catalog.json"
+        )
+        _assert_committed_json_matches(
+            resource_manifest_file, generated.resource_manifest_payload, "resource_manifest.json"
+        )
         _assert_committed_text_matches(workflow_map_file, generated.workflow_map_text, "workflow_map.md")
-        _assert_committed_text_matches(workbench_bindings_file, generated.workbench_resource_bindings_text, "workbench_resource_bindings.md")
+        _assert_committed_text_matches(
+            workbench_bindings_file, generated.workbench_resource_bindings_text, "workbench_resource_bindings.md"
+        )
 
     return WorkflowLayer(
         runtime_surface_classification=foundation_registry.runtime_surface_classification,
@@ -408,14 +414,22 @@ def _validate_additive_schema(registry_payload: Mapping[str, Any], schema_payloa
                     )
     expected_ids = tuple(schema_payload.get("built_in_workbench_ids", []))
     if tuple(seen_ids) != expected_ids:
-        raise WorkflowLayerError(f"Built-in workbench inventory mismatch: expected {expected_ids}, got {tuple(seen_ids)}")
+        raise WorkflowLayerError(
+            f"Built-in workbench inventory mismatch: expected {expected_ids}, got {tuple(seen_ids)}"
+        )
 
 
 def _load_transaction_profiles(profiles_payload: Mapping[str, Any]) -> tuple[TransactionProfile, ...]:
     profiles = []
     seen_kinds: set[str] = set()
     for item in profiles_payload.get("transaction_profiles", []):
-        required = {"transaction_kind", "required_refs", "bounded_families", "allowed_contract_refs", "side_effect_class"}
+        required = {
+            "transaction_kind",
+            "required_refs",
+            "bounded_families",
+            "allowed_contract_refs",
+            "side_effect_class",
+        }
         missing = sorted(required - set(item.keys()))
         if missing:
             raise WorkflowLayerError(f"transaction_profiles entry missing fields: {missing}")
@@ -453,7 +467,10 @@ def _build_workbenches(
                 raise WorkflowLayerError(
                     f"{workbench_id}.workflow_surface.response_surface_bindings references unknown transaction kind {transaction_kind!r}"
                 )
-            if raw["workflow_surface"]["contract_refs"][0] not in transaction_profiles[transaction_kind].allowed_contract_refs:
+            if (
+                raw["workflow_surface"]["contract_refs"][0]
+                not in transaction_profiles[transaction_kind].allowed_contract_refs
+            ):
                 raise WorkflowLayerError(
                     f"{workbench_id}.workflow_surface.contract_refs[0] is not allowed by transaction profile {transaction_kind!r}"
                 )
@@ -498,7 +515,9 @@ def _validate_collective_artifact_family_coverage(workbenches: Iterable[Workflow
         raise WorkflowLayerError(f"Workflow layer is missing required artifact families: {missing}")
 
 
-def _validate_grammar_gate_compatibility(grammar: Any, workbenches: Iterable[WorkflowWorkbench], grammar_version: str) -> None:
+def _validate_grammar_gate_compatibility(
+    grammar: Any, workbenches: Iterable[WorkflowWorkbench], grammar_version: str
+) -> None:
     for workbench in workbenches:
         gate_ids = []
         placement = workbench.lifecycle_placement
@@ -644,7 +663,11 @@ def _build_contract_catalog(
                 family_binding=workbench.artifacts_in_scope,
                 gate_binding=tuple(gate_binding),
                 workbench_refs=(workbench.workbench_id,),
-                guide_refs=(workbench.instruction_resource, *workbench.administration_guides, *workbench.authoritative_guides),
+                guide_refs=(
+                    workbench.instruction_resource,
+                    *workbench.administration_guides,
+                    *workbench.authoritative_guides,
+                ),
                 response_surface_bindings=workbench.response_surface_bindings,
                 compatibility=compatibility,
                 provenance=provenance,
@@ -755,13 +778,13 @@ def _resource_entry_to_dict(entry: ResourceManifestEntry) -> dict[str, Any]:
     }
 
 
-
 def _to_plain_data(value: Any) -> Any:
     if isinstance(value, Mapping):
         return {str(k): _to_plain_data(v) for k, v in value.items()}
     if isinstance(value, (tuple, list)):
         return [_to_plain_data(v) for v in value]
     return value
+
 
 def _canonical_json(payload: Any) -> str:
     return json.dumps(payload, indent=2, sort_keys=True) + "\n"
@@ -782,7 +805,6 @@ def re_sub_multi_underscore(value: str) -> str:
     while "__" in value:
         value = value.replace("__", "_")
     return value
-
 
 
 def load_effective_layer(

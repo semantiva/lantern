@@ -23,7 +23,9 @@ from lantern.workflow.loader import (
     render_generated_artifacts,
 )
 
-DEFAULT_STATUS_CONTRACT_JSON_PATH = Path(__file__).resolve().parents[1] / "lantern" / "workflow" / "definitions" / "artifact_status_contract.json"
+DEFAULT_STATUS_CONTRACT_JSON_PATH = (
+    Path(__file__).resolve().parents[1] / "lantern" / "workflow" / "definitions" / "artifact_status_contract.json"
+)
 
 
 def _load_registry_payload() -> dict:
@@ -135,7 +137,14 @@ def test_status_contract_projection_exists_and_is_machine_readable() -> None:
     assert payload["projection_kind"] == "artifact_status_contract"
     assert payload["generated_from"]["authoritative_path"] == "workflow/artifact_status_contract.yaml"
     assert payload["families"]["CH"]["canonical_statuses"] == ["Proposed", "Ready", "Addressed"]
-    assert payload["families"]["IS"]["canonical_statuses"] == ["NEW", "NEEDS_INFO", "ACCEPTED", "DEFERRED", "REJECTED", "RESOLVED"]
+    assert payload["families"]["IS"]["canonical_statuses"] == [
+        "NEW",
+        "NEEDS_INFO",
+        "ACCEPTED",
+        "DEFERRED",
+        "REJECTED",
+        "RESOLVED",
+    ]
     assert payload["families"]["EV"]["normal_path_policy"] == "statusless"
 
 
@@ -251,9 +260,7 @@ def test_td0002_c17_schema_invalid_workbench_reports_workbench_context(tmp_path:
 
 def test_unresolved_authoritative_guide_path_is_fatal(tmp_path: Path) -> None:
     payload = _load_registry_payload()
-    payload["workbenches"][0]["authoritative_guides"] = [
-        "lantern/resources/guides/does_not_exist.md"
-    ]
+    payload["workbenches"][0]["authoritative_guides"] = ["lantern/resources/guides/does_not_exist.md"]
     registry_path = _write_registry_fixture(tmp_path, payload)
 
     with pytest.raises(WorkflowLayerError) as excinfo:

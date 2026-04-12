@@ -11,6 +11,7 @@ TD-0003 coverage:
   C12 - Determinism and no stage map: repeated resolution yields identical output;
         AST scan of resolver.py finds no authoritative stage-map dict literals
 """
+
 from __future__ import annotations
 
 import ast
@@ -213,8 +214,7 @@ def test_c12_resolver_source_has_no_authoritative_stage_map_dict_literals() -> N
                     and isinstance(value.value, str)
                 ):
                     self.violations.append(
-                        f"Stage-map literal at line {key.lineno}: "
-                        f"{key.value!r} -> {value.value!r}"
+                        f"Stage-map literal at line {key.lineno}: " f"{key.value!r} -> {value.value!r}"
                     )
             self.generic_visit(node)
 

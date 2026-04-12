@@ -4,6 +4,7 @@ This module owns the three-phase merge chain, declared-posture validation,
 intervention restriction enforcement, and runtime-posture audit labeling.
 It does not generate skill projections (see lantern/skills/generator.py).
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -33,9 +34,7 @@ _VALID_POSTURES = frozenset({"full_governed_surface", "partial_governed_surface"
 _REQUIRED_AUTHORED_SUBFOLDERS = ("instructions", "workbenches", "guides")
 
 # Required gates for full_governed_surface sourced from workbench_schema.yaml required_full_governed_gates
-_REQUIRED_FULL_GOVERNED_GATES = frozenset(
-    {"GT-030", "GT-050", "GT-060", "GT-110", "GT-115", "GT-120", "GT-130"}
-)
+_REQUIRED_FULL_GOVERNED_GATES = frozenset({"GT-030", "GT-050", "GT-060", "GT-110", "GT-115", "GT-120", "GT-130"})
 
 # Transaction kinds forbidden under intervention_surface posture (from DC-A design commitment)
 _INTERVENTION_FORBIDDEN_TRANSACTION_KINDS = frozenset(
@@ -93,6 +92,7 @@ class FreshnessResult:
 @dataclass(frozen=True)
 class EffectiveLayer:
     """Merged runtime surface: packaged baseline + optional product-governance config + optional launcher overlay."""
+
     baseline_surface_classification: str
     effective_surface_classification: str
     posture_result: PostureResult
@@ -135,9 +135,7 @@ class ConfigurationLoader:
         for subfolder_name in _REQUIRED_AUTHORED_SUBFOLDERS:
             subfolder = folder / subfolder_name
             if not subfolder.is_dir():
-                raise ConfigurationLoadError(
-                    f"Configuration folder is missing required subfolder: {subfolder}"
-                )
+                raise ConfigurationLoadError(f"Configuration folder is missing required subfolder: {subfolder}")
 
         # Workbench overrides
         overrides_raw = raw.get("workbench_overrides") or []
@@ -147,13 +145,9 @@ class ConfigurationLoader:
             wid = str(item.get("workbench_id", "")).strip()
             wfile = str(item.get("file", "")).strip()
             if not wid:
-                raise ConfigurationLoadError(
-                    f"workbench_overrides entry in {main_yaml_path} is missing workbench_id"
-                )
+                raise ConfigurationLoadError(f"workbench_overrides entry in {main_yaml_path} is missing workbench_id")
             if not wfile:
-                raise ConfigurationLoadError(
-                    f"workbench_overrides entry {wid!r} in {main_yaml_path} is missing file"
-                )
+                raise ConfigurationLoadError(f"workbench_overrides entry {wid!r} in {main_yaml_path} is missing file")
             if wid in seen_workbench_ids:
                 raise ConfigurationLoadError(
                     f"Duplicate workbench_id {wid!r} in workbench_overrides at {main_yaml_path}"
@@ -162,13 +156,10 @@ class ConfigurationLoader:
             override_path = folder / wfile
             if not override_path.exists():
                 raise ConfigurationLoadError(
-                    f"workbench_overrides {wid!r} declares file {wfile!r} "
-                    f"which does not exist at {override_path}"
+                    f"workbench_overrides {wid!r} declares file {wfile!r} " f"which does not exist at {override_path}"
                 )
             try:
-                override_raw: dict[str, Any] = yaml.safe_load(
-                    override_path.read_text(encoding="utf-8")
-                ) or {}
+                override_raw: dict[str, Any] = yaml.safe_load(override_path.read_text(encoding="utf-8")) or {}
             except yaml.YAMLError as exc:
                 raise ConfigurationLoadError(
                     f"workbench_overrides {wid!r} file {override_path} parse error: {exc}"
@@ -195,13 +186,9 @@ class ConfigurationLoader:
             entry_workbench = str(item.get("entry_workbench", "")).strip()
             guide_refs = tuple(str(g).strip() for g in (item.get("guide_refs") or []) if str(g).strip())
             if not mode_id:
-                raise ConfigurationLoadError(
-                    f"workflow_modes entry in {main_yaml_path} is missing mode_id"
-                )
+                raise ConfigurationLoadError(f"workflow_modes entry in {main_yaml_path} is missing mode_id")
             if mode_id in seen_mode_ids:
-                raise ConfigurationLoadError(
-                    f"Duplicate mode_id {mode_id!r} in workflow_modes at {main_yaml_path}"
-                )
+                raise ConfigurationLoadError(f"Duplicate mode_id {mode_id!r} in workflow_modes at {main_yaml_path}")
             seen_mode_ids.add(mode_id)
             if not entry_workbench:
                 raise ConfigurationLoadError(
@@ -210,9 +197,7 @@ class ConfigurationLoader:
             modes.append(WorkflowMode(mode_id=mode_id, entry_workbench=entry_workbench, guide_refs=guide_refs))
 
         main_yaml_hash = _sha256_path(main_yaml_path)
-        authoritative_refs = {
-            str(k): str(v) for k, v in (raw.get("authoritative_refs") or {}).items()
-        }
+        authoritative_refs = {str(k): str(v) for k, v in (raw.get("authoritative_refs") or {}).items()}
 
         return ConfigurationSurface(
             folder=folder,
@@ -295,18 +280,13 @@ class ConfigurationMerger:
         )
 
         bounded_scope_markers = tuple(
-            o.workbench_id
-            for o in (configuration_surface.workbench_overrides if configuration_surface else ())
+            o.workbench_id for o in (configuration_surface.workbench_overrides if configuration_surface else ())
         )
 
         provenance = MergeProvenance(
             baseline_version=baseline_version,
-            configuration_folder=(
-                str(configuration_surface.folder) if configuration_surface else None
-            ),
-            main_yaml_hash=(
-                configuration_surface.main_yaml_hash if configuration_surface else None
-            ),
+            configuration_folder=(str(configuration_surface.folder) if configuration_surface else None),
+            main_yaml_hash=(configuration_surface.main_yaml_hash if configuration_surface else None),
             launcher_overlay_folder=launcher_overlay_folder,
             launcher_overlay_hash=launcher_overlay_hash,
         )
@@ -387,9 +367,7 @@ class PostureValidator:
         provenance = effective_layer.posture_result.provenance
 
         if classification == "full_governed_surface":
-            return self._validate_full_governed(
-                effective_layer, workflow_layer, status_contract, provenance
-            )
+            return self._validate_full_governed(effective_layer, workflow_layer, status_contract, provenance)
         if classification == "partial_governed_surface":
             return self._validate_partial_governed(effective_layer, provenance)
         if classification == "intervention_surface":
@@ -458,7 +436,8 @@ class PostureValidator:
             o.workbench_id
             for o in (
                 effective_layer.configuration_surface.workbench_overrides
-                if effective_layer.configuration_surface else ()
+                if effective_layer.configuration_surface
+                else ()
             )
         )
         return PostureResult(
@@ -541,19 +520,23 @@ def build_runtime_posture_label(posture_result: PostureResult) -> dict[str, Any]
         {"phase": 1, "label": "packaged_baseline", "version": provenance.baseline_version},
     ]
     if provenance.configuration_folder is not None:
-        merge_sources.append({
-            "phase": 2,
-            "label": "product_governance_configuration",
-            "folder": provenance.configuration_folder,
-            "hash": provenance.main_yaml_hash,
-        })
+        merge_sources.append(
+            {
+                "phase": 2,
+                "label": "product_governance_configuration",
+                "folder": provenance.configuration_folder,
+                "hash": provenance.main_yaml_hash,
+            }
+        )
     if provenance.launcher_overlay_folder is not None:
-        merge_sources.append({
-            "phase": 3,
-            "label": "launcher_overlay",
-            "folder": provenance.launcher_overlay_folder,
-            "hash": provenance.launcher_overlay_hash,
-        })
+        merge_sources.append(
+            {
+                "phase": 3,
+                "label": "launcher_overlay",
+                "folder": provenance.launcher_overlay_folder,
+                "hash": provenance.launcher_overlay_hash,
+            }
+        )
     return {
         "classification": posture_result.classification,
         "bounded_scope_markers": list(posture_result.bounded_scope_markers),

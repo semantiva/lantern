@@ -32,9 +32,7 @@ def main() -> None:
     from lantern.cli.main import main as cli_main  # noqa: F401
 
     if args.expected_package_version and lantern.__version__ != args.expected_package_version:
-        raise SystemExit(
-            f"Expected package version {args.expected_package_version!r}, got {lantern.__version__!r}"
-        )
+        raise SystemExit(f"Expected package version {args.expected_package_version!r}, got {lantern.__version__!r}")
 
     compat = check_grammar_compatibility()
     if compat["status"] not in {"ok", "missing", "unsupported"}:

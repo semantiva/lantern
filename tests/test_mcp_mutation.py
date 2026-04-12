@@ -1,4 +1,5 @@
 """CH-0004 mutation-path tests."""
+
 from __future__ import annotations
 
 import threading
@@ -129,9 +130,7 @@ def _seed_runtime_hygiene_gitignore(product_root: Path) -> None:
     )
 
 
-def test_td0004_c03_invalid_draft_returns_machine_readable_path_based_findings(
-    workflow_layer, tmp_path: Path
-) -> None:
+def test_td0004_c03_invalid_draft_returns_machine_readable_path_based_findings(workflow_layer, tmp_path: Path) -> None:
     product_root = tmp_path / "product"
     governance_root = tmp_path / "governance"
     product_root.mkdir()
@@ -163,9 +162,7 @@ def test_td0004_c03_invalid_draft_returns_machine_readable_path_based_findings(
         assert isinstance(finding["anchor"], str) and finding["anchor"]
 
 
-def test_td0004_c04_draft_returns_allocated_id_derived_fields_and_preview(
-    workflow_layer, tmp_path: Path
-) -> None:
+def test_td0004_c04_draft_returns_allocated_id_derived_fields_and_preview(workflow_layer, tmp_path: Path) -> None:
     product_root = tmp_path / "product"
     governance_root = tmp_path / "governance"
     product_root.mkdir()
@@ -228,9 +225,7 @@ def test_td0004_c05_change_surface_inspection_returns_deterministic_writable_pos
     assert len(first.change_surface_hash) == 64
 
 
-def test_td0004_c06_commit_persists_governance_artifact_as_canonical_markdown(
-    workflow_layer, tmp_path: Path
-) -> None:
+def test_td0004_c06_commit_persists_governance_artifact_as_canonical_markdown(workflow_layer, tmp_path: Path) -> None:
     product_root = tmp_path / "product"
     governance_root = tmp_path / "governance"
     product_root.mkdir()
@@ -260,9 +255,7 @@ def test_td0004_c06_commit_persists_governance_artifact_as_canonical_markdown(
     assert Path(commit_result["journal_path"]).exists()
 
 
-def test_td0004_c07_selected_ci_commit_applies_only_allowed_product_writes(
-    workflow_layer, tmp_path: Path
-) -> None:
+def test_td0004_c07_selected_ci_commit_applies_only_allowed_product_writes(workflow_layer, tmp_path: Path) -> None:
     product_root = tmp_path / "product"
     governance_root = tmp_path / "governance"
     product_root.mkdir()
@@ -310,9 +303,7 @@ def test_td0004_c07_selected_ci_commit_applies_only_allowed_product_writes(
     assert not (product_root / "README.md").exists()
 
 
-def test_td0004_c08_commits_serialize_under_internal_transaction_lock(
-    workflow_layer, tmp_path: Path
-) -> None:
+def test_td0004_c08_commits_serialize_under_internal_transaction_lock(workflow_layer, tmp_path: Path) -> None:
     product_root = tmp_path / "product"
     governance_root = tmp_path / "governance"
     product_root.mkdir()
@@ -362,9 +353,7 @@ def test_td0004_c08_commits_serialize_under_internal_transaction_lock(
     assert statuses == ["committed", "lock_conflict"]
 
 
-def test_td0004_c10_workspace_validate_returns_structured_scope_findings(
-    workflow_layer, tmp_path: Path
-) -> None:
+def test_td0004_c10_workspace_validate_returns_structured_scope_findings(workflow_layer, tmp_path: Path) -> None:
     governance_root = tmp_path / "governance"
     governance_root.mkdir()
 
@@ -447,9 +436,7 @@ def test_td0009_c05_selected_ci_application_records_handoff_and_runtime_managed_
     assert transaction_validation["application_handoff"]["post_application_state"] == "awaiting_gt130"
 
 
-def test_td0009_c06_selected_ci_application_accepts_gt130_extension_surface(
-    workflow_layer, tmp_path: Path
-) -> None:
+def test_td0009_c06_selected_ci_application_accepts_gt130_extension_surface(workflow_layer, tmp_path: Path) -> None:
     product_root = tmp_path / "product"
     governance_root = tmp_path / "governance"
     product_root.mkdir()

@@ -1,4 +1,5 @@
 """MCP server registration and routing for Lantern."""
+
 from __future__ import annotations
 
 import argparse
@@ -10,6 +11,7 @@ from typing import Any, Mapping, Optional
 try:
     from mcp.server.fastmcp import FastMCP
 except ImportError:  # pragma: no cover
+
     class _Tool:
         def __init__(self, func):
             self.func = func
@@ -24,6 +26,7 @@ except ImportError:  # pragma: no cover
             def decorator(func):
                 self._tools.append(_Tool(func))
                 return func
+
             return decorator
 
         async def list_tools(self):
@@ -31,6 +34,7 @@ except ImportError:  # pragma: no cover
 
         def run(self):
             raise RuntimeError("mcp package not installed")
+
 
 from lantern.mcp.commit import handle_commit
 from lantern.mcp.draft import handle_draft
@@ -63,9 +67,7 @@ def configure_server_paths(
 ) -> None:
     global _product_root, _governance_root, _workflow_layer, _effective_layer, _posture_result
     _product_root = Path(product_root).resolve()
-    _governance_root = (
-        Path(governance_root).resolve() if governance_root is not None else None
-    )
+    _governance_root = Path(governance_root).resolve() if governance_root is not None else None
     _workflow_layer = None
     _effective_layer = None
     _posture_result = None
@@ -274,9 +276,7 @@ def main() -> None:
     if not args.product_root.is_dir():
         parser.error(f"--product-root does not exist or is not a directory: {args.product_root}")
     if args.governance_root is not None and not args.governance_root.is_dir():
-        parser.error(
-            f"--governance-root does not exist or is not a directory: {args.governance_root}"
-        )
+        parser.error(f"--governance-root does not exist or is not a directory: {args.governance_root}")
     configure_server_paths(
         product_root=args.product_root,
         governance_root=args.governance_root,

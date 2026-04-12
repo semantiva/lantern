@@ -1,4 +1,5 @@
 """Artifact allocation and path helpers for governed Markdown artifacts."""
+
 from __future__ import annotations
 
 from pathlib import Path

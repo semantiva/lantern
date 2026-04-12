@@ -11,9 +11,7 @@ from .models import NameViolation
 def assert_name_isolation(root: str | Path) -> None:
     violations = scan_forbidden_names(root)
     if violations:
-        formatted = "; ".join(
-            f"{item.path}:{item.line_number}:{item.line_text}" for item in violations
-        )
+        formatted = "; ".join(f"{item.path}:{item.line_number}:{item.line_text}" for item in violations)
         raise AssertionError(f"Forbidden repository-specific name detected: {formatted}")
 
 

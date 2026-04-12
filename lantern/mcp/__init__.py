@@ -1,4 +1,5 @@
 """Lantern MCP execution surface."""
+
 from __future__ import annotations
 
 from lantern.mcp.catalog import (

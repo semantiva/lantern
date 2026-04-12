@@ -4,6 +4,7 @@ This module owns the committed package-default `SKILL.md` and `skill-manifest.js
 under `lantern/skills/packaged_default/`. It does not manage governance-folder
 freshness checks or generated template mirrors.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -133,9 +134,7 @@ def _workflow_mode_ids(workflow_layer: WorkflowLayer) -> list[str]:
 
 
 def build_packaged_skill_md(workflow_layer: WorkflowLayer) -> str:
-    workflow_modes = "\n".join(
-        f"- `{mode_id}`" for mode_id in _workflow_mode_ids(workflow_layer)
-    )
+    workflow_modes = "\n".join(f"- `{mode_id}`" for mode_id in _workflow_mode_ids(workflow_layer))
     return f"""---
 name: lantern
 description: Use this skill when the task involves Lantern-governed workflow work. This includes authoring or assessing change handlers (CH, TD, DB, CI), upstream baseline intake (DIP, SPEC, ARCH), design candidate or design selection steps, CI authoring or selection, applying a selected CI, verification or closure, issue intake, governance onboarding, or bootstrap. Triggers on any mention of Lantern gates (GT-030, GT-050, GT-060, GT-110, GT-115, GT-120, GT-130), Lantern MCP tools (inspect, orient, draft, commit, validate), Lantern artifact families, or requests to operate through Lantern workflow procedures rather than direct repository editing.

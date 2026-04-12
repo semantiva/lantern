@@ -1,4 +1,5 @@
 """Preview-first bootstrap planning and application for CH-0021."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -14,140 +15,141 @@ _MANAGED_END = "<!-- LANTERN-MANAGED:END -->"
 
 @dataclass(frozen=True)
 class BootstrapOperation:
-  path: Path
-  action: str
-  content: str = ""
+    path: Path
+    action: str
+    content: str = ""
 
 
 @dataclass(frozen=True)
 class BootstrapPlan:
-  product_root: Path
-  governance_root: Path
-  preview_only: bool
-  operations: tuple[BootstrapOperation, ...]
+    product_root: Path
+    governance_root: Path
+    preview_only: bool
+    operations: tuple[BootstrapOperation, ...]
 
 
 def plan_bootstrap(*, product_root: Path, governance_root: Path) -> BootstrapPlan:
-  product_root = Path(product_root).resolve()
-  governance_root = Path(governance_root).resolve()
+    product_root = Path(product_root).resolve()
+    governance_root = Path(governance_root).resolve()
 
-  operations: list[BootstrapOperation] = []
+    operations: list[BootstrapOperation] = []
 
-  config_root = governance_root / "workflow" / "configuration"
-  for folder in (
-    config_root,
-    config_root / "instructions",
-    config_root / "workbenches",
-    config_root / "guides",
-  ):
-    if not folder.exists():
-      operations.append(BootstrapOperation(path=folder, action="mkdir"))
+    config_root = governance_root / "workflow" / "configuration"
+    for folder in (
+        config_root,
+        config_root / "instructions",
+        config_root / "workbenches",
+        config_root / "guides",
+    ):
+        if not folder.exists():
+            operations.append(BootstrapOperation(path=folder, action="mkdir"))
 
-  desired_files = {
-    product_root / "AGENTS.md": _merge_managed_block(
-      product_root / "AGENTS.md",
-      _PRODUCT_AGENTS_TEMPLATE.read_text(encoding="utf-8"),
-    ),
-    governance_root / "AGENTS.md": _merge_managed_block(
-      governance_root / "AGENTS.md",
-      _governance_agents_template(product_root=product_root),
-    ),
-    governance_root / "README.md": _governance_readme(product_root=product_root),
-    config_root / "main.yaml": yaml.safe_dump(
-      {
-        "configuration_version": "1",
-        "declared_posture": "full_governed_surface",
-        "authoritative_refs": {
-          "product_root": str(product_root),
-        },
-        "workflow_modes": [],
-        "workbench_overrides": [],
-      },
-      sort_keys=False,
-    ),
-  }
+    desired_files = {
+        product_root
+        / "AGENTS.md": _merge_managed_block(
+            product_root / "AGENTS.md",
+            _PRODUCT_AGENTS_TEMPLATE.read_text(encoding="utf-8"),
+        ),
+        governance_root
+        / "AGENTS.md": _merge_managed_block(
+            governance_root / "AGENTS.md",
+            _governance_agents_template(product_root=product_root),
+        ),
+        governance_root / "README.md": _governance_readme(product_root=product_root),
+        config_root
+        / "main.yaml": yaml.safe_dump(
+            {
+                "configuration_version": "1",
+                "declared_posture": "full_governed_surface",
+                "authoritative_refs": {
+                    "product_root": str(product_root),
+                },
+                "workflow_modes": [],
+                "workbench_overrides": [],
+            },
+            sort_keys=False,
+        ),
+    }
 
-  for path, desired_content in desired_files.items():
-    if path.exists():
-      current = path.read_text(encoding="utf-8")
-      if current == desired_content:
-        continue
-    operations.append(
-      BootstrapOperation(path=path, action="write", content=desired_content)
+    for path, desired_content in desired_files.items():
+        if path.exists():
+            current = path.read_text(encoding="utf-8")
+            if current == desired_content:
+                continue
+        operations.append(BootstrapOperation(path=path, action="write", content=desired_content))
+
+    return BootstrapPlan(
+        product_root=product_root,
+        governance_root=governance_root,
+        preview_only=True,
+        operations=tuple(operations),
     )
-
-  return BootstrapPlan(
-    product_root=product_root,
-    governance_root=governance_root,
-    preview_only=True,
-    operations=tuple(operations),
-  )
 
 
 def apply_bootstrap_plan(plan: BootstrapPlan) -> BootstrapPlan:
-  for operation in plan.operations:
-    if operation.action == "mkdir":
-      operation.path.mkdir(parents=True, exist_ok=True)
-      continue
-    if operation.action == "write":
-      operation.path.parent.mkdir(parents=True, exist_ok=True)
-      operation.path.write_text(operation.content, encoding="utf-8")
-      continue
-    raise ValueError(f"unsupported bootstrap action: {operation.action}")
-  return plan
+    for operation in plan.operations:
+        if operation.action == "mkdir":
+            operation.path.mkdir(parents=True, exist_ok=True)
+            continue
+        if operation.action == "write":
+            operation.path.parent.mkdir(parents=True, exist_ok=True)
+            operation.path.write_text(operation.content, encoding="utf-8")
+            continue
+        raise ValueError(f"unsupported bootstrap action: {operation.action}")
+    return plan
 
 
 def _merge_managed_block(path: Path, managed_content: str) -> str:
-  if not path.exists():
+    if not path.exists():
+        return managed_content.rstrip() + "\n"
+    existing = path.read_text(encoding="utf-8")
+    if _MANAGED_BEGIN in existing and _MANAGED_END in existing:
+        before, remainder = existing.split(_MANAGED_BEGIN, 1)
+        _, after = remainder.split(_MANAGED_END, 1)
+        trimmed_after = after
+        if _MANAGED_END in managed_content:
+            managed_suffix = managed_content.split(_MANAGED_END, 1)[1].lstrip("\n")
+            normalized_after = after.lstrip("\n")
+            if managed_suffix and normalized_after.startswith(managed_suffix):
+                trimmed_after = normalized_after[len(managed_suffix) :]
+        parts: list[str] = []
+        if before.strip():
+            parts.append(before.rstrip())
+        parts.append(managed_content.rstrip())
+        if trimmed_after.strip():
+            parts.append(trimmed_after.lstrip().rstrip())
+        return "\n\n".join(parts).rstrip() + "\n"
+    if existing.strip():
+        return (managed_content.rstrip() + "\n\n" + existing.lstrip()).rstrip() + "\n"
     return managed_content.rstrip() + "\n"
-  existing = path.read_text(encoding="utf-8")
-  if _MANAGED_BEGIN in existing and _MANAGED_END in existing:
-    before, remainder = existing.split(_MANAGED_BEGIN, 1)
-    _, after = remainder.split(_MANAGED_END, 1)
-    trimmed_after = after
-    if _MANAGED_END in managed_content:
-      managed_suffix = managed_content.split(_MANAGED_END, 1)[1].lstrip("\n")
-      normalized_after = after.lstrip("\n")
-      if managed_suffix and normalized_after.startswith(managed_suffix):
-        trimmed_after = normalized_after[len(managed_suffix) :]
-    parts: list[str] = []
-    if before.strip():
-      parts.append(before.rstrip())
-    parts.append(managed_content.rstrip())
-    if trimmed_after.strip():
-      parts.append(trimmed_after.lstrip().rstrip())
-    return "\n\n".join(parts).rstrip() + "\n"
-  if existing.strip():
-    return (managed_content.rstrip() + "\n\n" + existing.lstrip()).rstrip() + "\n"
-  return managed_content.rstrip() + "\n"
 
 
 def _governance_agents_template(*, product_root: Path) -> str:
-  return (
-    f"{_MANAGED_BEGIN}\n"
-    "<!-- Lantern workflow release: source-tree bootstrap -->\n"
-    "# AGENTS.md — governed product governance workspace\n\n"
-    "This managed block was generated by `bootstrap-product`.\n"
-    "Keep the managed markers intact so future Lantern refreshes can update this file safely.\n\n"
-    "## Workspace boundary\n\n"
-    "- This repository is the authoritative governance workspace for the companion product repository.\n"
-    f"- The configured product workspace is `{product_root}`.\n"
-    "- Product-local source edits remain in the product repository; governed artifacts stay here.\n"
-    "- Do not vendor the Lantern runtime into either repository as part of bootstrap.\n\n"
-    "## Bootstrap posture\n\n"
-    "- Lantern resolves the product root from governed configuration after bootstrap.\n"
-    "- Update `workflow/configuration/main.yaml` intentionally if the companion product root changes.\n"
-    "- Keep governance README and governance configuration files owned by this repository.\n"
-    f"{_MANAGED_END}\n"
-  )
+    return (
+        f"{_MANAGED_BEGIN}\n"
+        "<!-- Lantern workflow release: source-tree bootstrap -->\n"
+        "# AGENTS.md — governed product governance workspace\n\n"
+        "This managed block was generated by `bootstrap-product`.\n"
+        "Keep the managed markers intact so future Lantern refreshes can update this file safely.\n\n"
+        "## Workspace boundary\n\n"
+        "- This repository is the authoritative governance workspace for the companion product repository.\n"
+        f"- The configured product workspace is `{product_root}`.\n"
+        "- Product-local source edits remain in the product repository; governed artifacts stay here.\n"
+        "- Do not vendor the Lantern runtime into either repository as part of bootstrap.\n\n"
+        "## Bootstrap posture\n\n"
+        "- Lantern resolves the product root from governed configuration after bootstrap.\n"
+        "- Update `workflow/configuration/main.yaml` intentionally if the companion product root changes.\n"
+        "- Keep governance README and governance configuration files owned by this repository.\n"
+        f"{_MANAGED_END}\n"
+    )
 
 
 def _governance_readme(*, product_root: Path) -> str:
-  return (
-    "# Governed Product Governance Workspace\n\n"
-    "This repository is the Lantern-governed companion SSOT for a product workspace.\n\n"
-    f"- Configured product workspace: `{product_root}`\n"
-    "- Bootstrap is preview-first and idempotent.\n"
-    "- Governance configuration lives under `workflow/configuration/`.\n"
-    "- Product README and product-side governance configuration are intentionally out of scope.\n"
-  )
+    return (
+        "# Governed Product Governance Workspace\n\n"
+        "This repository is the Lantern-governed companion SSOT for a product workspace.\n\n"
+        f"- Configured product workspace: `{product_root}`\n"
+        "- Bootstrap is preview-first and idempotent.\n"
+        "- Governance configuration lives under `workflow/configuration/`.\n"
+        "- Product README and product-side governance configuration are intentionally out of scope.\n"
+    )

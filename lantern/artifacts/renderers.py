@@ -1,4 +1,5 @@
 """Canonical rendering helpers for governed Markdown artifacts."""
+
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence

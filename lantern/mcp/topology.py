@@ -1,4 +1,5 @@
 """Workspace topology resolution and startup-validation posture."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -19,7 +20,6 @@ class TopologyPosture:
     consistency_state: str
     startup_issues: tuple[str, ...]
     read_only: bool = True
-
 
 
 def resolve_topology(
@@ -66,7 +66,6 @@ def resolve_topology(
         startup_issues=tuple(issues),
         read_only=True,
     )
-
 
 
 def _read_runtime_surface(registry_path: Path) -> str:

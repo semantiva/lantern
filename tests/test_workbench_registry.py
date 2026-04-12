@@ -138,9 +138,7 @@ def test_invalid_contract_ref_is_fatal() -> None:
 
 def test_structurally_valid_nonexistent_guide_path_is_allowed() -> None:
     payload = _load_registry_payload()
-    payload["workbenches"][0]["authoritative_guides"] = [
-        "lantern/resources/guides/not-yet-delivered.md"
-    ]
+    payload["workbenches"][0]["authoritative_guides"] = ["lantern/resources/guides/not-yet-delivered.md"]
     registry = _load_registry_from_payload("ch0008_valid_nonexistent_guide", payload)
     assert registry.ids() == EXPECTED_WORKBENCH_IDS
 

@@ -1,4 +1,5 @@
 """Inspect tool handler for the Lantern MCP surface."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -98,7 +99,13 @@ def handle_inspect(
     governance_root: Optional[Path] = None,
     ci_path: Optional[str] = None,
     posture_result: Optional[PostureResult] = None,
-) -> InspectCatalogResult | InspectContractResult | InspectWorkspaceResult | InspectStatusContractResult | InspectChangeSurfaceResult:
+) -> (
+    InspectCatalogResult
+    | InspectContractResult
+    | InspectWorkspaceResult
+    | InspectStatusContractResult
+    | InspectChangeSurfaceResult
+):
     _rp = _default_runtime_posture_label(workflow_layer, posture_result)
     if kind == "catalog":
         return _handle_catalog(workflow_layer, _rp)
@@ -277,6 +284,7 @@ def _default_runtime_posture_label(
     if posture_result is not None:
         return build_runtime_posture_label(posture_result)
     from lantern.workflow.merger import MergeProvenance, PostureResult as _PostureResult
+
     default_pr = _PostureResult(
         classification=workflow_layer.runtime_surface_classification,
         bounded_scope_markers=(),

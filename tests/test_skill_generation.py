@@ -1,4 +1,5 @@
 """TD-0006 packaged thin-skill and discovery-manifest tests."""
+
 from __future__ import annotations
 
 import json
@@ -28,14 +29,16 @@ def test_td0006_c01_packaged_skill_has_mandatory_header_and_routing_content() ->
     layer = load_workflow_layer()
     skill = build_packaged_skill_md(layer)
 
-    assert skill.startswith("---\nname: lantern\ndescription: Use this skill when the task involves Lantern-governed workflow work.")
+    assert skill.startswith(
+        "---\nname: lantern\ndescription: Use this skill when the task involves Lantern-governed workflow work."
+    )
     assert "---\n\n# Lantern Operator Skill\n" in skill
     assert "## Use Lantern when" in skill
     assert "## Do not use Lantern as" in skill
     assert "## What Lantern gives you" in skill
     assert "## First MCP move" in skill
-    assert "`inspect(kind=\"catalog\")`" in skill
-    assert "`inspect(kind=\"workspace\")`" in skill
+    assert '`inspect(kind="catalog")`' in skill
+    assert '`inspect(kind="workspace")`' in skill
     assert "## Universal discovery sequence" in skill
     assert "## Workflow modes currently exposed" in skill
     assert "## Minimal routing hints" in skill
@@ -76,31 +79,22 @@ def test_td0006_c02_manifest_is_mode_first_and_path_free() -> None:
 def test_td0006_c02_manifest_carries_template_refs_for_draftable_modes() -> None:
     manifest = build_packaged_skill_manifest(load_workflow_layer())
     assert any(
-        ref.startswith("resource.template.")
-        for item in manifest["workflow_modes"]
-        for ref in item["resource_refs"]
+        ref.startswith("resource.template.") for item in manifest["workflow_modes"] for ref in item["resource_refs"]
     )
     selected_ci_mode = next(
-        item
-        for item in manifest["workflow_modes"]
-        if item["entry_workbench_id"] == "selected_ci_application"
+        item for item in manifest["workflow_modes"] if item["entry_workbench_id"] == "selected_ci_application"
     )
-    assert all(
-        not ref.startswith("resource.template.")
-        for ref in selected_ci_mode["resource_refs"]
-    )
+    assert all(not ref.startswith("resource.template.") for ref in selected_ci_mode["resource_refs"])
 
 
 def test_td0006_c03_packaged_first_touch_route_is_mechanically_derivable() -> None:
     layer = load_workflow_layer()
     manifest = build_packaged_skill_manifest(layer)
     workbench_ids = {workbench.workbench_id for workbench in layer.workbenches}
-    contract_lookup = {
-        workbench.workbench_id: set(workbench.contract_refs) for workbench in layer.workbenches
-    }
+    contract_lookup = {workbench.workbench_id: set(workbench.contract_refs) for workbench in layer.workbenches}
 
-    assert "inspect(kind=\"catalog\")" in build_packaged_skill_md(layer)
-    assert "inspect(kind=\"workspace\")" in build_packaged_skill_md(layer)
+    assert 'inspect(kind="catalog")' in build_packaged_skill_md(layer)
+    assert 'inspect(kind="workspace")' in build_packaged_skill_md(layer)
 
     for mode in manifest["workflow_modes"]:
         assert mode["entry_workbench_id"] in workbench_ids

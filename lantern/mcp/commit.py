@@ -1,4 +1,5 @@
 """Commit handler for CH-0004 structured mutation flows."""
+
 from __future__ import annotations
 
 from pathlib import Path

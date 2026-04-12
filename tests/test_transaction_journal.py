@@ -1,4 +1,5 @@
 """CH-0004 transaction journal and validation-correlation tests."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -8,7 +9,12 @@ import pytest
 from lantern.artifacts.renderers import canonical_render_markdown
 from lantern.mcp.commit import handle_commit
 from lantern.mcp.draft import handle_draft
-from lantern.mcp.journal import load_application_handoff, load_journal_record, load_validation_snapshot, runtime_state_root
+from lantern.mcp.journal import (
+    load_application_handoff,
+    load_journal_record,
+    load_validation_snapshot,
+    runtime_state_root,
+)
 from lantern.mcp.validate import handle_validate
 from lantern.workflow.loader import load_workflow_layer
 
@@ -61,9 +67,7 @@ def _seed_runtime_hygiene_gitignore(product_root: Path) -> None:
     )
 
 
-def test_td0004_c09_commit_and_journal_capture_transaction_correlation_metadata(
-    workflow_layer, tmp_path: Path
-) -> None:
+def test_td0004_c09_commit_and_journal_capture_transaction_correlation_metadata(workflow_layer, tmp_path: Path) -> None:
     product_root = tmp_path / "product"
     governance_root = tmp_path / "governance"
     product_root.mkdir()
@@ -115,9 +119,7 @@ def test_td0004_c09_commit_and_journal_capture_transaction_correlation_metadata(
     assert snapshot["affected_paths"] == [commit_result["artifact_path"]]
 
 
-def test_td0004_c11_validate_supports_draft_artifact_and_transaction_scopes(
-    workflow_layer, tmp_path: Path
-) -> None:
+def test_td0004_c11_validate_supports_draft_artifact_and_transaction_scopes(workflow_layer, tmp_path: Path) -> None:
     product_root = tmp_path / "product"
     governance_root = tmp_path / "governance"
     product_root.mkdir()
@@ -181,9 +183,7 @@ def test_td0004_c11_validate_supports_draft_artifact_and_transaction_scopes(
     assert transaction_validation["affected_paths"] == [commit_result["artifact_path"]]
 
 
-def test_td0004_c12_post_commit_validation_remains_correlated_to_transaction(
-    workflow_layer, tmp_path: Path
-) -> None:
+def test_td0004_c12_post_commit_validation_remains_correlated_to_transaction(workflow_layer, tmp_path: Path) -> None:
     product_root = tmp_path / "product"
     governance_root = tmp_path / "governance"
     product_root.mkdir()
@@ -251,9 +251,7 @@ def test_td0004_c12_post_commit_validation_remains_correlated_to_transaction(
     }
 
 
-def test_td0009_c05_application_handoff_is_persisted_for_selected_ci_delivery(
-    workflow_layer, tmp_path: Path
-) -> None:
+def test_td0009_c05_application_handoff_is_persisted_for_selected_ci_delivery(workflow_layer, tmp_path: Path) -> None:
     product_root = tmp_path / "product"
     governance_root = tmp_path / "governance"
     product_root.mkdir()

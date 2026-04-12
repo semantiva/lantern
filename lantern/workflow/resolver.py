@@ -7,6 +7,7 @@ No authoritative hardcoded stage maps or stage-ID if/elif chains are used.
 Workbench eligibility is derived entirely from each workbench's
 lifecycle_placement declaration and the supplied governance_state dict.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -85,9 +86,7 @@ def _check_multi_ch_ambiguity(
     ch_statuses: dict[str, str],
     ch_id: Optional[str],
 ) -> None:
-    non_terminal = [
-        ch for ch, status in ch_statuses.items() if status in _non_terminal_ch_statuses()
-    ]
+    non_terminal = [ch for ch, status in ch_statuses.items() if status in _non_terminal_ch_statuses()]
     if len(non_terminal) > 1 and ch_id is None:
         raise ResolverAmbiguityError(
             f"Multiple non-terminal CHs exist ({', '.join(sorted(non_terminal))}) "

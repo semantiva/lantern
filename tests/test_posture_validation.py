@@ -3,6 +3,7 @@
 C03: PostureValidator raises PostureValidationError when full_governed_surface claim is invalid.
 C04: PostureValidator returns PostureResult with bounded_scope_markers for partial_governed_surface.
 """
+
 from __future__ import annotations
 
 import json
@@ -24,6 +25,7 @@ from lantern.workflow.merger import (
 # ---------------------------------------------------------------------------
 # Helpers: minimal workflow_layer mock and status_contract fixture
 # ---------------------------------------------------------------------------
+
 
 def _make_workflow_layer(
     *,
@@ -115,6 +117,7 @@ def _make_effective_layer_from_merger(
 # C03 — fail-closed full_governed_surface
 # ---------------------------------------------------------------------------
 
+
 def test_c03_full_governed_passes_when_gates_covered(tmp_path: Path) -> None:
     from lantern.workflow.merger import _REQUIRED_FULL_GOVERNED_GATES
 
@@ -196,14 +199,20 @@ def test_c03_intervention_workbench_not_counted_toward_gate_coverage(tmp_path: P
 # C04 — partial_governed_surface acceptance
 # ---------------------------------------------------------------------------
 
+
 def test_c04_partial_governed_accepted_with_bounded_scope_markers(tmp_path: Path) -> None:
     import textwrap
     import yaml as _yaml
+
     cfg = tmp_path / "workflow" / "configuration"
     for sub in ("instructions", "workbenches", "guides"):
         (cfg / sub).mkdir(parents=True, exist_ok=True)
     (cfg / "instructions" / "onboarding.md").write_text("# onboarding", encoding="utf-8")
-    wb_yaml = {"workbench_id": "ci_authoring", "instruction_resource": "instructions/onboarding.md", "authoritative_guides": []}
+    wb_yaml = {
+        "workbench_id": "ci_authoring",
+        "instruction_resource": "instructions/onboarding.md",
+        "authoritative_guides": [],
+    }
     (cfg / "workbenches" / "ci_authoring.yaml").write_text(_yaml.safe_dump(wb_yaml), encoding="utf-8")
     main_yaml = {
         "configuration_version": "1",

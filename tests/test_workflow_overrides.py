@@ -3,6 +3,7 @@
 C01: ConfigurationLoader validates the required folder tree and fails descriptively on violations.
 C02: ConfigurationMerger applies baseline < product-governance < launcher-overlay precedence.
 """
+
 from __future__ import annotations
 
 import textwrap
@@ -25,6 +26,7 @@ from lantern.workflow.merger import (
 # Fixture helpers
 # ---------------------------------------------------------------------------
 
+
 def _make_valid_config_folder(root: Path, declared_posture: str = "full_governed_surface") -> Path:
     """Create a minimal valid configuration folder at root/workflow/configuration/."""
     cfg = root / "workflow" / "configuration"
@@ -32,11 +34,13 @@ def _make_valid_config_folder(root: Path, declared_posture: str = "full_governed
         (cfg / sub).mkdir(parents=True, exist_ok=True)
     (cfg / "instructions" / "onboarding.md").write_text("# onboarding", encoding="utf-8")
     (cfg / "workbenches" / "ch_and_td_readiness.yaml").write_text(
-        textwrap.dedent("""\
+        textwrap.dedent(
+            """\
             workbench_id: ch_and_td_readiness
             instruction_resource: instructions/onboarding.md
             authoritative_guides: []
-        """),
+        """
+        ),
         encoding="utf-8",
     )
     main_yaml = {
@@ -63,6 +67,7 @@ def _make_valid_config_folder(root: Path, declared_posture: str = "full_governed
 # ---------------------------------------------------------------------------
 # C01 — configuration-folder contract
 # ---------------------------------------------------------------------------
+
 
 def test_c01_valid_folder_loads_successfully(tmp_path: Path) -> None:
     cfg = _make_valid_config_folder(tmp_path)
@@ -108,6 +113,7 @@ def test_c01_invalid_declared_posture_raises(tmp_path: Path) -> None:
 def test_c01_missing_required_subfolder_raises(tmp_path: Path) -> None:
     cfg = _make_valid_config_folder(tmp_path)
     import shutil
+
     shutil.rmtree(cfg / "instructions")
     loader = ConfigurationLoader()
     with pytest.raises(ConfigurationLoadError, match="missing required subfolder.*instructions"):
@@ -117,9 +123,7 @@ def test_c01_missing_required_subfolder_raises(tmp_path: Path) -> None:
 def test_c01_workbench_override_missing_instruction_resource_raises(tmp_path: Path) -> None:
     cfg = _make_valid_config_folder(tmp_path)
     bad_wb = {"workbench_id": "ch_and_td_readiness"}  # no instruction_resource
-    (cfg / "workbenches" / "ch_and_td_readiness.yaml").write_text(
-        yaml.safe_dump(bad_wb), encoding="utf-8"
-    )
+    (cfg / "workbenches" / "ch_and_td_readiness.yaml").write_text(yaml.safe_dump(bad_wb), encoding="utf-8")
     loader = ConfigurationLoader()
     with pytest.raises(ConfigurationLoadError, match="missing instruction_resource"):
         loader.load_and_validate(cfg)
@@ -128,9 +132,7 @@ def test_c01_workbench_override_missing_instruction_resource_raises(tmp_path: Pa
 def test_c01_workbench_override_unresolvable_instruction_resource_raises(tmp_path: Path) -> None:
     cfg = _make_valid_config_folder(tmp_path)
     bad_wb = {"workbench_id": "ch_and_td_readiness", "instruction_resource": "instructions/nonexistent.md"}
-    (cfg / "workbenches" / "ch_and_td_readiness.yaml").write_text(
-        yaml.safe_dump(bad_wb), encoding="utf-8"
-    )
+    (cfg / "workbenches" / "ch_and_td_readiness.yaml").write_text(yaml.safe_dump(bad_wb), encoding="utf-8")
     loader = ConfigurationLoader()
     with pytest.raises(ConfigurationLoadError, match="does not exist"):
         loader.load_and_validate(cfg)
@@ -139,10 +141,12 @@ def test_c01_workbench_override_unresolvable_instruction_resource_raises(tmp_pat
 def test_c01_duplicate_workbench_id_raises(tmp_path: Path) -> None:
     cfg = _make_valid_config_folder(tmp_path)
     raw = yaml.safe_load((cfg / "main.yaml").read_text())
-    raw["workbench_overrides"].append({
-        "workbench_id": "ch_and_td_readiness",
-        "file": "workbenches/ch_and_td_readiness.yaml",
-    })
+    raw["workbench_overrides"].append(
+        {
+            "workbench_id": "ch_and_td_readiness",
+            "file": "workbenches/ch_and_td_readiness.yaml",
+        }
+    )
     (cfg / "main.yaml").write_text(yaml.safe_dump(raw), encoding="utf-8")
     loader = ConfigurationLoader()
     with pytest.raises(ConfigurationLoadError, match="Duplicate workbench_id"):
@@ -152,6 +156,7 @@ def test_c01_duplicate_workbench_id_raises(tmp_path: Path) -> None:
 # ---------------------------------------------------------------------------
 # C02 — deterministic merge precedence
 # ---------------------------------------------------------------------------
+
 
 def test_c02_baseline_only_uses_baseline_classification(tmp_path: Path) -> None:
     merger = ConfigurationMerger()
@@ -190,9 +195,7 @@ def test_c02_phase3_overlay_overrides_phase2_workbench(tmp_path: Path) -> None:
         "authoritative_guides": [],
         "_source": "overlay",
     }
-    (cfg2 / "workbenches" / "ch_and_td_readiness.yaml").write_text(
-        yaml.safe_dump(overlay_wb), encoding="utf-8"
-    )
+    (cfg2 / "workbenches" / "ch_and_td_readiness.yaml").write_text(yaml.safe_dump(overlay_wb), encoding="utf-8")
     main_overlay = {
         "configuration_version": "1",
         "declared_posture": "partial_governed_surface",
@@ -202,9 +205,7 @@ def test_c02_phase3_overlay_overrides_phase2_workbench(tmp_path: Path) -> None:
     }
     cfg3 = _make_valid_config_folder(tmp_path / "p3", declared_posture="partial_governed_surface")
     (cfg3 / "instructions" / "onboarding_overlay.md").write_text("# overlay", encoding="utf-8")
-    (cfg3 / "workbenches" / "ch_and_td_readiness.yaml").write_text(
-        yaml.safe_dump(overlay_wb), encoding="utf-8"
-    )
+    (cfg3 / "workbenches" / "ch_and_td_readiness.yaml").write_text(yaml.safe_dump(overlay_wb), encoding="utf-8")
     (cfg3 / "main.yaml").write_text(yaml.safe_dump(main_overlay), encoding="utf-8")
 
     loader = ConfigurationLoader()
@@ -248,7 +249,11 @@ def test_c02_launcher_overlay_new_workbench_id_raises(tmp_path: Path) -> None:
     (cfg2.parent.parent / "p3" / "workflow" / "configuration" / "guides").mkdir(parents=True, exist_ok=True)
     instr = cfg2.parent.parent / "p3" / "workflow" / "configuration" / "instructions" / "new.md"
     instr.write_text("# new", encoding="utf-8")
-    new_wb = {"workbench_id": "new_workbench", "instruction_resource": "instructions/new.md", "authoritative_guides": []}
+    new_wb = {
+        "workbench_id": "new_workbench",
+        "instruction_resource": "instructions/new.md",
+        "authoritative_guides": [],
+    }
     wb_path = cfg2.parent.parent / "p3" / "workflow" / "configuration" / "workbenches" / "new_workbench.yaml"
     wb_path.write_text(yaml.safe_dump(new_wb), encoding="utf-8")
     main3 = {

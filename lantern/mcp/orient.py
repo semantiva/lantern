@@ -1,4 +1,5 @@
 """Orient tool handler for the Lantern MCP surface."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -18,9 +19,7 @@ from lantern.workflow.resolver import (
 )
 
 _ORIENT_TRANSACTION_KIND = "orient"
-_ORIENT_DISCOVERY_SAFE_ROLES = frozenset(
-    {"instruction_resource", "authoritative_guides", "artifact_templates"}
-)
+_ORIENT_DISCOVERY_SAFE_ROLES = frozenset({"instruction_resource", "authoritative_guides", "artifact_templates"})
 
 
 @dataclass(frozen=True)
@@ -104,12 +103,8 @@ def _build_runtime_exposure(
         allowed_roles = get_allowed_roles_for_transaction(workbench, _ORIENT_TRANSACTION_KIND)
         if not allowed_roles:
             allowed_roles = get_allowed_roles_for_transaction(workbench, "inspect")
-        allowed_roles = tuple(
-            role for role in allowed_roles if role in _ORIENT_DISCOVERY_SAFE_ROLES
-        )
-        resources = filter_resources_for_workbench(
-            workflow_layer, workbench_id, allowed_roles
-        )
+        allowed_roles = tuple(role for role in allowed_roles if role in _ORIENT_DISCOVERY_SAFE_ROLES)
+        resources = filter_resources_for_workbench(workflow_layer, workbench_id, allowed_roles)
         resource_packets = build_resource_packets_for_workbench(
             workflow_layer=workflow_layer,
             workbench_id=workbench_id,
@@ -135,6 +130,7 @@ def _orient_runtime_posture_label(
     if posture_result is not None:
         return build_runtime_posture_label(posture_result)
     from lantern.workflow.merger import MergeProvenance, PostureResult as _PostureResult
+
     default_pr = _PostureResult(
         classification=workflow_layer.runtime_surface_classification,
         bounded_scope_markers=(),

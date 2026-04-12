@@ -1,4 +1,5 @@
 """Server-owned mutation contract surfaces for CH-0004."""
+
 from __future__ import annotations
 
 from typing import Any

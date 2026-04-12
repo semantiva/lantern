@@ -9,7 +9,9 @@ PRODUCT_ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_selection_guide_uses_live_ch_fields() -> None:
-    content = (PRODUCT_ROOT / "lantern/authoring_contracts/design_candidate_selection_guide_v0.1.0.md").read_text(encoding="utf-8")
+    content = (PRODUCT_ROOT / "lantern/authoring_contracts/design_candidate_selection_guide_v0.1.0.md").read_text(
+        encoding="utf-8"
+    )
     assert "constraints.must_not_change" not in content
     assert "constraints.out_of_scope" not in content
     assert "allowed_change_surface" in content
@@ -18,14 +20,18 @@ def test_selection_guide_uses_live_ch_fields() -> None:
 
 
 def test_gt115_procedure_and_templates_use_live_conventions() -> None:
-    procedure = (PRODUCT_ROOT / "lantern/administration_procedures/GT-115__DESIGN_BASELINE_SELECTION_v0.1.0.md").read_text(encoding="utf-8")
-    ev_template = (PRODUCT_ROOT / "lantern/templates/EV_TEMPLATE__GT115_SELECTION_REPORT.md").read_text(encoding="utf-8")
+    procedure = (
+        PRODUCT_ROOT / "lantern/administration_procedures/GT-115__DESIGN_BASELINE_SELECTION_v0.1.0.md"
+    ).read_text(encoding="utf-8")
+    ev_template = (PRODUCT_ROOT / "lantern/templates/EV_TEMPLATE__GT115_SELECTION_REPORT.md").read_text(
+        encoding="utf-8"
+    )
     dec_template = (PRODUCT_ROOT / "lantern/templates/DEC_TEMPLATE__GT115_SELECTION.md").read_text(encoding="utf-8")
 
     assert "Lantern/change/INDEX.md" not in procedure
     assert "lantern" + "-" + "governance" not in procedure
     assert "`INDEX.md` at the governance repo root" in procedure
-    assert 'applies_to_initiative' in ev_template
+    assert "applies_to_initiative" in ev_template
     assert 'gate_id: "GT-115"' in ev_template
     assert 'title: "GT-115 selection report for CH-####"' in ev_template
     assert 'artifacts: ["DB-####", "DEC-####"]' in ev_template
@@ -33,9 +39,15 @@ def test_gt115_procedure_and_templates_use_live_conventions() -> None:
     assert 'path: "ch/CH-####.md"' in ev_template
     assert 'path: "spec/SPEC-####.md"' in ev_template
     assert 'path: "arch/ARCH-####.md"' in ev_template
-    assert 'governance repo root' in ev_template
-    assert "references:" in ev_template and "  ch:" in ev_template and "  td:" in ev_template and "  spec:" in ev_template and "  arch:" in ev_template
-    assert 'applies_to_initiative' in dec_template
+    assert "governance repo root" in ev_template
+    assert (
+        "references:" in ev_template
+        and "  ch:" in ev_template
+        and "  td:" in ev_template
+        and "  spec:" in ev_template
+        and "  arch:" in ev_template
+    )
+    assert "applies_to_initiative" in dec_template
     assert 'outcome: "PASS"' in dec_template
     assert "## Decision" in dec_template
     assert "## Decision rationale" in dec_template

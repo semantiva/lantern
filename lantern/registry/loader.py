@@ -24,22 +24,10 @@ DEFAULT_REGISTRY_PATH = DEFAULT_DEFINITIONS_ROOT / "workbench_registry.yaml"
 DEFAULT_SCHEMA_YAML_PATH = DEFAULT_DEFINITIONS_ROOT / "workbench_schema.yaml"
 DEFAULT_SCHEMA_JSON_PATH = Path(__file__).resolve().parents[1] / "artifacts" / "schemas" / "workbench_schema.json"
 
-_TEXT_EXTENSIONS = {
-    ".py", ".yaml", ".yml", ".json", ".md", ".txt", ".toml", ".ini", ".cfg", ".rst", ".sh"
-}
+_TEXT_EXTENSIONS = {".py", ".yaml", ".yml", ".json", ".md", ".txt", ".toml", ".ini", ".cfg", ".rst", ".sh"}
 _SKIP_DIRS = {".git", ".pytest_cache", "__pycache__", ".mypy_cache", ".ruff_cache", ".venv", "venv"}
 _FORBIDDEN_NAME_PATTERN = re.compile(
-    "(?i)(?:"
-    + "tier"
-    + r"[-_ ]?"
-    + "h|_"
-    + "tier"
-    + "_"
-    + "h|"
-    + "lantern"
-    + "-"
-    + "governance"
-    + ")"
+    "(?i)(?:" + "tier" + r"[-_ ]?" + "h|_" + "tier" + "_" + "h|" + "lantern" + "-" + "governance" + ")"
 )
 _CONTRACT_REF_PATTERN = re.compile(r"^contract\.[a-z0-9_]+(?:\.[a-z0-9_]+)*\.v\d+$")
 _FOUNDATION_WORKFLOW_SURFACE_FIELDS = frozenset(
@@ -93,8 +81,12 @@ def _validate_workflow_references(payload: Mapping[str, Any]) -> None:
     for entry in payload.get("workbenches", []):
         workbench_id = str(entry.get("workbench_id", "<unknown-workbench>"))
         _append_resource_ref_error(errors, workbench_id, "instruction_resource", entry.get("instruction_resource"))
-        _append_resource_ref_list_errors(errors, workbench_id, "authoritative_guides", entry.get("authoritative_guides", []))
-        _append_resource_ref_list_errors(errors, workbench_id, "administration_guides", entry.get("administration_guides", []))
+        _append_resource_ref_list_errors(
+            errors, workbench_id, "authoritative_guides", entry.get("authoritative_guides", [])
+        )
+        _append_resource_ref_list_errors(
+            errors, workbench_id, "administration_guides", entry.get("administration_guides", [])
+        )
         workflow_surface = entry.get("workflow_surface", {})
         _append_contract_ref_errors(errors, workbench_id, workflow_surface.get("contract_refs", []))
     if errors:
@@ -128,9 +120,7 @@ def _append_resource_ref_error(
         or ".." in candidate.parts
         or candidate.suffix != ".md"
     ):
-        errors.append(
-            f"{workbench_id}.{field} must be a Lantern-local markdown path under 'lantern/': {value!r}"
-        )
+        errors.append(f"{workbench_id}.{field} must be a Lantern-local markdown path under 'lantern/': {value!r}")
 
 
 def _append_contract_ref_errors(
@@ -222,10 +212,7 @@ def _validate_schema_metadata(payload: Mapping[str, Any], metadata: Mapping[str,
     actual_ids = [entry["workbench_id"] for entry in payload["workbenches"]]
     if actual_ids != built_in_ids:
         raise ValueError(
-            "workbench_id set/order mismatch: expected "
-            + ", ".join(built_in_ids)
-            + "; got "
-            + ", ".join(actual_ids)
+            "workbench_id set/order mismatch: expected " + ", ".join(built_in_ids) + "; got " + ", ".join(actual_ids)
         )
 
 

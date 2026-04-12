@@ -1,4 +1,5 @@
 """Validate handler for CH-0004 scope-driven verification."""
+
 from __future__ import annotations
 
 from pathlib import Path
