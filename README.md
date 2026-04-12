@@ -18,7 +18,7 @@ This is the **product repository**. It contains:
 - `lantern/` — the Lantern Python package
 - `tests/` — the test suite
 
-The companion governance workspace lives in a separate sibling repository and is the authoritative SSOT for all governed artifacts. Do not create or edit governed records or `binding_record.md` in this repository.
+The companion governance workspace lives in a separate sibling repository and remains authoritative for governed artifacts. Keep governed artifact maintenance in that repository.
 
 ## Getting started
 
@@ -45,6 +45,55 @@ PYTHONPATH=/path/to/lantern python -m lantern.mcp.server  \
 In both modes, Lantern resolves its workflow release surface from the executing `lantern` runtime environment. Governed product repositories must **not** vendor or copy a `lantern/` runtime tree as a startup prerequisite.
 
 If `lantern_grammar` is not installed, Lantern fails descriptively at startup and tells the operator to complete the prerequisite step before loading the workflow layer.
+
+## Operational CLI
+
+Lantern also ships a bounded operator CLI for startup, diagnostics, bootstrap, and flat discovery over the governed workspace.
+
+- `serve` starts the MCP server with explicit workspace roots.
+- `doctor` reports runtime, workspace, bootstrap, and discovery posture.
+- `bootstrap-product` previews or applies the managed bootstrap surface for a product/governance pair.
+- `list` filters the flat discovery registry by bounded metadata fields.
+- `show` resolves one exact record from that same registry.
+
+From this repository checkout, use repository-relative paths instead of machine-specific absolute paths:
+
+```bash
+python -m lantern.cli doctor --governance-root ../governance-root --product-root . --json
+python -m lantern.cli bootstrap-product \
+  --product-root ../example-product \
+  --governance-root ../example-product-governance
+python -m lantern.cli serve --governance-root ../governance-root --product-root .
+python -m lantern.cli list --governance-root ../governance-root --product-root . --family CH --status Ready --json
+python -m lantern.cli show ch_and_td_readiness --entity-kind workbench --governance-root ../governance-root --product-root .
+```
+
+Operational rules:
+
+- `serve` requires an explicit governance root and uses the governed configuration to resolve the product root after bootstrap.
+- `bootstrap-product` previews changes by default and only writes files when `--apply` is present.
+- `doctor`, `list`, and `show` can emit machine-readable JSON with `--json`.
+- `list` and `show` stay inside exact-token lookup and bounded metadata filtering; they do not run free-form text search or graph traversal.
+
+## Packaged skill surface
+
+Lantern generates a committed package-default skill surface from the workflow layer. When you modify workflow declarations (workbenches, transaction profiles, or resource manifests), regenerate the skill surface:
+
+```bash
+python -c "from lantern.skills.generator import write_packaged_skill_surface; write_packaged_skill_surface()"
+```
+
+Or use the provided installation script to set up git hooks that enforce skill freshness on commit:
+
+```bash
+cd /path/to/lantern
+bash scripts/install_git_hooks.sh
+```
+
+The pre-commit hook will:
+- Run the full pytest suite
+- Regenerate committed skill artifacts if any workflow declarations changed
+- Reject commits that would leave skill artifacts stale
 
 ## Workflow layer
 
@@ -149,7 +198,7 @@ resolution against the validated workflow layer:
 - `inspect(kind="workspace")` — read-only topology and startup-validation posture
 - `orient(governance_state, intent, ch_id)` — active workbench set, blockers, and next valid actions
 
-`draft`, `commit`, and `validate` mutation behavior is delivered in CH-0004.
+`draft`, `commit`, and `validate` cover governed mutation and verification over the same runtime contract.
 
 ### Packaged operator surface
 

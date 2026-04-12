@@ -274,6 +274,45 @@ def _copy_product_fixture(tmp_path: Path) -> Path:
     return fixture_root
 
 
+def _refresh_generated_artifacts(fixture_root: Path) -> Path:
+    definitions_root = fixture_root / "lantern" / "workflow" / "definitions"
+    layer = load_workflow_layer(
+        registry_path=definitions_root / "workbench_registry.yaml",
+        schema_path=definitions_root / "workbench_schema.yaml",
+        transaction_profiles_path=definitions_root / "transaction_profiles.yaml",
+        contract_catalog_path=definitions_root / "contract_catalog.json",
+        resource_manifest_path=definitions_root / "resource_manifest.json",
+        workflow_map_path=definitions_root / "workflow_map.md",
+        workbench_resource_bindings_path=definitions_root / "workbench_resource_bindings.md",
+        relocation_manifest_path=fixture_root / "lantern" / "preservation" / "relocation_manifest.yaml",
+        enforce_generated_artifacts=False,
+    )
+    generated = render_generated_artifacts(
+        runtime_surface_classification=layer.runtime_surface_classification,
+        workbenches=layer.workbenches,
+        transaction_profiles=layer.transaction_profiles,
+        contract_catalog=layer.contract_catalog,
+        resource_manifest=layer.resource_manifest,
+    )
+    (definitions_root / "contract_catalog.json").write_text(
+        json.dumps(generated.contract_catalog_payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    (definitions_root / "resource_manifest.json").write_text(
+        json.dumps(generated.resource_manifest_payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    (definitions_root / "workflow_map.md").write_text(
+        generated.workflow_map_text,
+        encoding="utf-8",
+    )
+    (definitions_root / "workbench_resource_bindings.md").write_text(
+        generated.workbench_resource_bindings_text,
+        encoding="utf-8",
+    )
+    return definitions_root
+
+
 def test_td0009_c01_missing_lantern_grammar_failure_names_manual_install_step(monkeypatch: pytest.MonkeyPatch) -> None:
     from lantern.workflow.loader import WorkflowLayerError
 
@@ -291,7 +330,7 @@ def test_td0009_c01_missing_lantern_grammar_failure_names_manual_install_step(mo
 
 def test_td0009_c02_stale_generated_artifact_is_reported_with_path(tmp_path: Path) -> None:
     fixture_root = _copy_product_fixture(tmp_path)
-    definitions_root = fixture_root / "lantern" / "workflow" / "definitions"
+    definitions_root = _refresh_generated_artifacts(fixture_root)
     workflow_map = definitions_root / "workflow_map.md"
     workflow_map.write_text(workflow_map.read_text(encoding="utf-8") + "\nSTALE\n", encoding="utf-8")
 
@@ -310,6 +349,27 @@ def test_td0009_c02_stale_generated_artifact_is_reported_with_path(tmp_path: Pat
     message = str(excinfo.value)
     assert "stale" in message
     assert str(workflow_map) in message
+
+
+def test_stale_generated_artifacts_can_be_bypassed_for_read_only_diagnostics(tmp_path: Path) -> None:
+    fixture_root = _copy_product_fixture(tmp_path)
+    definitions_root = _refresh_generated_artifacts(fixture_root)
+    workflow_map = definitions_root / "workflow_map.md"
+    workflow_map.write_text(workflow_map.read_text(encoding="utf-8") + "\nSTALE\n", encoding="utf-8")
+
+    layer = load_workflow_layer(
+        registry_path=definitions_root / "workbench_registry.yaml",
+        schema_path=definitions_root / "workbench_schema.yaml",
+        transaction_profiles_path=definitions_root / "transaction_profiles.yaml",
+        contract_catalog_path=definitions_root / "contract_catalog.json",
+        resource_manifest_path=definitions_root / "resource_manifest.json",
+        workflow_map_path=workflow_map,
+        workbench_resource_bindings_path=definitions_root / "workbench_resource_bindings.md",
+        relocation_manifest_path=fixture_root / "lantern" / "preservation" / "relocation_manifest.yaml",
+        enforce_generated_artifacts=False,
+    )
+
+    assert layer.workbenches
 
 
 def test_td0011_c02_external_workspace_readiness_uses_runtime_release_surface(tmp_path: Path) -> None:

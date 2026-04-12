@@ -173,6 +173,7 @@ def load_workflow_layer(
     workflow_map_path: str | Path | None = None,
     workbench_resource_bindings_path: str | Path | None = None,
     relocation_manifest_path: str | Path | None = None,
+    enforce_generated_artifacts: bool = True,
 ) -> WorkflowLayer:
     grammar = _load_grammar()
     grammar_manifest = dict(grammar.manifest())
@@ -226,10 +227,11 @@ def load_workflow_layer(
         resource_manifest=resource_manifest,
     )
 
-    _assert_committed_json_matches(contract_catalog_file, generated.contract_catalog_payload, "contract_catalog.json")
-    _assert_committed_json_matches(resource_manifest_file, generated.resource_manifest_payload, "resource_manifest.json")
-    _assert_committed_text_matches(workflow_map_file, generated.workflow_map_text, "workflow_map.md")
-    _assert_committed_text_matches(workbench_bindings_file, generated.workbench_resource_bindings_text, "workbench_resource_bindings.md")
+    if enforce_generated_artifacts:
+        _assert_committed_json_matches(contract_catalog_file, generated.contract_catalog_payload, "contract_catalog.json")
+        _assert_committed_json_matches(resource_manifest_file, generated.resource_manifest_payload, "resource_manifest.json")
+        _assert_committed_text_matches(workflow_map_file, generated.workflow_map_text, "workflow_map.md")
+        _assert_committed_text_matches(workbench_bindings_file, generated.workbench_resource_bindings_text, "workbench_resource_bindings.md")
 
     return WorkflowLayer(
         runtime_surface_classification=foundation_registry.runtime_surface_classification,
@@ -309,8 +311,9 @@ def render_generated_artifacts(
 
 def _load_grammar():
     if Grammar is None:
+        error_detail = f": {_GRAMMAR_IMPORT_ERROR}" if _GRAMMAR_IMPORT_ERROR else ""
         raise WorkflowLayerError(
-            "lantern_grammar public API import failed; install lantern_grammar before loading the workflow layer (for example from a sibling checkout: pip install -e ../lantern-grammar)"
+            f"lantern_grammar public API import failed{error_detail}. Install lantern_grammar before loading the workflow layer (for example from a sibling checkout: pip install -e ../lantern-grammar)"
         ) from _GRAMMAR_IMPORT_ERROR
     try:
         grammar = Grammar.load()

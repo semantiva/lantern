@@ -5,7 +5,7 @@ import json
 import threading
 import time
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from hashlib import sha256
 from pathlib import Path
 from typing import Any, Mapping
@@ -574,12 +574,12 @@ class TransactionEngine:
 
     @staticmethod
     def _new_transaction_id() -> str:
-        stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%S")
+        stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
         return f"{stamp}-{uuid4().hex[:12]}"
 
 
 def _utc_now() -> str:
-    return datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
 def _is_path_allowed(relative_path: str, allowed_entries: tuple[str, ...]) -> bool:
