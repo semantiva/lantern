@@ -74,7 +74,11 @@ def _dependency_closure(root_names: list[str]) -> list[metadata.Distribution]:
         if current in seen:
             continue
 
-        dist = metadata.distribution(current)
+        try:
+            dist = metadata.distribution(current)
+        except metadata.PackageNotFoundError:
+            continue
+
         canonical_name = _canonicalize(dist.metadata["Name"])
         if canonical_name in seen:
             continue

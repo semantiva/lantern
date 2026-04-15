@@ -4,6 +4,12 @@ Lantern is a governed workflow runtime that provides a discovery-first MCP
 execution surface for AI-assisted development on top of a machine-readable
 workflow layer.
 
+Lantern's first public release supports one public operating posture: install the
+published `lantern-runtime` package and run it as a single-operator runtime against
+an explicit product/governance pair. Concurrent team operation is unsupported in
+this release. Source-checkout and maintainer notes below are not the public operator
+install/start contract.
+
 It combines:
 
 - **Machine-readable workflow layer** — governed workbench declarations, transaction profiles, and response-surface bindings
@@ -21,11 +27,9 @@ Install Lantern Runtime as the published package:
 pip install lantern-runtime
 ```
 
-Lantern Runtime requires a compatible `lantern-grammar` package. Install it as a managed package:
-
-```bash
-pip install "lantern-grammar>=0.3.0,<0.4.0"
-```
+The documented `pip install lantern-runtime` path supplies the supported
+package-managed runtime prerequisites for the normal operator flow, including a
+compatible `lantern-grammar` dependency.
 
 The documented primary command is `lantern`. `lantern-runtime` is an explicit package-identity alias.
 
@@ -58,6 +62,8 @@ If `lantern_grammar` is missing or unsupported, Lantern fails descriptively at s
 
 ## Maintainer guide
 
+> This section is for release and repository maintenance. It is not the public operator install/start contract.
+
 Lantern Runtime reuses the `lantern-grammar` `linting -> test -> build -> publish` topology under one pinned local/CI posture.
 
 Install the local release toolchain:
@@ -79,6 +85,13 @@ python scripts/check_license_headers.py
 coverage run -m pytest --maxfail=1 -q
 coverage report
 python scripts/build_runtime_release.py
+rm -rf .venv-smoke
+python -m venv .venv-smoke
+. .venv-smoke/bin/activate
+python -m pip install --upgrade pip
+python -m pip install dist/*.whl
+python scripts/smoke_test_installed_package.py --expected-package-version "$(python scripts/check_version_alignment.py --print-package-version)"
+deactivate
 python -m twine check dist/*
 python scripts/check_artifact_hygiene.py
 ```
@@ -93,7 +106,7 @@ python -c "from lantern.skills.generator import write_packaged_skill_surface; wr
 
 ## Contributor guide
 
-> This section is for source-checkout development. Normal operators should use the installed-package workflow above.
+> This section is for source-checkout development. It is not the public operator install/start contract. Normal operators should use the installed-package workflow above.
 
 Clone the repository and install the dev environment:
 

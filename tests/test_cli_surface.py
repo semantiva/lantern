@@ -641,7 +641,11 @@ def test_doctor_reports_degraded_runtime_and_blocked_discovery_paths(
 
     report = gather_doctor_report(product_root=product_root, governance_root=governance_root)
 
-    assert report["checks"]["runtime_availability"]["mcp_runtime"] == "degraded"
+    runtime_availability = report["checks"]["runtime_availability"]
+    assert runtime_availability["status"] == "blocked"
+    assert runtime_availability["mcp_runtime"] == "degraded"
+    assert runtime_availability["packaged_assets"]["status"] == "ok"
+    assert runtime_availability["runtime_metadata"]["status"] == "ok"
     assert report["checks"]["grammar_compatibility"]["status"] == "missing"
     assert report["checks"]["workspace_validity"]["status"] == "blocked"
     assert report["checks"]["workflow_configuration"]["status"] == "absent"
@@ -653,7 +657,9 @@ def test_doctor_reports_degraded_runtime_and_blocked_discovery_paths(
         "strict_status": "stale_generated_artifacts",
     }
     assert {finding["classification"] for finding in report["findings"]} == {"advisory", "blocker"}
-    assert any(finding["subject"] == "mcp_runtime" for finding in report["findings"])
+    assert any(
+        finding["subject"] == "mcp_runtime" and finding["classification"] == "blocker" for finding in report["findings"]
+    )
     assert any(finding["subject"] == "lantern_grammar" for finding in report["findings"])
     assert any(finding["subject"] == "workflow.configuration" for finding in report["findings"])
     assert any(finding["subject"] == "discovery_registry" for finding in report["findings"])
@@ -817,6 +823,65 @@ def test_cli_dispatch_covers_serve_doctor_list_show_and_error_paths(
     error_stderr = io.StringIO()
     assert run_cli(["doctor", "--governance-root", str(governance_root)], stderr=error_stderr) == 2
     assert error_stderr.getvalue() == "context failed\n"
+
+
+def test_serve_preflight_returns_exit_code_2_and_skips_server_on_blockers(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    product_root = tmp_path / "product"
+    governance_root = tmp_path / "governance"
+    product_root.mkdir()
+    governance_root.mkdir()
+    context = OperationalContext(
+        governance_root=governance_root.resolve(),
+        product_root=product_root.resolve(),
+        product_root_source="command_line",
+        configuration_path=None,
+    )
+
+    configured_paths: list[tuple[Path, Path]] = []
+    server_runs: list[str] = []
+    monkeypatch.setattr(CLI_MAIN_MODULE, "resolve_operational_context", lambda **_: context)
+    monkeypatch.setattr(
+        CLI_MAIN_MODULE,
+        "configure_server_paths",
+        lambda *, product_root, governance_root: configured_paths.append((product_root, governance_root)),
+    )
+    monkeypatch.setattr(CLI_MAIN_MODULE.mcp_server, "run", lambda: server_runs.append("ran"))
+    monkeypatch.setattr(
+        CLI_MAIN_MODULE,
+        "gather_doctor_report",
+        lambda **_: {
+            "kind": "doctor_report",
+            "categories": ["runtime_availability"],
+            "checks": {"runtime_availability": {"status": "blocked"}},
+            "findings": [
+                {
+                    "category": "runtime_availability",
+                    "classification": "blocker",
+                    "subject": "mcp_runtime",
+                    "message": "FastMCP runtime is not importable",
+                    "remediation": "Repair or reinstall lantern-runtime.",
+                }
+            ],
+            "summary": {"blocker_count": 1, "advisory_count": 0},
+        },
+    )
+
+    stderr = io.StringIO()
+    assert (
+        run_cli(
+            ["serve", "--governance-root", str(governance_root), "--product-root", str(product_root)],
+            stderr=stderr,
+            run_server=False,
+        )
+        == 2
+    )
+    assert "Doctor Report" in stderr.getvalue()
+    assert "mcp_runtime" in stderr.getvalue()
+    assert configured_paths == []
+    assert server_runs == []
 
 
 def test_cli_bootstrap_renders_human_and_json_payloads(tmp_path: Path) -> None:

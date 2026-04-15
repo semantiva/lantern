@@ -94,6 +94,14 @@ def run_cli(
                 supplied_product_root=args.product_root,
                 allow_supplied_product_root=args.product_root is not None,
             )
+            payload = gather_doctor_report(
+                governance_root=context.governance_root,
+                product_root=context.product_root,
+            )
+            blockers = [finding for finding in payload["findings"] if finding["classification"] == "blocker"]
+            if blockers:
+                stderr.write(_render_human_payload(payload) + "\n")
+                return 2
             configure_server_paths(
                 product_root=context.product_root,
                 governance_root=context.governance_root,

@@ -16,9 +16,12 @@
 
 from __future__ import annotations
 
+from importlib import metadata
 from pathlib import Path
 from typing import Any
 
+from lantern import GRAMMAR_COMPAT_RANGE, __version__ as LANTERN_VERSION
+from lantern._compat import get_package_resource_path
 from lantern.artifacts.validator import validate_workspace_readiness
 from lantern.discovery.registry import build_discovery_registry
 from lantern.workflow.loader import WorkflowLayerError, load_workflow_layer
@@ -33,6 +36,19 @@ _CATEGORY_ORDER = (
     "bootstrap_posture",
     "managed_file_posture",
     "discovery_availability",
+)
+
+_REQUIRED_PACKAGED_ASSETS = (
+    "skills/packaged_default/SKILL.md",
+    "skills/packaged_default/skill-manifest.json",
+    "workflow/definitions/workbench_registry.yaml",
+    "workflow/definitions/workbench_schema.yaml",
+    "workflow/definitions/transaction_profiles.yaml",
+    "workflow/definitions/contract_catalog.json",
+    "workflow/definitions/resource_manifest.json",
+    "workflow/definitions/workflow_map.md",
+    "workflow/definitions/workbench_resource_bindings.md",
+    "preservation/relocation_manifest.yaml",
 )
 
 
@@ -50,7 +66,10 @@ def gather_doctor_report(
         "product_root": str(product_root),
         "governance_root": str(governance_root),
         "mcp_runtime": _probe_mcp_runtime(findings),
+        "packaged_assets": _probe_packaged_assets(findings),
+        "runtime_metadata": _probe_runtime_metadata(findings),
     }
+    runtime_availability["status"] = _category_status(findings, "runtime_availability")
     grammar_compatibility = _probe_grammar(findings)
     workspace_validity = _probe_workspace(product_root, governance_root, findings)
     workflow_configuration = _probe_configuration(governance_root, findings)
@@ -79,6 +98,15 @@ def gather_doctor_report(
     return report
 
 
+def _category_status(findings: list[dict[str, str]], category: str) -> str:
+    category_findings = [finding for finding in findings if finding["category"] == category]
+    if any(finding["classification"] == "blocker" for finding in category_findings):
+        return "blocked"
+    if category_findings:
+        return "degraded"
+    return "ok"
+
+
 def _probe_mcp_runtime(findings: list[dict[str, str]]) -> str:
     try:
         from mcp.server.fastmcp import FastMCP  # noqa: F401
@@ -86,14 +114,82 @@ def _probe_mcp_runtime(findings: list[dict[str, str]]) -> str:
         findings.append(
             _finding(
                 category="runtime_availability",
-                classification="advisory",
+                classification="blocker",
                 subject="mcp_runtime",
                 message=f"FastMCP runtime is not importable: {exc}",
-                remediation="Install the mcp package before using the serve command in a packaged environment.",
+                remediation=(
+                    "Repair or reinstall the lantern-runtime environment so the published package's "
+                    "runtime dependencies are present."
+                ),
             )
         )
         return "degraded"
     return "ok"
+
+
+def _probe_packaged_assets(findings: list[dict[str, str]]) -> dict[str, Any]:
+    missing_paths = [
+        relative for relative in _REQUIRED_PACKAGED_ASSETS if not get_package_resource_path(relative).exists()
+    ]
+    if missing_paths:
+        findings.append(
+            _finding(
+                category="runtime_availability",
+                classification="blocker",
+                subject="packaged_assets",
+                message=(
+                    "Installed lantern-runtime package is missing required packaged assets: " + ", ".join(missing_paths)
+                ),
+                remediation=(
+                    "Reinstall lantern-runtime from a complete published distribution or rebuild the wheel "
+                    "so packaged workflow and skill resources are included."
+                ),
+            )
+        )
+        return {"status": "blocked", "missing_paths": missing_paths}
+    return {"status": "ok", "missing_paths": []}
+
+
+def _probe_runtime_metadata(findings: list[dict[str, str]]) -> dict[str, Any]:
+    distribution_version: str | None = None
+    problems: list[str] = []
+
+    try:
+        distribution_version = metadata.version("lantern-runtime")
+    except metadata.PackageNotFoundError:
+        problems.append("installed distribution metadata for 'lantern-runtime' is unavailable")
+
+    if distribution_version is not None and distribution_version != LANTERN_VERSION:
+        problems.append(
+            "installed distribution version "
+            f"{distribution_version!r} does not match lantern.__version__ {LANTERN_VERSION!r}"
+        )
+    if not GRAMMAR_COMPAT_RANGE.strip():
+        problems.append("lantern.GRAMMAR_COMPAT_RANGE is empty")
+
+    if problems:
+        findings.append(
+            _finding(
+                category="runtime_availability",
+                classification="blocker",
+                subject="runtime_metadata",
+                message="; ".join(problems),
+                remediation=(
+                    "Repair or reinstall lantern-runtime so its published distribution metadata, package "
+                    "version, and grammar-compat metadata are coherent."
+                ),
+            )
+        )
+        status = "blocked"
+    else:
+        status = "ok"
+
+    return {
+        "status": status,
+        "distribution_version": distribution_version,
+        "package_version": LANTERN_VERSION,
+        "grammar_compat_range": GRAMMAR_COMPAT_RANGE,
+    }
 
 
 def _probe_grammar(findings: list[dict[str, str]]) -> dict[str, Any]:

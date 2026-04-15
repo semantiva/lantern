@@ -19,7 +19,19 @@
 from __future__ import annotations
 
 import argparse
+import io
+import json
 import subprocess
+import tempfile
+from pathlib import Path
+
+
+def _run_command(command: list[str], *, cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
+    result = subprocess.run(command, cwd=cwd, capture_output=True, text=True, check=False)
+    if result.returncode != 0:
+        rendered = " ".join(command)
+        raise SystemExit(f"Command failed: {rendered}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}")
+    return result
 
 
 def main() -> None:
@@ -29,21 +41,77 @@ def main() -> None:
 
     import lantern
     from lantern._compat import GRAMMAR_COMPAT_RANGE, check_grammar_compatibility, get_package_resource_path
-    from lantern.cli.main import main as cli_main  # noqa: F401
+    from lantern.cli.main import run_cli
 
     if args.expected_package_version and lantern.__version__ != args.expected_package_version:
         raise SystemExit(f"Expected package version {args.expected_package_version!r}, got {lantern.__version__!r}")
 
     compat = check_grammar_compatibility()
-    if compat["status"] not in {"ok", "missing", "unsupported"}:
-        raise SystemExit(f"Unexpected compatibility status: {compat['status']!r}")
+    if compat["status"] != "ok":
+        raise SystemExit(compat["message"])
 
     manifest_path = get_package_resource_path("skills/packaged_default/skill-manifest.json")
     if not manifest_path.exists():
         raise SystemExit(f"Packaged-default skill manifest not found at {manifest_path}")
 
+    with tempfile.TemporaryDirectory(prefix="lantern_installed_smoke_") as temp_root:
+        root = Path(temp_root)
+        product_root = root / "product"
+        governance_root = root / "governance"
+        product_root.mkdir()
+        governance_root.mkdir()
+
+        _run_command(
+            [
+                "lantern",
+                "bootstrap-product",
+                "--governance-root",
+                str(governance_root),
+                "--product-root",
+                str(product_root),
+                "--apply",
+            ]
+        )
+        doctor_result = _run_command(
+            [
+                "lantern",
+                "doctor",
+                "--governance-root",
+                str(governance_root),
+                "--product-root",
+                str(product_root),
+                "--json",
+            ]
+        )
+        report = json.loads(doctor_result.stdout)
+        blockers = [finding for finding in report["findings"] if finding["classification"] == "blocker"]
+        if blockers:
+            subjects = ", ".join(sorted({finding["subject"] for finding in blockers}))
+            raise SystemExit(f"Installed package doctor reported blocker findings: {subjects}")
+
+        serve_stdout = io.StringIO()
+        serve_stderr = io.StringIO()
+        serve_exit_code = run_cli(
+            [
+                "serve",
+                "--governance-root",
+                str(governance_root),
+                "--product-root",
+                str(product_root),
+            ],
+            stdout=serve_stdout,
+            stderr=serve_stderr,
+            run_server=False,
+        )
+        if serve_exit_code != 0:
+            raise SystemExit(
+                "Installed package serve preflight failed.\n"
+                f"stdout:\n{serve_stdout.getvalue()}\n"
+                f"stderr:\n{serve_stderr.getvalue()}"
+            )
+
     for command in ["lantern", "lantern-runtime"]:
-        result = subprocess.run([command, "--help"], capture_output=True, check=False)
+        result = subprocess.run([command, "--help"], capture_output=True, text=True, check=False)
         if result.returncode != 0:
             raise SystemExit(f"Console command {command!r} failed with exit code {result.returncode}")
 

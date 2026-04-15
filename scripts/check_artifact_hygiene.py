@@ -55,11 +55,25 @@ def _sdist_members(path: Path) -> list[str]:
         return archive.getnames()
 
 
+def _matches_forbidden_pattern(member: str, pattern: str) -> bool:
+    if pattern != "artifacts/":
+        return pattern in member
+
+    parts = Path(member).parts
+    for index, part in enumerate(parts):
+        if part != "artifacts":
+            continue
+        if index > 0 and parts[index - 1] == "lantern":
+            continue
+        return True
+    return False
+
+
 def _check_forbidden(members: list[str], archive_name: str) -> list[str]:
     violations: list[str] = []
     for member in members:
         for pattern in FORBIDDEN_PATTERNS:
-            if pattern in member:
+            if _matches_forbidden_pattern(member, pattern):
                 violations.append(f"[{archive_name}] {member} (forbidden pattern {pattern!r})")
                 break
         else:
