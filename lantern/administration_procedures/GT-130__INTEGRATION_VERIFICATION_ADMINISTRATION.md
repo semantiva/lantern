@@ -4,7 +4,7 @@
 Status: **AUTHORITATIVE — Procedure**
 Date (UTC): 2026-03-15
 
-Purpose: execute integration verification for the Selected CI against the locked CH + DB + TD baseline and complete required administration.
+Purpose: execute integration verification for the Selected CI against the locked CH + DB + TD baseline, apply the selected CI into the product repository as needed for closure, and complete required administration.
 
 GT-130 is the final change-lifecycle gate. A PASS at GT-130 transitions the CI to `Verified` and the CH to `Addressed`.
 
@@ -44,9 +44,11 @@ These are administrative requirements, not evaluation criteria.
 ## Definitions (for this procedure)
 
 - "Verification execution": running the commands declared in the Selected CI's `## Verification Plan` against the product repo at the declared baseline, and collecting actual outputs.
+- "Integration responsibility": applying the selected CI into the product repository is part of GT-130 integration responsibility. GT-130 is not verification-only when the Selected CI still needs to be applied cleanly against the verified product baseline.
 - "Verification report": the human-readable record of the verification execution, including commands run, actual outputs, and PASS/FAIL status per TD case covered by the CI.
 - "Administrative demotion": a human decision to change a CI from `Selected` back to `Candidate` or to `Rejected` when GT-130 fails and the CI cannot be re-verified in its current form.
 - "Blocked integration-surface gap": a late-discovered workflow-integration consistency gap that prevents closure even though the Selected CI already satisfies the approved change truth.
+- "Bounded GT-130 extension": a late-discovered, minor adjustment can provide the full value of the effort invested in a CH when integration identifies a small change-surface gap that must be closed to land the Selected CI coherently.
 
 ---
 
@@ -102,9 +104,14 @@ Verify all preconditions in Section 0 before proceeding.
 
 If any precondition fails, stop and document the blocker before returning to the appropriate upstream gate.
 
-### Step 2 — Execute verification in the product repository
+### Step 2 — Apply the Selected CI and execute verification in the product repository
 
 This step MUST be performed against the product repository at the baseline declared in the Selected CI's `baseline.branch_or_commit`.
+
+Before verification is considered complete:
+1. Apply the Selected CI's intended changes into the product repository if they are not already present at the verification baseline.
+2. Confirm the resulting product state still respects the locked CH + DB + TD envelope.
+3. Only then run the declared verification commands and compare actual output against the expected signals.
 
 For each item in the CI's `## Verification Plan`:
 1. Run the declared command exactly as written.
@@ -122,7 +129,9 @@ Hard rules:
 - If the verification environment prevents a command from running, record this as a FAIL with the blocking reason; do not fabricate evidence.
 - The commit hash recorded in the EV and binding record MUST identify the committed product repository revision used for the delivered code; do not close GT-130 against an uncommitted dirty worktree.
 - If GT-130 discovers a blocked integration-surface gap, it may register a bounded extension only when all of the following are true: the gap was discovered during GT-130, the extra paths are enumerated explicitly, the extension closes only the integration-consistency gap, and the extension does not modify specifications, tests, design baselines, or architectural baselines.
+- This is a valid GT-130 posture when a minor adjustment can provide the full value of the effort invested in a CH without reopening the design or test baseline.
 - GT-130 extension authority is recorded in EV and DEC evidence only. Do not modify the Selected CI to register the extension.
+- Record that extension in the GT-130 EV and DEC artifacts, including the approved paths and the rationale for why integration was blocked without them.
 
 ### Step 3 — Allocate new EV and DEC ids
 

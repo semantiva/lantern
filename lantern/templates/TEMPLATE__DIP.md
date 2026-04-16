@@ -8,6 +8,13 @@ Timestamp: [[TEMPLATE:TIMESTAMP]]  <!-- ISO 8601 recommended -->
 
 [[TEMPLATE:SUMMARY]]
 
+## Product refinement framing (required)
+
+- Real bottleneck: [[TEMPLATE:REAL_BOTTLENECK]]
+- Delivered value in this slice: [[TEMPLATE:DELIVERED_VALUE]]
+- Complexity explicitly avoided or deferred: [[TEMPLATE:DEFERRED_COMPLEXITY]]
+- Required decomposition or sequencing consequence: [[TEMPLATE:DECOMPOSITION_OR_SEQUENCING]]
+
 ## Source inventory (required)
 
 Rules

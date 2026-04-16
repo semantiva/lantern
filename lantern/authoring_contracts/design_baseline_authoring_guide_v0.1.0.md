@@ -191,21 +191,27 @@ Rules:
 - `## Selection Rationale` MUST reference the GT-115 decision (EV and DEC ids) and state why this DC was selected over the alternatives.
 - `## Governed Scope` MUST match the `governed_scope` declared in the Selected DC.
 - If the DB author cannot trace a design commitment to the Selected DC, it MUST block rather than invent.
+- Every fixed commitment, downstream latitude item, and reopen condition MUST include an explicit `Source:` traceback to the selected DC clause or section that authorizes it.
+- Missing traceback is non-admissible extraction: if the author cannot point to the selected DC source, the item MUST NOT appear as DB truth.
 
 ### 7.2 Fixed commitments vs downstream latitude
 The `## Implementation Latitude` section MUST contain all three sub-lists:
 
 1. **Fixed commitments** — a list of specific design decisions that CI candidates MUST implement exactly as stated.
    - Examples: "The public API must expose `canonicalize(record: dict) -> str`; signature is frozen.", "The processing pipeline must be deterministic."
+   - Every fixed commitment MUST include `Source: <selected DC section or clause>`.
 
 2. **Downstream latitude** — a list of implementation choices that CI candidates may make freely.
    - Examples: "CI candidates may choose any internal data structure for intermediate computation.", "Logging level and format are at CI author discretion."
+   - Every downstream latitude item MUST include `Source: <selected DC section or clause>`.
 
 3. **Reopen GT-115 conditions** — a list of changes that would require a new GT-115 run.
    - Examples: "Changing the public API signature would require reopening GT-115.", "Adding governed scope beyond what this DB declares requires a new GT-115 run."
+   - Every reopen condition MUST include `Source: <selected DC section or clause>`.
 
 Hard rule:
 - All three sub-lists MUST be present and non-empty. If a sub-list is genuinely empty (e.g., no latitude exists), this MUST be stated explicitly with a brief rationale, not simply omitted.
+- A DB line item without `Source:` traceback is non-admissible extraction and MUST block approval until the selected DC authorization is explicit.
 
 ### 7.3 Supersession authoring rules
 When authoring a DB that supersedes a prior DB:

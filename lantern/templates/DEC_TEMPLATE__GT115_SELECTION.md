@@ -32,3 +32,5 @@ Approved DB: `DB-####`
 ## Decision rationale
 
 <grounded rationale tied to the selection report>
+
+See EV-#### for the GT-115 selection report and structured findings ledger.

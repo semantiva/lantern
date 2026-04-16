@@ -118,6 +118,8 @@ Header requirements:
 
 Body requirements:
 - Paste the selection report in full (or a faithful, unedited copy of it).
+- The selection report MUST include one structured findings ledger where each material finding records finding ID, candidate ID, claim, evidence, governing rule or artifact, blocker class, severity, confidence, required remediation before promotion when blocking, outcome effect, and final disposition/rationale.
+- The EV MUST include a bounded handoff section labeled `GT-120 → GT-130`.
 - Add a short “Human approval” line that states:
   - approved selected CI id, OR approved “NONE”
   - approver identity (name/team) if available
@@ -141,6 +143,7 @@ Body requirements:
   - `PASS` if a CI is selected
   - `FAIL` if “NONE” is approved
 - Rationale: 1 paragraph max, grounded in the selection report
+- Keep detailed findings in the EV; the DEC remains concise and should point readers to the GT-120 selection report evidence rather than duplicating the ledger.
 
 ### Step 5 — Update CI statuses (finalize the selection)
 

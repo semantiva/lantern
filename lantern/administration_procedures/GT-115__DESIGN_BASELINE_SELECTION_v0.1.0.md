@@ -129,6 +129,8 @@ Header requirements:
 
 Body requirements:
 - Paste the selection report in full (or a faithful, unedited copy of it).
+- The selection report MUST include one structured findings ledger where each material finding records finding ID, candidate ID, claim, evidence, governing rule or artifact, blocker class, severity, confidence, required remediation before promotion when blocking, outcome effect, and final disposition/rationale.
+- The EV MUST include a bounded handoff section labeled `GT-115 → DB/GT-120`.
 - Add a short "Human approval" line that states:
   - approved selected DC id, OR approved "NONE"
   - approver identity (name/team) if available
@@ -167,6 +169,7 @@ Body requirements:
   - `Selected DC: <dc-id> | NONE`
   - `Approved DB: <db-id>` when PASS
 - Add a `## Decision rationale` section grounded in the selection report.
+- Keep detailed findings in the EV; the DEC remains concise and should point readers to the GT-115 selection report evidence rather than duplicating the ledger.
 
 ### Step 5 — Update DC statuses (finalize the selection)
 

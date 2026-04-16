@@ -25,6 +25,8 @@ Preconditions:
 
 Your job is to recommend which DC should be selected for baseline approval (**DC status → `Selected`**) or declare that none is acceptable. You must also produce a concise list of high-priority issues (selection blockers and design risks).
 
+The GT-115 EV is the one authoritative rich findings artifact. Record all material findings in one structured single-review findings ledger and preserve a bounded `GT-115 → DB/GT-120` handoff section for downstream continuity.
+
 Scope: selection analysis only.
 
 After the selection report is produced and a human approves the chosen candidate, GT-115 status administration MUST be completed using:
@@ -230,6 +232,23 @@ PASS requires:
   6) most comprehensive tradeoff documentation (strongest GT-115 comparison evidence posture).
 - If none pass: declare `NONE ACCEPTABLE`, identify the best near-miss, and list the minimal remediation required for it to reach PASS (specific missing sections/fields and exact insertion points).
 
+### 4A) Structured findings ledger (required)
+
+For every material finding recorded in the GT-115 EV, include:
+- finding ID
+- candidate ID
+- short claim statement
+- evidence cited
+- governing rule or artifact invoked
+- blocking or non-blocking classification
+- severity
+- confidence
+- required remediation before promotion when blocking
+- outcome effect (`excluded from ranking`, `comparative only`, or `handoff-only`)
+- final disposition and rationale
+
+The EV MUST also include bounded handoff notes labeled `GT-115 → DB/GT-120` describing what the selected DB extraction and later GT-120 work must preserve.
+
 ### Many-candidate mode (8+) (reporting rules; must follow exactly)
 
 This mode preserves the same evaluation standards, but produces a compact report surface.
@@ -303,9 +322,9 @@ If multiple ranking-eligible candidates pass all classes A–E, use the tie-brea
   - TD coverage expectations
 
 - Candidate Scorecards
-  - Candidate A: PASS/FAIL per class (A–E) + evidence excerpts
+  - Candidate A: PASS/FAIL per class (A–E) + evidence excerpts + structured findings entries for each material finding
     - High-priority issues (BLOCKER/HIGH)
-  - Candidate B: PASS/FAIL per class (A–E) + evidence excerpts
+  - Candidate B: PASS/FAIL per class (A–E) + evidence excerpts + structured findings entries for each material finding
     - High-priority issues (BLOCKER/HIGH)
   - (Candidate C/D if provided)
 
@@ -318,6 +337,7 @@ If multiple ranking-eligible candidates pass all classes A–E, use the tie-brea
   - Minimal remediation required (if any), with exact insertion points (section names and/or header fields)
 
 - Handoff Notes (GT-115 → DB authoring → GT-120)
+  - Use the literal handoff heading `GT-115 → DB/GT-120`
   - What DB authoring must preserve from the Selected DC (fixed commitments, governed scope, compatibility posture)
   - What implementation latitude the DB must state for CI authoring
   - Known design ambiguities or open latitude questions to resolve before DB approval (if any)

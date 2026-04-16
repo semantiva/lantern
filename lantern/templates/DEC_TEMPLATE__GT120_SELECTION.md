@@ -23,3 +23,5 @@ Candidate pool (ordered):
 - CI-####-<UUID>
 
 Rationale (max 1 paragraph): <fill>
+
+See EV-#### for the GT-120 selection report and structured findings ledger.

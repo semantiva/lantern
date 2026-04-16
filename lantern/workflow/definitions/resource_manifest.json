@@ -158,7 +158,7 @@
     "workbench_id": "ci_authoring"
   },
   {
-    "content_hash": "83c12f6bc0f7e81b7aeebc3cc9674e54fa79dc28d95041e423f51a10742d0581",
+    "content_hash": "1da7e5a55e0ecd269003eb84d36a94c1ded070f7b81950a1dd25bc6b7caaf47a",
     "kind": "administration_guide",
     "path": "lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION_v0.2.1.md",
     "projection_trace": {
@@ -180,7 +180,7 @@
     "workbench_id": "ci_selection"
   },
   {
-    "content_hash": "f5874e24421202320b15c3f4be2d9c0b3c9e54193f7dc06d0db956f37e3e34b4",
+    "content_hash": "c67464e327cd7da5f7d94b218b4cb82f8dda8475845d746501439e7161a63ebb",
     "kind": "authoring_contract",
     "path": "lantern/authoring_contracts/change_increment_selection_guide_v0.2.1.md",
     "projection_trace": {
@@ -316,7 +316,7 @@
     "workbench_id": "design_candidate_authoring"
   },
   {
-    "content_hash": "459214c1e1ad22c02079afadf7170fe0d0f15da817e52a372b553a678f5687ba",
+    "content_hash": "7c44a1fc280c54064031316bf0318f624a82f3c6c5c5cf0c96159c77de819444",
     "kind": "administration_guide",
     "path": "lantern/administration_procedures/GT-115__DESIGN_BASELINE_SELECTION_v0.1.0.md",
     "projection_trace": {
@@ -338,7 +338,7 @@
     "workbench_id": "design_selection"
   },
   {
-    "content_hash": "ad55acaf4c03101cba07f85e671809ace7f37d0f78563973ad37c42191273eb6",
+    "content_hash": "aa5e5855819fd2960ac0f8f872e25c4cea0ebfdf73bbc2320baee50d61b20d14",
     "kind": "authoring_contract",
     "path": "lantern/authoring_contracts/design_candidate_selection_guide_v0.1.0.md",
     "projection_trace": {
@@ -522,7 +522,7 @@
     "workbench_id": "governance_onboarding"
   },
   {
-    "content_hash": "9969f9bfc2fd01b4bd31909f8cdbbe4ff668c5a50b9ec77d4126cbc549fb7d70",
+    "content_hash": "32c6edda60342171ac42f5639e37a93737c703377cca18f62af93f6fb105633e",
     "kind": "administration_guide",
     "path": "lantern/administration_procedures/ISSUE__INTAKE_TRIAGE_RESOLUTION_v0.2.0.md",
     "projection_trace": {
@@ -588,7 +588,7 @@
     "workbench_id": "issue_operations"
   },
   {
-    "content_hash": "83c12f6bc0f7e81b7aeebc3cc9674e54fa79dc28d95041e423f51a10742d0581",
+    "content_hash": "1da7e5a55e0ecd269003eb84d36a94c1ded070f7b81950a1dd25bc6b7caaf47a",
     "kind": "administration_guide",
     "path": "lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION_v0.2.1.md",
     "projection_trace": {
@@ -610,7 +610,7 @@
     "workbench_id": "selected_ci_application"
   },
   {
-    "content_hash": "c8a064673c2f6da367c347f904c2ba90cf73669375df920d8e551921d693a3a8",
+    "content_hash": "708e8cd9c6cbed1ccd9cbaafa188db7832c7e038b73793a77c0c179936435ad7",
     "kind": "administration_guide",
     "path": "lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md",
     "projection_trace": {
@@ -790,7 +790,7 @@
     "workbench_id": "upstream_intake_and_baselines"
   },
   {
-    "content_hash": "c8a064673c2f6da367c347f904c2ba90cf73669375df920d8e551921d693a3a8",
+    "content_hash": "708e8cd9c6cbed1ccd9cbaafa188db7832c7e038b73793a77c0c179936435ad7",
     "kind": "administration_guide",
     "path": "lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md",
     "projection_trace": {

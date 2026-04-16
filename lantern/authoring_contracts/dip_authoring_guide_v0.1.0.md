@@ -150,9 +150,10 @@ Header rules:
 Every DIP MUST contain these top-level sections:
 
 1. `## Summary`
-2. `## Source inventory (required)`
-3. `## Constraints and non-goals (required)`
-4. `## Questions referenced (required; may be empty)`
+2. `## Product refinement framing (required)`
+3. `## Source inventory (required)`
+4. `## Constraints and non-goals (required)`
+5. `## Questions referenced (required; may be empty)`
 
 Recommended additional sections:
 - `## Pinning pointers` (informative; baseline locator evidence is formally captured at GT-030 EV)
@@ -193,7 +194,17 @@ Rules:
 - Questions MUST NOT be placeholders (e.g., "Q-001: TBD").
 - Resolution of a blocking question MUST be documented in the DIP or in a referenced Decision record.
 
-### 7.4 DIP is intake, not design
+### 7.4 Product refinement framing
+A DIP MUST force the author to explain why this slice exists now and what complexity is intentionally being held back.
+
+Rules:
+- `## Product refinement framing (required)` MUST be non-empty.
+- The framing MUST state the real bottleneck that justifies the slice.
+- The framing MUST state the value being delivered in this slice.
+- The framing MUST state the complexity being avoided or deferred.
+- The framing MUST state any decomposition or sequencing consequence created by that deferral.
+
+### 7.5 DIP is intake, not design
 A DIP captures what is known at intake and what is intentionally out of scope. It does not make design choices.
 
 Hard rules:

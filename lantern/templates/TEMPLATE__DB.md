@@ -28,5 +28,11 @@ Describe the selected design that is authoritative for the governed scope.
 
 ## Implementation Latitude
 - Fixed commitments:
+  - Commitment: <fixed design commitment>
+    Source: <selected DC section or clause>
 - Downstream latitude:
+  - Latitude: <allowed implementation freedom>
+    Source: <selected DC section or clause>
 - Reopen GT-115 if:
+  - Condition: <reopen trigger>
+    Source: <selected DC section or clause>

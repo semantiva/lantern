@@ -14,6 +14,8 @@ An Issue is a factual report of an observed problem or risk.
 If the issue is accepted, the unit of work becomes a Change Intent (CH).
 The issue remains as the origin record.
 
+Ordered notes are append-only timestamped issue comments captured inside the issue artifact. They document mitigation posture and incremental observations without changing the lifecycle model.
+
 ## Artifacts
 
 - Issue file: `is/IS-####.md`
@@ -66,6 +68,7 @@ Procedure
 2. Record triage decision, date, decider, rationale, and next action.
 3. If `NEEDS_INFO`, list explicit missing items.
 4. If `ACCEPTED`, create `CH-####` and link it in the issue file.
+5. If new mitigation context or validation posture must be recorded while the issue remains open, append it under `## Ordered notes` as a new timestamped entry rather than rewriting the historical Observation or Triage sections.
 
 Triage completion criteria
 - Decision and rationale are explicit and auditable.
@@ -83,6 +86,11 @@ For `DEFERRED` issues:
 
 For `REJECTED` issues:
 - Keep concise rejection rationale.
+
+Ordered note rules
+- Use append-only timestamped ordered notes for mitigation-in-place context, reviewer observations, and validation updates.
+- Ordered notes do not add a new issue state and do not change the meaning of `NEW`, `NEEDS_INFO`, `ACCEPTED`, `DEFERRED`, `REJECTED`, or `RESOLVED`.
+- When an issue remains open after a bounded mitigation lands, record that posture in ordered notes instead of marking the issue resolved early.
 
 ## Quality guardrails
 

@@ -28,6 +28,8 @@ Preconditions:
 
 Your job is to recommend which CI should be selected for integration (**CI status → `Selected`**) or declare that none is acceptable. You must also produce a concise list of high-priority issues (selection blockers and integration risks).
 
+The GT-120 EV is the one authoritative rich findings artifact. Record all material findings in one structured single-review findings ledger and preserve a bounded `GT-120 → GT-130` handoff section for downstream continuity.
+
 Scope: selection only.
 
 After the selection report is produced and a human approves the chosen candidate, GT-120 status administration MUST be completed using:
@@ -223,6 +225,25 @@ PASS requires:
   6) strongest determinism and verification posture.
 - If none pass: declare `NONE ACCEPTABLE`, identify the best near-miss, and list the minimal remediation required for it to reach PASS (specific missing sections/fields and exact insertion points).
 
+### 4A) Structured findings ledger (required)
+
+For every material finding recorded in the GT-120 EV, include:
+- finding ID
+- candidate ID
+- short claim statement
+- evidence cited
+- governing rule or artifact invoked
+- blocking or non-blocking classification
+- severity
+- confidence
+- required remediation before promotion when blocking
+- outcome effect (`excluded from ranking`, `comparative only`, or `handoff-only`)
+- final disposition and rationale
+
+Remediable record-shape or section-form defects may be recorded, but they are not winner-determinative unless the report states why they make the locked envelope unverifiable or the downstream handoff unreliable.
+
+The EV MUST also include bounded handoff notes labeled `GT-120 → GT-130` describing what integration and verification must preserve.
+
 ### Many-candidate mode (8+) (reporting rules; must follow exactly)
 
 This mode preserves the same evaluation standards, but produces a compact report surface.
@@ -293,9 +314,9 @@ If multiple ranking-eligible candidates pass all classes A–E, use the tie-brea
   - TD coverage expectations
 
 - Candidate Scorecards
-  - Candidate A: PASS/FAIL per class (A–E) + evidence excerpts
+  - Candidate A: PASS/FAIL per class (A–E) + evidence excerpts + structured findings entries for each material finding
     - High-priority issues (BLOCKER/HIGH)
-  - Candidate B: PASS/FAIL per class (A–E) + evidence excerpts
+  - Candidate B: PASS/FAIL per class (A–E) + evidence excerpts + structured findings entries for each material finding
     - High-priority issues (BLOCKER/HIGH)
   - (Candidate C/D if provided)
 
@@ -308,6 +329,7 @@ If multiple ranking-eligible candidates pass all classes A–E, use the tie-brea
   - Minimal remediation required (if any), with exact insertion points (section names and/or header fields)
 
 - Handoff Notes (GT-120 → GT-130)
+  - Use the literal handoff heading `GT-120 → GT-130`
   - What integration must preserve (CH baseline, contracts/seams, allowed change surface)
   - Evidence expectations for GT-130 (tests + artifacts) as declared in the selected CI
   - Known ambiguity hotspots to resolve before integration (if any)

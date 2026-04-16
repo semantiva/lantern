@@ -62,6 +62,12 @@ Implemented via:
 Verification evidence:
 - <what proves resolution; EV/DEC links>
 
+## Ordered notes
+
+Append-only timestamped ordered notes. Use this section to record mitigation posture, field observations, or lifecycle context without rewriting prior sections or inventing new issue states.
+
+1. YYYY-MM-DDTHH:MM:SSZ — <ordered note>
+
 ## Change log
 - YYYY-MM-DD: Created
 - YYYY-MM-DD: <status change + short note>
