@@ -1,0 +1,73 @@
+workbench_id: verification_and_closure
+display_name: Verification and Closure
+lifecycle_placement:
+  kind: covered_gates
+  covered_gates:
+  - GT-130
+artifacts_in_scope:
+- CI
+- EV
+- DEC
+intent_classes:
+- verification_and_closure
+posture_constraints:
+- requires_selected_ci
+workflow_surface:
+  allowed_transaction_kinds:
+  - inspect
+  - draft
+  - commit
+  - validate
+  draftable_artifact_families:
+  - EV
+  - DEC
+  contract_refs:
+  - contract.verification_and_closure.v1
+  inspect_views:
+  - catalog
+  - verification
+  - closure
+  response_surface_bindings:
+  - transaction_kind: inspect
+    response_envelope: catalog
+    allowed_resource_roles:
+    - instruction_resource
+    - authoritative_guides
+    - artifact_templates
+  - transaction_kind: inspect
+    response_envelope: verification
+    allowed_resource_roles:
+    - instruction_resource
+    - authoritative_guides
+    - artifact_templates
+  - transaction_kind: inspect
+    response_envelope: closure
+    allowed_resource_roles:
+    - instruction_resource
+    - authoritative_guides
+    - artifact_templates
+  - transaction_kind: draft
+    response_envelope: default
+    allowed_resource_roles:
+    - instruction_resource
+    - authoritative_guides
+    - administration_guides
+  - transaction_kind: commit
+    response_envelope: default
+    allowed_resource_roles:
+    - instruction_resource
+    - administration_guides
+  - transaction_kind: validate
+    response_envelope: default
+    allowed_resource_roles:
+    - instruction_resource
+    - authoritative_guides
+instruction_resource: lantern/resources/instructions/verification_and_closure.md
+authoritative_guides:
+- lantern/resources/guides/verification_and_closure.md
+administration_guides:
+- lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md
+entry_conditions:
+- selected CI applied
+exit_conditions:
+- GT-130 passed

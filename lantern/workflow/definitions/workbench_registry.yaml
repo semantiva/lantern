@@ -1,3 +1,4 @@
+# Generated compatibility projection. Do not use this file as runtime authority.
 runtime_surface_classification: full_governed_surface
 workbenches:
 - workbench_id: upstream_intake_and_baselines
@@ -39,16 +40,22 @@ workbenches:
     response_surface_bindings:
     - transaction_kind: inspect
       response_envelope: catalog
-      allowed_resource_roles: &id004
+      allowed_resource_roles:
       - instruction_resource
       - authoritative_guides
       - artifact_templates
     - transaction_kind: inspect
       response_envelope: baselines
-      allowed_resource_roles: *id004
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+      - artifact_templates
     - transaction_kind: inspect
       response_envelope: lineage
-      allowed_resource_roles: *id004
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+      - artifact_templates
     - transaction_kind: draft
       response_envelope: default
       allowed_resource_roles:
@@ -76,9 +83,6 @@ workbenches:
   - governance workspace bootstrapped
   exit_conditions:
   - upstream baselines approved
-  source: spec/SPEC-0001.md
-  enabled: true
-  governance_mode: full
 - workbench_id: ch_and_td_readiness
   display_name: CH and TD Readiness
   lifecycle_placement:
@@ -115,27 +119,36 @@ workbenches:
     response_surface_bindings:
     - transaction_kind: inspect
       response_envelope: catalog
-      allowed_resource_roles: *id004
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+      - artifact_templates
     - transaction_kind: inspect
       response_envelope: readiness
-      allowed_resource_roles: *id004
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+      - artifact_templates
     - transaction_kind: inspect
       response_envelope: lineage
-      allowed_resource_roles: *id004
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+      - artifact_templates
     - transaction_kind: draft
       response_envelope: default
-      allowed_resource_roles: &id001
+      allowed_resource_roles:
       - instruction_resource
       - authoritative_guides
       - administration_guides
     - transaction_kind: commit
       response_envelope: default
-      allowed_resource_roles: &id003
+      allowed_resource_roles:
       - instruction_resource
       - administration_guides
     - transaction_kind: validate
       response_envelope: default
-      allowed_resource_roles: &id002
+      allowed_resource_roles:
       - instruction_resource
       - authoritative_guides
   instruction_resource: lantern/resources/instructions/ch_and_td_readiness.md
@@ -147,9 +160,6 @@ workbenches:
   - upstream baselines approved
   exit_conditions:
   - GT-110 passed
-  source: ch/CH-0001.md
-  enabled: true
-  governance_mode: full
 - workbench_id: design_candidate_authoring
   display_name: Design Candidate Authoring
   lifecycle_placement:
@@ -177,16 +187,27 @@ workbenches:
     response_surface_bindings:
     - transaction_kind: inspect
       response_envelope: catalog
-      allowed_resource_roles: *id004
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+      - artifact_templates
     - transaction_kind: inspect
       response_envelope: design_candidates
-      allowed_resource_roles: *id004
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+      - artifact_templates
     - transaction_kind: draft
       response_envelope: default
-      allowed_resource_roles: *id001
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+      - administration_guides
     - transaction_kind: validate
       response_envelope: default
-      allowed_resource_roles: *id002
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
   instruction_resource: lantern/resources/instructions/design_candidate_authoring.md
   authoritative_guides:
   - lantern/resources/guides/design_candidate_authoring.md
@@ -196,9 +217,6 @@ workbenches:
   - GT-110 passed
   exit_conditions:
   - at least one design candidate exists
-  source: dip/DIP-0006.md
-  enabled: true
-  governance_mode: full
 - workbench_id: design_selection
   display_name: Design Selection
   lifecycle_placement:
@@ -232,19 +250,32 @@ workbenches:
     response_surface_bindings:
     - transaction_kind: inspect
       response_envelope: catalog
-      allowed_resource_roles: *id004
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+      - artifact_templates
     - transaction_kind: inspect
       response_envelope: design_selection
-      allowed_resource_roles: *id004
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+      - artifact_templates
     - transaction_kind: draft
       response_envelope: default
-      allowed_resource_roles: *id001
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+      - administration_guides
     - transaction_kind: commit
       response_envelope: default
-      allowed_resource_roles: *id003
+      allowed_resource_roles:
+      - instruction_resource
+      - administration_guides
     - transaction_kind: validate
       response_envelope: default
-      allowed_resource_roles: *id002
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
   instruction_resource: lantern/resources/instructions/design_selection.md
   authoritative_guides:
   - lantern/resources/guides/design_selection.md
@@ -255,9 +286,6 @@ workbenches:
   - GT-110 passed
   exit_conditions:
   - DB approved
-  source: db/DB-0001.md
-  enabled: true
-  governance_mode: full
 - workbench_id: ci_authoring
   display_name: CI Authoring
   lifecycle_placement:
@@ -285,16 +313,27 @@ workbenches:
     response_surface_bindings:
     - transaction_kind: inspect
       response_envelope: catalog
-      allowed_resource_roles: *id004
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+      - artifact_templates
     - transaction_kind: inspect
       response_envelope: implementation_scope
-      allowed_resource_roles: *id004
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+      - artifact_templates
     - transaction_kind: draft
       response_envelope: default
-      allowed_resource_roles: *id001
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+      - administration_guides
     - transaction_kind: validate
       response_envelope: default
-      allowed_resource_roles: *id002
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
   instruction_resource: lantern/resources/instructions/ci_authoring.md
   authoritative_guides:
   - lantern/resources/guides/ci_authoring.md
@@ -305,9 +344,6 @@ workbenches:
   - GT-115 passed
   exit_conditions:
   - at least one CI candidate exists
-  source: ch/CH-0001.md
-  enabled: true
-  governance_mode: full
 - workbench_id: ci_selection
   display_name: CI Selection
   lifecycle_placement:
@@ -339,19 +375,32 @@ workbenches:
     response_surface_bindings:
     - transaction_kind: inspect
       response_envelope: catalog
-      allowed_resource_roles: *id004
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+      - artifact_templates
     - transaction_kind: inspect
       response_envelope: ci_selection
-      allowed_resource_roles: *id004
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+      - artifact_templates
     - transaction_kind: draft
       response_envelope: default
-      allowed_resource_roles: *id001
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+      - administration_guides
     - transaction_kind: commit
       response_envelope: default
-      allowed_resource_roles: *id003
+      allowed_resource_roles:
+      - instruction_resource
+      - administration_guides
     - transaction_kind: validate
       response_envelope: default
-      allowed_resource_roles: *id002
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
   instruction_resource: lantern/resources/instructions/ci_selection.md
   authoritative_guides:
   - lantern/resources/guides/ci_selection.md
@@ -362,9 +411,6 @@ workbenches:
   - GT-115 passed
   exit_conditions:
   - selected CI recorded
-  source: td/TD-0001.md
-  enabled: true
-  governance_mode: full
 - workbench_id: selected_ci_application
   display_name: Selected CI Application
   lifecycle_placement:
@@ -401,10 +447,14 @@ workbenches:
       - authoritative_guides
     - transaction_kind: commit
       response_envelope: default
-      allowed_resource_roles: *id003
+      allowed_resource_roles:
+      - instruction_resource
+      - administration_guides
     - transaction_kind: validate
       response_envelope: default
-      allowed_resource_roles: *id002
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
   instruction_resource: lantern/resources/instructions/selected_ci_application.md
   authoritative_guides:
   - lantern/resources/guides/selected_ci_application.md
@@ -415,9 +465,6 @@ workbenches:
   - GT-120 passed
   exit_conditions:
   - selected CI applied
-  source: spec/SPEC-0001.md
-  enabled: true
-  governance_mode: full
 - workbench_id: verification_and_closure
   display_name: Verification and Closure
   lifecycle_placement:
@@ -450,22 +497,38 @@ workbenches:
     response_surface_bindings:
     - transaction_kind: inspect
       response_envelope: catalog
-      allowed_resource_roles: *id004
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+      - artifact_templates
     - transaction_kind: inspect
       response_envelope: verification
-      allowed_resource_roles: *id004
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+      - artifact_templates
     - transaction_kind: inspect
       response_envelope: closure
-      allowed_resource_roles: *id004
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+      - artifact_templates
     - transaction_kind: draft
       response_envelope: default
-      allowed_resource_roles: *id001
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+      - administration_guides
     - transaction_kind: commit
       response_envelope: default
-      allowed_resource_roles: *id003
+      allowed_resource_roles:
+      - instruction_resource
+      - administration_guides
     - transaction_kind: validate
       response_envelope: default
-      allowed_resource_roles: *id002
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
   instruction_resource: lantern/resources/instructions/verification_and_closure.md
   authoritative_guides:
   - lantern/resources/guides/verification_and_closure.md
@@ -475,9 +538,6 @@ workbenches:
   - selected CI applied
   exit_conditions:
   - GT-130 passed
-  source: spec/SPEC-0001.md
-  enabled: true
-  governance_mode: full
 - workbench_id: issue_operations
   display_name: Issue Operations
   lifecycle_placement:
@@ -505,19 +565,32 @@ workbenches:
     response_surface_bindings:
     - transaction_kind: inspect
       response_envelope: catalog
-      allowed_resource_roles: *id004
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+      - artifact_templates
     - transaction_kind: inspect
       response_envelope: issues
-      allowed_resource_roles: *id004
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+      - artifact_templates
     - transaction_kind: draft
       response_envelope: default
-      allowed_resource_roles: *id001
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+      - administration_guides
     - transaction_kind: commit
       response_envelope: default
-      allowed_resource_roles: *id003
+      allowed_resource_roles:
+      - instruction_resource
+      - administration_guides
     - transaction_kind: validate
       response_envelope: default
-      allowed_resource_roles: *id002
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
   instruction_resource: lantern/resources/instructions/issue_operations.md
   authoritative_guides:
   - lantern/resources/guides/issue_operations.md
@@ -527,9 +600,6 @@ workbenches:
   - issue exists
   exit_conditions:
   - issue posture updated
-  source: is/IS-0002.md
-  enabled: true
-  governance_mode: full
 - workbench_id: governance_onboarding
   display_name: Governance Onboarding
   lifecycle_placement:
@@ -560,16 +630,27 @@ workbenches:
     response_surface_bindings:
     - transaction_kind: inspect
       response_envelope: catalog
-      allowed_resource_roles: *id004
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+      - artifact_templates
     - transaction_kind: inspect
       response_envelope: onboarding
-      allowed_resource_roles: *id004
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+      - artifact_templates
     - transaction_kind: draft
       response_envelope: default
-      allowed_resource_roles: *id001
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
+      - administration_guides
     - transaction_kind: validate
       response_envelope: default
-      allowed_resource_roles: *id002
+      allowed_resource_roles:
+      - instruction_resource
+      - authoritative_guides
   instruction_resource: lantern/resources/instructions/governance_onboarding.md
   authoritative_guides:
   - lantern/resources/guides/governance_onboarding.md
@@ -581,7 +662,3 @@ workbenches:
   - governance repo not yet prepared or needs inspection
   exit_conditions:
   - governance onboarding complete
-  source: dip/DIP-0001.md
-  enabled: true
-  governance_mode: intervention
-

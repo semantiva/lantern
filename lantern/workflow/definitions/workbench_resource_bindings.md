@@ -1,5 +1,7 @@
 # Workbench resource bindings
 
+Workflow ID: `default_full_governed_surface`
+
 | Workbench | Instruction resource | Administration guides | Authoritative guides | Manifest resource ids |
 |---|---|---|---|---|
 | upstream_intake_and_baselines | lantern/resources/instructions/upstream_intake_and_baselines.md | lantern/administration_procedures/GT-030__DIP_LOCK_ADMINISTRATION_v0.1.0.md<br>lantern/administration_procedures/GT-050_GT-060__BASELINE_READINESS_ADMINISTRATION_v0.1.0.md<br>lantern/administration_procedures/INITIATIVE__AUTHORING_AND_READYING_v0.1.0.md | lantern/resources/guides/upstream_intake_and_baselines.md | resource.administration_guide.upstream_intake_and_baselines_administration_guides_gt_030_dip_lock_administration_v0_1_0<br>resource.administration_guide.upstream_intake_and_baselines_administration_guides_gt_050_gt_060_baseline_readiness_administration_v0_1_0<br>resource.administration_guide.upstream_intake_and_baselines_administration_guides_initiative_authoring_and_readying_v0_1_0<br>resource.authoritative_guide.upstream_intake_and_baselines_authoritative_guides_upstream_intake_and_baselines<br>resource.instruction.upstream_intake_and_baselines_instruction_resource_upstream_intake_and_baselines |

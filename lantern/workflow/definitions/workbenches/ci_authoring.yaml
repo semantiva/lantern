@@ -1,0 +1,58 @@
+workbench_id: ci_authoring
+display_name: CI Authoring
+lifecycle_placement:
+  kind: lifecycle_span
+  start_gate: GT-115
+  end_gate: GT-120
+artifacts_in_scope:
+- CI
+intent_classes:
+- ci_authoring
+posture_constraints:
+- requires_approved_db
+workflow_surface:
+  allowed_transaction_kinds:
+  - inspect
+  - draft
+  - validate
+  draftable_artifact_families:
+  - CI
+  contract_refs:
+  - contract.ci_authoring.v1
+  inspect_views:
+  - catalog
+  - implementation_scope
+  response_surface_bindings:
+  - transaction_kind: inspect
+    response_envelope: catalog
+    allowed_resource_roles:
+    - instruction_resource
+    - authoritative_guides
+    - artifact_templates
+  - transaction_kind: inspect
+    response_envelope: implementation_scope
+    allowed_resource_roles:
+    - instruction_resource
+    - authoritative_guides
+    - artifact_templates
+  - transaction_kind: draft
+    response_envelope: default
+    allowed_resource_roles:
+    - instruction_resource
+    - authoritative_guides
+    - administration_guides
+  - transaction_kind: validate
+    response_envelope: default
+    allowed_resource_roles:
+    - instruction_resource
+    - authoritative_guides
+instruction_resource: lantern/resources/instructions/ci_authoring.md
+authoritative_guides:
+- lantern/resources/guides/ci_authoring.md
+administration_guides:
+- lantern/authoring_contracts/change_increment_authoring_guide.md
+- lantern/authoring_contracts/allowed_change_surface_flexibilization.md
+entry_conditions:
+- GT-115 passed
+exit_conditions:
+- at least one CI candidate exists

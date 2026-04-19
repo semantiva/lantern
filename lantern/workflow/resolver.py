@@ -15,11 +15,11 @@
 """Workflow resolver for Lantern.
 
 Computes the active workbench set and preferred workbench from governed state,
-the validated CH-0002 workflow layer, and an optional intent string.
+the selected workflow layer, and an optional intent string.
 
 No authoritative hardcoded stage maps or stage-ID if/elif chains are used.
-Workbench eligibility is derived entirely from each workbench's
-lifecycle_placement declaration and the supplied governance_state dict.
+The selected workflow already determines which workbench ids are in play;
+this resolver only applies lifecycle eligibility within that active set.
 """
 
 from __future__ import annotations
@@ -70,8 +70,6 @@ def resolve_active_workbenches(
     preconditions: list[str] = []
 
     for workbench in workflow_layer.workbenches:
-        if not workbench.enabled:
-            continue
         eligible, reason = _is_eligible(workbench, active_gates, passed_gates)
         if eligible:
             active.append(workbench)

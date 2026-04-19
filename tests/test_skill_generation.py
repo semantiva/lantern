@@ -17,7 +17,10 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import Any
+
+import yaml
 
 from lantern.skills.generator import (
     PACKAGED_SKILL_MANIFEST_PATH,
@@ -37,6 +40,11 @@ def _contains_forbidden_path_key(value: Any) -> bool:
     if isinstance(value, list):
         return any(_contains_forbidden_path_key(item) for item in value)
     return False
+
+
+def _write_yaml(path: Path, payload: dict[str, object]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
 
 
 def test_td0006_c01_packaged_skill_has_mandatory_header_and_routing_content() -> None:
@@ -126,3 +134,37 @@ def test_td0006_c07_packaged_manifest_matches_source_tree_routing() -> None:
 
     assert committed == built
     assert PACKAGED_SKILL_MD_PATH.read_text(encoding="utf-8") == build_packaged_skill_md(layer)
+
+
+def test_td0024_c11_packaged_skill_is_workflow_agnostic_when_active_workbench_set_matches(tmp_path: Path) -> None:
+    governance_root = tmp_path / "governance"
+    _write_yaml(
+        governance_root / "workflow" / "definitions" / "workflows" / "alternate_default_surface.yaml",
+        {
+            "workflow_id": "alternate_default_surface",
+            "display_name": "Alternate Default Surface",
+            "runtime_surface_classification": "partial_governed_surface",
+            "active_workbench_ids": [
+                "upstream_intake_and_baselines",
+                "ch_and_td_readiness",
+                "design_candidate_authoring",
+                "design_selection",
+                "ci_authoring",
+                "ci_selection",
+                "selected_ci_application",
+                "verification_and_closure",
+                "issue_operations",
+                "governance_onboarding",
+            ],
+        },
+    )
+
+    default_layer = load_workflow_layer()
+    alternate_layer = load_workflow_layer(
+        governance_root=governance_root,
+        workflow_id="alternate_default_surface",
+    )
+
+    assert default_layer.selected_workflow_id != alternate_layer.selected_workflow_id
+    assert build_packaged_skill_manifest(default_layer) == build_packaged_skill_manifest(alternate_layer)
+    assert build_packaged_skill_md(default_layer) == build_packaged_skill_md(alternate_layer)

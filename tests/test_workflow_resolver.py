@@ -33,6 +33,7 @@ import re
 from pathlib import Path
 
 import pytest
+import yaml
 
 import lantern.workflow.resolver as resolver_module
 from lantern.workflow.loader import load_workflow_layer
@@ -245,3 +246,64 @@ def test_c12_resolver_source_does_not_hardcode_legacy_ch_aliases() -> None:
     assert '{"Draft", "Ready", "InProgress", "Selected"}' not in source
     assert "InProgress" not in source
     assert "Selected" not in source
+
+
+def _write_repo_local_workflow(governance_root: Path, *, workflow_id: str = "change_readiness_only") -> None:
+    workflow_root = governance_root / "workflow" / "definitions" / "workflows"
+    workflow_root.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "workflow_id": workflow_id,
+        "display_name": "Change Readiness Only",
+        "runtime_surface_classification": "partial_governed_surface",
+        "active_workbench_ids": [
+            "ch_and_td_readiness",
+            "issue_operations",
+            "governance_onboarding",
+        ],
+    }
+    (workflow_root / f"{workflow_id}.yaml").write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
+
+
+def test_td0024_repo_local_subset_excludes_omitted_builtins(tmp_path: Path) -> None:
+    governance_root = tmp_path / "governance"
+    _write_repo_local_workflow(governance_root)
+    workflow_layer = load_workflow_layer(
+        governance_root=governance_root,
+        workflow_id="change_readiness_only",
+        enforce_generated_artifacts=False,
+    )
+
+    result = resolve_active_workbenches(
+        workflow_layer=workflow_layer,
+        governance_state=_GT110_ACTIVE,
+        ch_id="CH-0003",
+    )
+
+    assert set(result.active_workbench_ids) == {
+        "ch_and_td_readiness",
+        "issue_operations",
+        "governance_onboarding",
+    }
+    assert "design_candidate_authoring" not in result.active_workbench_ids
+    assert (
+        workflow_layer.get_catalog_workbench("design_candidate_authoring").display_name == "Design Candidate Authoring"
+    )
+
+
+def test_td0024_subset_keeps_omitted_builtins_inactive_between_gates(tmp_path: Path) -> None:
+    governance_root = tmp_path / "governance"
+    _write_repo_local_workflow(governance_root)
+    workflow_layer = load_workflow_layer(
+        governance_root=governance_root,
+        workflow_id="change_readiness_only",
+        enforce_generated_artifacts=False,
+    )
+
+    result = resolve_active_workbenches(
+        workflow_layer=workflow_layer,
+        governance_state=_GT115_SPAN,
+        ch_id="CH-0003",
+    )
+
+    assert set(result.active_workbench_ids) == {"issue_operations", "governance_onboarding"}
+    assert "design_candidate_authoring" not in result.active_workbench_ids

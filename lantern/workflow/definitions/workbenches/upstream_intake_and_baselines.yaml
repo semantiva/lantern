@@ -1,0 +1,82 @@
+workbench_id: upstream_intake_and_baselines
+display_name: Upstream Intake and Baselines
+lifecycle_placement:
+  kind: covered_gates
+  covered_gates:
+  - GT-030
+  - GT-050
+  - GT-060
+artifacts_in_scope:
+- DIP
+- SPEC
+- ARCH
+- INI
+intent_classes:
+- baseline_intake
+- baseline_approval
+posture_constraints:
+- requires_governance_workspace
+- startup_validated
+workflow_surface:
+  allowed_transaction_kinds:
+  - inspect
+  - draft
+  - commit
+  - validate
+  draftable_artifact_families:
+  - DIP
+  - SPEC
+  - ARCH
+  - INI
+  contract_refs:
+  - contract.upstream_intake.v1
+  inspect_views:
+  - catalog
+  - baselines
+  - lineage
+  response_surface_bindings:
+  - transaction_kind: inspect
+    response_envelope: catalog
+    allowed_resource_roles:
+    - instruction_resource
+    - authoritative_guides
+    - artifact_templates
+  - transaction_kind: inspect
+    response_envelope: baselines
+    allowed_resource_roles:
+    - instruction_resource
+    - authoritative_guides
+    - artifact_templates
+  - transaction_kind: inspect
+    response_envelope: lineage
+    allowed_resource_roles:
+    - instruction_resource
+    - authoritative_guides
+    - artifact_templates
+  - transaction_kind: draft
+    response_envelope: default
+    allowed_resource_roles:
+    - instruction_resource
+    - authoritative_guides
+    - administration_guides
+  - transaction_kind: commit
+    response_envelope: default
+    allowed_resource_roles:
+    - instruction_resource
+    - administration_guides
+  - transaction_kind: validate
+    response_envelope: default
+    allowed_resource_roles:
+    - instruction_resource
+    - authoritative_guides
+instruction_resource: lantern/resources/instructions/upstream_intake_and_baselines.md
+authoritative_guides:
+- lantern/resources/guides/upstream_intake_and_baselines.md
+administration_guides:
+- lantern/administration_procedures/GT-030__DIP_LOCK_ADMINISTRATION_v0.1.0.md
+- lantern/administration_procedures/GT-050_GT-060__BASELINE_READINESS_ADMINISTRATION_v0.1.0.md
+- lantern/administration_procedures/INITIATIVE__AUTHORING_AND_READYING_v0.1.0.md
+entry_conditions:
+- governance workspace bootstrapped
+exit_conditions:
+- upstream baselines approved

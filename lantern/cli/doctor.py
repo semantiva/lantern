@@ -25,8 +25,6 @@ from lantern._compat import get_package_resource_path
 from lantern.artifacts.validator import validate_workspace_readiness
 from lantern.discovery.registry import build_discovery_registry
 from lantern.workflow.loader import WorkflowLayerError, load_workflow_layer
-from lantern.workflow.merger import ConfigurationLoadError, ConfigurationLoader
-
 
 _CATEGORY_ORDER = (
     "runtime_availability",
@@ -41,13 +39,10 @@ _CATEGORY_ORDER = (
 _REQUIRED_PACKAGED_ASSETS = (
     "skills/packaged_default/SKILL.md",
     "skills/packaged_default/skill-manifest.json",
-    "workflow/definitions/workbench_registry.yaml",
     "workflow/definitions/workbench_schema.yaml",
+    "workflow/definitions/workflow_schema.yaml",
+    "workflow/definitions/workflows/default_full_governed_surface.yaml",
     "workflow/definitions/transaction_profiles.yaml",
-    "workflow/definitions/contract_catalog.json",
-    "workflow/definitions/resource_manifest.json",
-    "workflow/definitions/workflow_map.md",
-    "workflow/definitions/workbench_resource_bindings.md",
     "preservation/relocation_manifest.yaml",
 )
 
@@ -56,6 +51,9 @@ def gather_doctor_report(
     *,
     governance_root: Path,
     product_root: Path,
+    workflow_id: str | None = None,
+    workflow_folder: Path | None = None,
+    workbench_folder: Path | None = None,
 ) -> dict[str, Any]:
     governance_root = Path(governance_root).resolve()
     product_root = Path(product_root).resolve()
@@ -72,10 +70,23 @@ def gather_doctor_report(
     runtime_availability["status"] = _category_status(findings, "runtime_availability")
     grammar_compatibility = _probe_grammar(findings)
     workspace_validity = _probe_workspace(product_root, governance_root, findings)
-    workflow_configuration = _probe_configuration(governance_root, findings)
+    workflow_configuration = _probe_configuration(
+        governance_root,
+        findings,
+        workflow_id=workflow_id,
+        workflow_folder=workflow_folder,
+        workbench_folder=workbench_folder,
+    )
     bootstrap_posture = _probe_bootstrap(governance_root, product_root, findings)
     managed_file_posture = _probe_managed_files(governance_root, product_root, findings)
-    discovery_availability = _probe_discovery(governance_root, product_root, findings)
+    discovery_availability = _probe_discovery(
+        governance_root,
+        product_root,
+        findings,
+        workflow_id=workflow_id,
+        workflow_folder=workflow_folder,
+        workbench_folder=workbench_folder,
+    )
 
     report = {
         "kind": "doctor_report",
@@ -245,39 +256,54 @@ def _probe_workspace(
 def _probe_configuration(
     governance_root: Path,
     findings: list[dict[str, str]],
+    *,
+    workflow_id: str | None = None,
+    workflow_folder: Path | None = None,
+    workbench_folder: Path | None = None,
 ) -> dict[str, Any]:
-    config_root = governance_root / "workflow" / "configuration"
-    if not config_root.exists():
-        findings.append(
-            _finding(
-                category="workflow_configuration",
-                classification="advisory",
-                subject="workflow.configuration",
-                message=f"configuration folder is absent: {config_root}",
-                remediation="Run bootstrap-product to create the governed configuration surface.",
-            )
-        )
-        return {"status": "absent", "configuration_root": str(config_root)}
+    repo_workflow_root = (
+        Path(workflow_folder).resolve()
+        if workflow_folder is not None
+        else governance_root / "workflow" / "definitions" / "workflows"
+    )
+    repo_workbench_root = (
+        Path(workbench_folder).resolve()
+        if workbench_folder is not None
+        else governance_root / "workflow" / "definitions" / "workbenches"
+    )
 
-    loader = ConfigurationLoader()
     try:
-        surface = loader.load_and_validate(config_root)
-    except ConfigurationLoadError as exc:
+        layer = load_workflow_layer(
+            governance_root=governance_root,
+            workflow_id=workflow_id,
+            workflow_folder=workflow_folder,
+            workbench_folder=workbench_folder,
+            enforce_generated_artifacts=False,
+        )
+    except WorkflowLayerError as exc:
         findings.append(
             _finding(
                 category="workflow_configuration",
                 classification="blocker",
-                subject="workflow.configuration",
+                subject="workflow.catalogs",
                 message=str(exc),
-                remediation="Repair the governed configuration folder so Lantern can validate it.",
+                remediation="Repair the authored workbench/workflow catalogs or choose a valid --workflow-id.",
             )
         )
-        return {"status": "invalid", "configuration_root": str(config_root)}
+        return {
+            "status": "invalid",
+            "selected_workflow_id": workflow_id,
+            "workflow_root": str(repo_workflow_root),
+            "workbench_root": str(repo_workbench_root),
+        }
 
     return {
         "status": "ok",
-        "configuration_root": str(config_root),
-        "declared_posture": surface.declared_posture,
+        "selected_workflow_id": layer.selected_workflow_id,
+        "selected_workflow_source_path": layer.selected_workflow_source_path,
+        "runtime_surface_classification": layer.runtime_surface_classification,
+        "workflow_root": str(repo_workflow_root) if repo_workflow_root.exists() else None,
+        "workbench_root": str(repo_workbench_root) if repo_workbench_root.exists() else None,
     }
 
 
@@ -392,10 +418,20 @@ def _probe_discovery(
     governance_root: Path,
     product_root: Path,
     findings: list[dict[str, str]],
+    *,
+    workflow_id: str | None = None,
+    workflow_folder: Path | None = None,
+    workbench_folder: Path | None = None,
 ) -> dict[str, Any]:
     strict_status = "ok"
     try:
-        load_workflow_layer()
+        load_workflow_layer(
+            governance_root=governance_root,
+            workflow_id=workflow_id,
+            workflow_folder=workflow_folder,
+            workbench_folder=workbench_folder,
+            enforce_generated_artifacts=True,
+        )
     except WorkflowLayerError as exc:
         strict_status = "stale_generated_artifacts"
         findings.append(
@@ -412,6 +448,9 @@ def _probe_discovery(
         registry = build_discovery_registry(
             product_root=product_root,
             governance_root=governance_root,
+            workflow_id=workflow_id,
+            workflow_folder=workflow_folder,
+            workbench_folder=workbench_folder,
         )
     except Exception as exc:
         findings.append(

@@ -1,0 +1,62 @@
+workbench_id: governance_onboarding
+display_name: Governance Onboarding
+lifecycle_placement:
+  kind: lifecycle-independent
+artifacts_in_scope:
+- INI
+- CH
+- TD
+intent_classes:
+- bootstrap
+- onboarding
+posture_constraints:
+- supports_bootstrap_without_product_writes
+workflow_surface:
+  allowed_transaction_kinds:
+  - inspect
+  - draft
+  - validate
+  draftable_artifact_families:
+  - INI
+  - CH
+  - TD
+  contract_refs:
+  - contract.governance_onboarding.v1
+  inspect_views:
+  - catalog
+  - onboarding
+  response_surface_bindings:
+  - transaction_kind: inspect
+    response_envelope: catalog
+    allowed_resource_roles:
+    - instruction_resource
+    - authoritative_guides
+    - artifact_templates
+  - transaction_kind: inspect
+    response_envelope: onboarding
+    allowed_resource_roles:
+    - instruction_resource
+    - authoritative_guides
+    - artifact_templates
+  - transaction_kind: draft
+    response_envelope: default
+    allowed_resource_roles:
+    - instruction_resource
+    - authoritative_guides
+    - administration_guides
+  - transaction_kind: validate
+    response_envelope: default
+    allowed_resource_roles:
+    - instruction_resource
+    - authoritative_guides
+instruction_resource: lantern/resources/instructions/governance_onboarding.md
+authoritative_guides:
+- lantern/resources/guides/governance_onboarding.md
+administration_guides:
+- lantern/administration_procedures/SSOT_BLOB_INGESTION_v0.2.0.md
+- lantern/administration_procedures/INITIATIVE__AUTHORING_AND_READYING_v0.1.0.md
+- lantern/administration_procedures/INITIATIVE__DECOMPOSITION_AND_CH_SIZING_v0.1.0.md
+entry_conditions:
+- governance repo not yet prepared or needs inspection
+exit_conditions:
+- governance onboarding complete

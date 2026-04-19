@@ -1,11 +1,4 @@
 schema_id: lantern.workflow.workbench_schema.v2
-top_level_required:
-- runtime_surface_classification
-- workbenches
-runtime_surface_classification_values:
-- full_governed_surface
-- partial_governed_surface
-- intervention_surface
 required_workbench_fields:
 - workbench_id
 - display_name
@@ -19,9 +12,6 @@ required_workbench_fields:
 - administration_guides
 - entry_conditions
 - exit_conditions
-- source
-- enabled
-- governance_mode
 required_workflow_surface_fields:
 - allowed_transaction_kinds
 - draftable_artifact_families
@@ -58,6 +48,11 @@ built_in_workbench_ids:
 - verification_and_closure
 - issue_operations
 - governance_onboarding
+removed_authority_fields:
+- source
+- enabled
+- governance_mode
+catalog_shape: one_file_per_workbench
 lifecycle_placement_variants:
   covered_gates:
     requires:

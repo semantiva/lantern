@@ -32,7 +32,8 @@
       },
       "grammar_package_version": "0.3.0",
       "grammar_version": "0.3.0",
-      "runtime_surface_classification": "full_governed_surface"
+      "runtime_surface_classification": "full_governed_surface",
+      "selected_workflow_id": "default_full_governed_surface"
     },
     "contract_ref": "contract.ch_td_readiness.v1",
     "family_binding": [
@@ -50,12 +51,13 @@
       "lantern/resources/guides/ch_and_td_readiness.md"
     ],
     "provenance": {
+      "catalog_source": "built_in",
       "generated_from": [
-        "lantern/workflow/definitions/workbench_registry.yaml",
+        "lantern/workflow/definitions/workflows/default_full_governed_surface.yaml",
+        "lantern/workflow/definitions/workbenches/ch_and_td_readiness.yaml",
         "lantern/workflow/definitions/transaction_profiles.yaml",
         "lantern/preservation/relocation_manifest.yaml"
-      ],
-      "source": "ch/CH-0001.md"
+      ]
     },
     "request_schema_ref": "schema.request.ch_and_td_readiness.v1",
     "response_surface_bindings": [
@@ -183,7 +185,8 @@
       },
       "grammar_package_version": "0.3.0",
       "grammar_version": "0.3.0",
-      "runtime_surface_classification": "full_governed_surface"
+      "runtime_surface_classification": "full_governed_surface",
+      "selected_workflow_id": "default_full_governed_surface"
     },
     "contract_ref": "contract.ci_authoring.v1",
     "family_binding": [
@@ -200,12 +203,13 @@
       "lantern/resources/guides/ci_authoring.md"
     ],
     "provenance": {
+      "catalog_source": "built_in",
       "generated_from": [
-        "lantern/workflow/definitions/workbench_registry.yaml",
+        "lantern/workflow/definitions/workflows/default_full_governed_surface.yaml",
+        "lantern/workflow/definitions/workbenches/ci_authoring.yaml",
         "lantern/workflow/definitions/transaction_profiles.yaml",
         "lantern/preservation/relocation_manifest.yaml"
-      ],
-      "source": "ch/CH-0001.md"
+      ]
     },
     "request_schema_ref": "schema.request.ci_authoring.v1",
     "response_surface_bindings": [
@@ -285,7 +289,8 @@
       },
       "grammar_package_version": "0.3.0",
       "grammar_version": "0.3.0",
-      "runtime_surface_classification": "full_governed_surface"
+      "runtime_surface_classification": "full_governed_surface",
+      "selected_workflow_id": "default_full_governed_surface"
     },
     "contract_ref": "contract.ci_selection.v1",
     "family_binding": [
@@ -303,12 +308,13 @@
       "lantern/resources/guides/ci_selection.md"
     ],
     "provenance": {
+      "catalog_source": "built_in",
       "generated_from": [
-        "lantern/workflow/definitions/workbench_registry.yaml",
+        "lantern/workflow/definitions/workflows/default_full_governed_surface.yaml",
+        "lantern/workflow/definitions/workbenches/ci_selection.yaml",
         "lantern/workflow/definitions/transaction_profiles.yaml",
         "lantern/preservation/relocation_manifest.yaml"
-      ],
-      "source": "td/TD-0001.md"
+      ]
     },
     "request_schema_ref": "schema.request.ci_selection.v1",
     "response_surface_bindings": [
@@ -425,7 +431,8 @@
       },
       "grammar_package_version": "0.3.0",
       "grammar_version": "0.3.0",
-      "runtime_surface_classification": "full_governed_surface"
+      "runtime_surface_classification": "full_governed_surface",
+      "selected_workflow_id": "default_full_governed_surface"
     },
     "contract_ref": "contract.design_candidate_authoring.v1",
     "family_binding": [
@@ -441,12 +448,13 @@
       "lantern/resources/guides/design_candidate_authoring.md"
     ],
     "provenance": {
+      "catalog_source": "built_in",
       "generated_from": [
-        "lantern/workflow/definitions/workbench_registry.yaml",
+        "lantern/workflow/definitions/workflows/default_full_governed_surface.yaml",
+        "lantern/workflow/definitions/workbenches/design_candidate_authoring.yaml",
         "lantern/workflow/definitions/transaction_profiles.yaml",
         "lantern/preservation/relocation_manifest.yaml"
-      ],
-      "source": "dip/DIP-0006.md"
+      ]
     },
     "request_schema_ref": "schema.request.design_candidate_authoring.v1",
     "response_surface_bindings": [
@@ -528,7 +536,8 @@
       },
       "grammar_package_version": "0.3.0",
       "grammar_version": "0.3.0",
-      "runtime_surface_classification": "full_governed_surface"
+      "runtime_surface_classification": "full_governed_surface",
+      "selected_workflow_id": "default_full_governed_surface"
     },
     "contract_ref": "contract.design_selection.v1",
     "family_binding": [
@@ -547,12 +556,13 @@
       "lantern/resources/guides/design_selection.md"
     ],
     "provenance": {
+      "catalog_source": "built_in",
       "generated_from": [
-        "lantern/workflow/definitions/workbench_registry.yaml",
+        "lantern/workflow/definitions/workflows/default_full_governed_surface.yaml",
+        "lantern/workflow/definitions/workbenches/design_selection.yaml",
         "lantern/workflow/definitions/transaction_profiles.yaml",
         "lantern/preservation/relocation_manifest.yaml"
-      ],
-      "source": "db/DB-0001.md"
+      ]
     },
     "request_schema_ref": "schema.request.design_selection.v1",
     "response_surface_bindings": [
@@ -610,7 +620,8 @@
       "gate_dependencies": {},
       "grammar_package_version": "0.3.0",
       "grammar_version": "0.3.0",
-      "runtime_surface_classification": "full_governed_surface"
+      "runtime_surface_classification": "full_governed_surface",
+      "selected_workflow_id": "default_full_governed_surface"
     },
     "contract_ref": "contract.governance_onboarding.v1",
     "family_binding": [
@@ -627,12 +638,13 @@
       "lantern/resources/guides/governance_onboarding.md"
     ],
     "provenance": {
+      "catalog_source": "built_in",
       "generated_from": [
-        "lantern/workflow/definitions/workbench_registry.yaml",
+        "lantern/workflow/definitions/workflows/default_full_governed_surface.yaml",
+        "lantern/workflow/definitions/workbenches/governance_onboarding.yaml",
         "lantern/workflow/definitions/transaction_profiles.yaml",
         "lantern/preservation/relocation_manifest.yaml"
-      ],
-      "source": "dip/DIP-0001.md"
+      ]
     },
     "request_schema_ref": "schema.request.governance_onboarding.v1",
     "response_surface_bindings": [
@@ -682,7 +694,8 @@
       "gate_dependencies": {},
       "grammar_package_version": "0.3.0",
       "grammar_version": "0.3.0",
-      "runtime_surface_classification": "full_governed_surface"
+      "runtime_surface_classification": "full_governed_surface",
+      "selected_workflow_id": "default_full_governed_surface"
     },
     "contract_ref": "contract.issue_operations.v1",
     "family_binding": [
@@ -695,12 +708,13 @@
       "lantern/resources/guides/issue_operations.md"
     ],
     "provenance": {
+      "catalog_source": "built_in",
       "generated_from": [
-        "lantern/workflow/definitions/workbench_registry.yaml",
+        "lantern/workflow/definitions/workflows/default_full_governed_surface.yaml",
+        "lantern/workflow/definitions/workbenches/issue_operations.yaml",
         "lantern/workflow/definitions/transaction_profiles.yaml",
         "lantern/preservation/relocation_manifest.yaml"
-      ],
-      "source": "is/IS-0002.md"
+      ]
     },
     "request_schema_ref": "schema.request.issue_operations.v1",
     "response_surface_bindings": [
@@ -817,7 +831,8 @@
       },
       "grammar_package_version": "0.3.0",
       "grammar_version": "0.3.0",
-      "runtime_surface_classification": "full_governed_surface"
+      "runtime_surface_classification": "full_governed_surface",
+      "selected_workflow_id": "default_full_governed_surface"
     },
     "contract_ref": "contract.selected_ci_application.v1",
     "family_binding": [
@@ -834,12 +849,13 @@
       "lantern/resources/guides/selected_ci_application.md"
     ],
     "provenance": {
+      "catalog_source": "built_in",
       "generated_from": [
-        "lantern/workflow/definitions/workbench_registry.yaml",
+        "lantern/workflow/definitions/workflows/default_full_governed_surface.yaml",
+        "lantern/workflow/definitions/workbenches/selected_ci_application.yaml",
         "lantern/workflow/definitions/transaction_profiles.yaml",
         "lantern/preservation/relocation_manifest.yaml"
-      ],
-      "source": "spec/SPEC-0001.md"
+      ]
     },
     "request_schema_ref": "schema.request.selected_ci_application.v1",
     "response_surface_bindings": [
@@ -952,7 +968,8 @@
       },
       "grammar_package_version": "0.3.0",
       "grammar_version": "0.3.0",
-      "runtime_surface_classification": "full_governed_surface"
+      "runtime_surface_classification": "full_governed_surface",
+      "selected_workflow_id": "default_full_governed_surface"
     },
     "contract_ref": "contract.upstream_intake.v1",
     "family_binding": [
@@ -974,12 +991,13 @@
       "lantern/resources/guides/upstream_intake_and_baselines.md"
     ],
     "provenance": {
+      "catalog_source": "built_in",
       "generated_from": [
-        "lantern/workflow/definitions/workbench_registry.yaml",
+        "lantern/workflow/definitions/workflows/default_full_governed_surface.yaml",
+        "lantern/workflow/definitions/workbenches/upstream_intake_and_baselines.yaml",
         "lantern/workflow/definitions/transaction_profiles.yaml",
         "lantern/preservation/relocation_manifest.yaml"
-      ],
-      "source": "spec/SPEC-0001.md"
+      ]
     },
     "request_schema_ref": "schema.request.upstream_intake_and_baselines.v1",
     "response_surface_bindings": [
@@ -1076,7 +1094,8 @@
       },
       "grammar_package_version": "0.3.0",
       "grammar_version": "0.3.0",
-      "runtime_surface_classification": "full_governed_surface"
+      "runtime_surface_classification": "full_governed_surface",
+      "selected_workflow_id": "default_full_governed_surface"
     },
     "contract_ref": "contract.verification_and_closure.v1",
     "family_binding": [
@@ -1093,12 +1112,13 @@
       "lantern/resources/guides/verification_and_closure.md"
     ],
     "provenance": {
+      "catalog_source": "built_in",
       "generated_from": [
-        "lantern/workflow/definitions/workbench_registry.yaml",
+        "lantern/workflow/definitions/workflows/default_full_governed_surface.yaml",
+        "lantern/workflow/definitions/workbenches/verification_and_closure.yaml",
         "lantern/workflow/definitions/transaction_profiles.yaml",
         "lantern/preservation/relocation_manifest.yaml"
-      ],
-      "source": "spec/SPEC-0001.md"
+      ]
     },
     "request_schema_ref": "schema.request.verification_and_closure.v1",
     "response_surface_bindings": [

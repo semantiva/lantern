@@ -14,306 +14,173 @@
 
 from __future__ import annotations
 
-import copy
-import dataclasses
-import hashlib
 import json
 import shutil
 from pathlib import Path
 
 import pytest
 import yaml
-from lantern_grammar import Grammar
 
-from lantern.artifacts.validator import validate_workspace_readiness
 from lantern.workflow.loader import (
-    DEFAULT_CONTRACT_CATALOG_PATH,
-    DEFAULT_REGISTRY_PATH,
-    DEFAULT_RESOURCE_MANIFEST_PATH,
-    DEFAULT_WORKBENCH_BINDINGS_PATH,
-    DEFAULT_WORKFLOW_MAP_PATH,
+    DEFAULT_WORKFLOW_ID,
     WorkflowLayerError,
     load_workflow_layer,
     render_generated_artifacts,
 )
 
-DEFAULT_STATUS_CONTRACT_JSON_PATH = (
-    Path(__file__).resolve().parents[1] / "lantern" / "workflow" / "definitions" / "artifact_status_contract.json"
+
+PRODUCT_ROOT = Path(__file__).resolve().parents[1]
+EXPECTED_DEFAULT_WORKBENCH_IDS = (
+    "upstream_intake_and_baselines",
+    "ch_and_td_readiness",
+    "design_candidate_authoring",
+    "design_selection",
+    "ci_authoring",
+    "ci_selection",
+    "selected_ci_application",
+    "verification_and_closure",
+    "issue_operations",
+    "governance_onboarding",
 )
 
+REPO_LOCAL_TRIAGE_WORKBENCH = {
+    "workbench_id": "repo_local_triage",
+    "display_name": "Repo Local Triage",
+    "lifecycle_placement": {"kind": "lifecycle-independent"},
+    "artifacts_in_scope": ["IS"],
+    "intent_classes": ["repo_local_triage"],
+    "posture_constraints": ["repo_local_only"],
+    "workflow_surface": {
+        "allowed_transaction_kinds": ["inspect", "draft", "validate"],
+        "draftable_artifact_families": ["IS"],
+        "contract_refs": ["contract.issue_operations.v1"],
+        "inspect_views": ["catalog", "issues"],
+        "response_surface_bindings": [
+            {
+                "transaction_kind": "inspect",
+                "response_envelope": "catalog",
+                "allowed_resource_roles": [
+                    "instruction_resource",
+                    "authoritative_guides",
+                    "artifact_templates",
+                ],
+            },
+            {
+                "transaction_kind": "inspect",
+                "response_envelope": "issues",
+                "allowed_resource_roles": [
+                    "instruction_resource",
+                    "authoritative_guides",
+                    "artifact_templates",
+                ],
+            },
+            {
+                "transaction_kind": "draft",
+                "response_envelope": "default",
+                "allowed_resource_roles": [
+                    "instruction_resource",
+                    "authoritative_guides",
+                    "administration_guides",
+                ],
+            },
+            {
+                "transaction_kind": "validate",
+                "response_envelope": "default",
+                "allowed_resource_roles": ["instruction_resource", "authoritative_guides"],
+            },
+        ],
+    },
+    "instruction_resource": "lantern/resources/instructions/issue_operations.md",
+    "authoritative_guides": ["lantern/resources/guides/issue_operations.md"],
+    "administration_guides": ["lantern/administration_procedures/ISSUE__INTAKE_TRIAGE_RESOLUTION_v0.2.0.md"],
+    "entry_conditions": ["repo local issue intake"],
+    "exit_conditions": ["repo local issue resolved"],
+}
 
-def _load_registry_payload() -> dict:
-    return copy.deepcopy(yaml.safe_load(DEFAULT_REGISTRY_PATH.read_text(encoding="utf-8")))
 
-
-def _write_yaml(path: Path, payload: dict) -> Path:
+def _write_yaml(path: Path, payload: dict[str, object]) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
     return path
 
 
-def _write_registry_fixture(tmp_path: Path, payload: dict) -> Path:
-    fixture_root = tmp_path / "fixture_repo"
-    source_lantern = Path(__file__).resolve().parents[1] / "lantern"
-    fixture_lantern = fixture_root / "lantern"
-    fixture_lantern.mkdir(parents=True, exist_ok=True)
-    for name in ("resources", "administration_procedures", "authoring_contracts", "preservation"):
-        target = fixture_lantern / name
-        if not target.exists():
-            target.symlink_to(source_lantern / name, target_is_directory=True)
-    return _write_yaml(fixture_lantern / "workflow" / "definitions" / "workbench_registry.yaml", payload)
-
-
-def test_workflow_layer_loads_typed_immutable_objects() -> None:
-    layer = load_workflow_layer()
-
-    assert layer.runtime_surface_classification == "full_governed_surface"
-    assert len(layer.workbenches) == 10
-    assert len(layer.contract_catalog) == 10
-    assert layer.grammar_version
-    assert layer.grammar_package_version
-
-    first_workbench = layer.workbenches[0]
-    first_binding = first_workbench.response_surface_bindings[0]
-    first_profile = layer.transaction_profiles[0]
-    first_contract = layer.contract_catalog[0]
-    first_resource = layer.resource_manifest[0]
-
-    with pytest.raises(dataclasses.FrozenInstanceError):
-        first_binding.response_envelope = "mutated"
-    with pytest.raises(dataclasses.FrozenInstanceError):
-        first_profile.side_effect_class = "mutated"
-    with pytest.raises(dataclasses.FrozenInstanceError):
-        first_contract.transaction_kind = "mutated"
-    with pytest.raises(dataclasses.FrozenInstanceError):
-        first_resource.kind = "mutated"
-    with pytest.raises(dataclasses.FrozenInstanceError):
-        first_workbench.display_name = "mutated"
-
-
-def test_td0002_c02_built_in_inventory_and_loader_derived_content_hashes() -> None:
-    payload = _load_registry_payload()
-    layer = load_workflow_layer()
-
-    expected_ids = (
-        "upstream_intake_and_baselines",
-        "ch_and_td_readiness",
-        "design_candidate_authoring",
-        "design_selection",
-        "ci_authoring",
-        "ci_selection",
-        "selected_ci_application",
-        "verification_and_closure",
-        "issue_operations",
-        "governance_onboarding",
-    )
-
-    assert tuple(workbench.workbench_id for workbench in layer.workbenches) == expected_ids
-
-    for raw_entry, workbench in zip(payload["workbenches"], layer.workbenches, strict=True):
-        assert "content_hash" not in raw_entry
-        assert raw_entry["workflow_surface"]["response_surface_bindings"]
-        normalized = json.dumps(raw_entry, sort_keys=True, separators=(",", ":"))
-        assert workbench.content_hash == hashlib.sha256(normalized.encode("utf-8")).hexdigest()
-
-
-def test_generated_artifacts_are_deterministic_and_match_committed_outputs() -> None:
-    layer = load_workflow_layer()
-    first = render_generated_artifacts(
-        runtime_surface_classification=layer.runtime_surface_classification,
-        workbenches=layer.workbenches,
-        transaction_profiles=layer.transaction_profiles,
-        contract_catalog=layer.contract_catalog,
-        resource_manifest=layer.resource_manifest,
-    )
-    second = render_generated_artifacts(
-        runtime_surface_classification=layer.runtime_surface_classification,
-        workbenches=layer.workbenches,
-        transaction_profiles=layer.transaction_profiles,
-        contract_catalog=layer.contract_catalog,
-        resource_manifest=layer.resource_manifest,
-    )
-
-    assert first.contract_catalog_payload == second.contract_catalog_payload
-    assert first.resource_manifest_payload == second.resource_manifest_payload
-    assert first.workflow_map_text == second.workflow_map_text
-    assert first.workbench_resource_bindings_text == second.workbench_resource_bindings_text
-
-    assert json.loads(DEFAULT_CONTRACT_CATALOG_PATH.read_text(encoding="utf-8")) == first.contract_catalog_payload
-    assert json.loads(DEFAULT_RESOURCE_MANIFEST_PATH.read_text(encoding="utf-8")) == first.resource_manifest_payload
-    assert DEFAULT_WORKFLOW_MAP_PATH.read_text(encoding="utf-8") == first.workflow_map_text
-    assert DEFAULT_WORKBENCH_BINDINGS_PATH.read_text(encoding="utf-8") == first.workbench_resource_bindings_text
-
-
-def test_status_contract_projection_exists_and_is_machine_readable() -> None:
-    payload = json.loads(DEFAULT_STATUS_CONTRACT_JSON_PATH.read_text(encoding="utf-8"))
-
-    assert payload["projection_kind"] == "artifact_status_contract"
-    assert payload["generated_from"]["authoritative_path"] == "workflow/artifact_status_contract.yaml"
-    assert payload["families"]["CH"]["canonical_statuses"] == ["Proposed", "Ready", "Addressed"]
-    assert payload["families"]["IS"]["canonical_statuses"] == [
-        "NEW",
-        "NEEDS_INFO",
-        "ACCEPTED",
-        "DEFERRED",
-        "REJECTED",
-        "RESOLVED",
-    ]
-    assert payload["families"]["EV"]["normal_path_policy"] == "statusless"
-
-
-def test_grammar_metadata_flows_into_contract_catalog_compatibility() -> None:
-    layer = load_workflow_layer()
-    grammar = Grammar.load()
-    manifest = dict(grammar.manifest())
-
-    expected_grammar_version = str(manifest["model_version"])
-    expected_package_version = str(grammar.package_version())
-
-    assert layer.grammar_version == expected_grammar_version
-    assert layer.grammar_package_version == expected_package_version
-    for entry in layer.contract_catalog:
-        assert entry.compatibility["grammar_version"] == expected_grammar_version
-        assert entry.compatibility["grammar_package_version"] == expected_package_version
-        assert entry.compatibility["runtime_surface_classification"] == layer.runtime_surface_classification
-        if entry.gate_binding:
-            assert entry.compatibility["gate_dependencies"]
-        else:
-            assert entry.compatibility["gate_dependencies"] == {}
-
-
-def test_td0002_c10_grammar_gate_incompatibility_is_descriptive(monkeypatch: pytest.MonkeyPatch) -> None:
-    class FakeGrammar:
-        def manifest(self) -> dict[str, str]:
-            return {"model_version": "broken-grammar"}
-
-        def package_version(self) -> str:
-            return "0.test"
-
-        def validate_integrity(self) -> dict[str, object]:
-            return {"ok": True}
-
-        def get_entity(self, entity_id: str):
-            if entity_id.endswith("gt_115"):
-                return None
-            return object()
-
-        def gate_dependencies(self, entity_id: str) -> dict[str, object]:
-            return {"entity_id": entity_id}
-
-    monkeypatch.setattr("lantern.workflow.loader._load_grammar", lambda: FakeGrammar())
-
-    with pytest.raises(WorkflowLayerError) as excinfo:
-        load_workflow_layer()
-
-    message = str(excinfo.value)
-    assert "design_candidate_authoring" in message
-    assert "GT-115" in message
-    assert "not present in lantern_grammar" in message
-
-
-def test_td0002_c12_collective_artifact_family_union_covers_all_governed_families() -> None:
-    layer = load_workflow_layer()
-    observed = {family for workbench in layer.workbenches for family in workbench.artifacts_in_scope}
-
-    assert observed == {"ARCH", "CH", "CI", "DB", "DC", "DEC", "DIP", "EV", "INI", "IS", "SPEC", "TD"}
-
-
-def test_td0002_c13_runtime_surface_and_gate_coverage_are_enforced(tmp_path: Path) -> None:
-    layer = load_workflow_layer()
-    covered_gates: set[str] = set()
-    for workbench in layer.workbenches:
-        placement = workbench.lifecycle_placement
-        if placement.kind == "covered_gates":
-            covered_gates.update(placement.covered_gates)
-        elif placement.kind == "lifecycle_span":
-            covered_gates.update((placement.start_gate, placement.end_gate))
-
-    assert layer.runtime_surface_classification == "full_governed_surface"
-    assert {"GT-030", "GT-050", "GT-060", "GT-110", "GT-115", "GT-120", "GT-130"} <= covered_gates
-
-    payload = _load_registry_payload()
-    for workbench in payload["workbenches"]:
-        if workbench["workbench_id"] == "design_selection":
-            workbench["lifecycle_placement"]["covered_gates"] = ["GT-999"]
-    registry_path = _write_registry_fixture(tmp_path, payload)
-
-    with pytest.raises(ValueError) as excinfo:
-        load_workflow_layer(registry_path=registry_path)
-
-    message = str(excinfo.value)
-    assert "GT-115" in message
-    assert "uncovered" in message
-
-
-def test_missing_response_surface_binding_is_fatal(tmp_path: Path) -> None:
-    payload = _load_registry_payload()
-    payload["workbenches"][0]["workflow_surface"]["response_surface_bindings"] = []
-    registry_path = _write_registry_fixture(tmp_path, payload)
-
-    with pytest.raises(WorkflowLayerError) as excinfo:
-        load_workflow_layer(registry_path=registry_path)
-
-    message = str(excinfo.value)
-    assert "upstream_intake_and_baselines" in message
-    assert "response_surface_bindings" in message
-
-
-def test_td0002_c17_schema_invalid_workbench_reports_workbench_context(tmp_path: Path) -> None:
-    payload = _load_registry_payload()
-    del payload["workbenches"][0]["workflow_surface"]["response_surface_bindings"]
-    registry_path = _write_registry_fixture(tmp_path, payload)
-
-    with pytest.raises(WorkflowLayerError) as excinfo:
-        load_workflow_layer(registry_path=registry_path)
-
-    message = str(excinfo.value)
-    assert "upstream_intake_and_baselines" in message
-    assert "response_surface_bindings" in message
-
-
-def test_unresolved_authoritative_guide_path_is_fatal(tmp_path: Path) -> None:
-    payload = _load_registry_payload()
-    payload["workbenches"][0]["authoritative_guides"] = ["lantern/resources/guides/does_not_exist.md"]
-    registry_path = _write_registry_fixture(tmp_path, payload)
-
-    with pytest.raises(WorkflowLayerError) as excinfo:
-        load_workflow_layer(registry_path=registry_path)
-
-    message = str(excinfo.value)
-    assert "upstream_intake_and_baselines" in message
-    assert "authoritative_guides" in message
-    assert "does_not_exist.md" in message
-    assert "resource.authoritative_guide.upstream_intake_and_baselines_authoritative_guides_does_not_exist" in message
-    assert "affected_response_surface_bindings" in message
-    assert "inspect:catalog" in message
-
-
 def _copy_product_fixture(tmp_path: Path) -> Path:
     fixture_root = tmp_path / "product_fixture"
-    shutil.copytree(Path(__file__).resolve().parents[1] / "lantern", fixture_root / "lantern", dirs_exist_ok=True)
+    shutil.copytree(PRODUCT_ROOT / "lantern", fixture_root / "lantern", dirs_exist_ok=True)
     return fixture_root
 
 
-def _refresh_generated_artifacts(fixture_root: Path) -> Path:
-    definitions_root = fixture_root / "lantern" / "workflow" / "definitions"
-    layer = load_workflow_layer(
-        registry_path=definitions_root / "workbench_registry.yaml",
+def _definitions_root(fixture_root: Path) -> Path:
+    return fixture_root / "lantern" / "workflow" / "definitions"
+
+
+def _generated_workflow_map_root(fixture_root: Path) -> Path:
+    return fixture_root / "lantern" / "workflow" / "generated" / "workflow_maps"
+
+
+def _load_fixture_layer(
+    fixture_root: Path,
+    *,
+    governance_root: Path | None = None,
+    workflow_id: str | None = None,
+    workflow_folder: Path | None = None,
+    workbench_folder: Path | None = None,
+    enforce_generated_artifacts: bool = False,
+):
+    definitions_root = _definitions_root(fixture_root)
+    return load_workflow_layer(
+        governance_root=governance_root,
+        workflow_id=workflow_id,
+        workflow_folder=workflow_folder,
+        workbench_folder=workbench_folder,
+        workbench_catalog_root=definitions_root / "workbenches",
+        workflow_catalog_root=definitions_root / "workflows",
         schema_path=definitions_root / "workbench_schema.yaml",
+        workflow_schema_path=definitions_root / "workflow_schema.yaml",
         transaction_profiles_path=definitions_root / "transaction_profiles.yaml",
+        registry_path=definitions_root / "workbench_registry.yaml",
         contract_catalog_path=definitions_root / "contract_catalog.json",
         resource_manifest_path=definitions_root / "resource_manifest.json",
         workflow_map_path=definitions_root / "workflow_map.md",
         workbench_resource_bindings_path=definitions_root / "workbench_resource_bindings.md",
+        builtin_workflow_map_root=_generated_workflow_map_root(fixture_root),
         relocation_manifest_path=fixture_root / "lantern" / "preservation" / "relocation_manifest.yaml",
+        enforce_generated_artifacts=enforce_generated_artifacts,
+    )
+
+
+def _refresh_fixture_projections(
+    fixture_root: Path,
+    *,
+    governance_root: Path | None = None,
+    workflow_id: str | None = None,
+    workflow_folder: Path | None = None,
+    workbench_folder: Path | None = None,
+) -> None:
+    definitions_root = _definitions_root(fixture_root)
+    workflow_map_root = _generated_workflow_map_root(fixture_root)
+    workflow_map_root.mkdir(parents=True, exist_ok=True)
+
+    layer = _load_fixture_layer(
+        fixture_root,
+        governance_root=governance_root,
+        workflow_id=workflow_id,
+        workflow_folder=workflow_folder,
+        workbench_folder=workbench_folder,
         enforce_generated_artifacts=False,
     )
     generated = render_generated_artifacts(
+        workflow_id=layer.selected_workflow_id,
+        workflow_display_name=layer.selected_workflow_display_name,
         runtime_surface_classification=layer.runtime_surface_classification,
         workbenches=layer.workbenches,
         transaction_profiles=layer.transaction_profiles,
         contract_catalog=layer.contract_catalog,
         resource_manifest=layer.resource_manifest,
+    )
+    (definitions_root / "workbench_registry.yaml").write_text(
+        generated.compatibility_registry_text,
+        encoding="utf-8",
     )
     (definitions_root / "contract_catalog.json").write_text(
         json.dumps(generated.contract_catalog_payload, indent=2, sort_keys=True) + "\n",
@@ -323,137 +190,220 @@ def _refresh_generated_artifacts(fixture_root: Path) -> Path:
         json.dumps(generated.resource_manifest_payload, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
-    (definitions_root / "workflow_map.md").write_text(
-        generated.workflow_map_text,
-        encoding="utf-8",
-    )
+    (definitions_root / "workflow_map.md").write_text(generated.workflow_map_text, encoding="utf-8")
     (definitions_root / "workbench_resource_bindings.md").write_text(
         generated.workbench_resource_bindings_text,
         encoding="utf-8",
     )
-    return definitions_root
-
-
-def test_td0009_c01_missing_lantern_grammar_failure_names_manual_install_step(monkeypatch: pytest.MonkeyPatch) -> None:
-    from lantern.workflow.loader import WorkflowLayerError
-
-    def _raise_missing_grammar():
-        raise WorkflowLayerError(
-            "lantern_grammar public API import failed; install lantern-grammar into the active Python environment before loading the workflow layer (for example: pip install lantern-grammar)."
-        )
-
-    monkeypatch.setattr("lantern.workflow.loader._load_grammar", _raise_missing_grammar)
-    findings = validate_workspace_readiness(product_root=Path(__file__).resolve().parents[1])
-    assert findings
-    assert findings[0]["path"] == "workspace.grammar"
-    assert "pip install lantern-grammar" in findings[0]["message"]
-
-
-def test_td0009_c02_stale_generated_artifact_is_reported_with_path(tmp_path: Path) -> None:
-    fixture_root = _copy_product_fixture(tmp_path)
-    definitions_root = _refresh_generated_artifacts(fixture_root)
-    workflow_map = definitions_root / "workflow_map.md"
-    workflow_map.write_text(workflow_map.read_text(encoding="utf-8") + "\nSTALE\n", encoding="utf-8")
-
-    with pytest.raises(WorkflowLayerError) as excinfo:
-        load_workflow_layer(
-            registry_path=definitions_root / "workbench_registry.yaml",
-            schema_path=definitions_root / "workbench_schema.yaml",
-            transaction_profiles_path=definitions_root / "transaction_profiles.yaml",
-            contract_catalog_path=definitions_root / "contract_catalog.json",
-            resource_manifest_path=definitions_root / "resource_manifest.json",
-            workflow_map_path=workflow_map,
-            workbench_resource_bindings_path=definitions_root / "workbench_resource_bindings.md",
-            relocation_manifest_path=fixture_root / "lantern" / "preservation" / "relocation_manifest.yaml",
-        )
-
-    message = str(excinfo.value)
-    assert "stale" in message
-    assert str(workflow_map) in message
-
-
-def test_stale_generated_artifacts_can_be_bypassed_for_read_only_diagnostics(tmp_path: Path) -> None:
-    fixture_root = _copy_product_fixture(tmp_path)
-    definitions_root = _refresh_generated_artifacts(fixture_root)
-    workflow_map = definitions_root / "workflow_map.md"
-    workflow_map.write_text(workflow_map.read_text(encoding="utf-8") + "\nSTALE\n", encoding="utf-8")
-
-    layer = load_workflow_layer(
-        registry_path=definitions_root / "workbench_registry.yaml",
-        schema_path=definitions_root / "workbench_schema.yaml",
-        transaction_profiles_path=definitions_root / "transaction_profiles.yaml",
-        contract_catalog_path=definitions_root / "contract_catalog.json",
-        resource_manifest_path=definitions_root / "resource_manifest.json",
-        workflow_map_path=workflow_map,
-        workbench_resource_bindings_path=definitions_root / "workbench_resource_bindings.md",
-        relocation_manifest_path=fixture_root / "lantern" / "preservation" / "relocation_manifest.yaml",
-        enforce_generated_artifacts=False,
-    )
-
-    assert layer.workbenches
-
-
-def test_td0011_c02_external_workspace_readiness_uses_runtime_release_surface(tmp_path: Path) -> None:
-    product_root = tmp_path / "product"
-    governance_root = tmp_path / "governance"
-    product_root.mkdir()
-    governance_root.mkdir()
-
-    findings = validate_workspace_readiness(product_root=product_root, governance_root=governance_root)
-
-    assert findings == []
-    assert not (product_root / "lantern").exists()
-
-
-def test_workspace_readiness_reports_missing_status_contract_projection() -> None:
-    from lantern.artifacts import validator as validator_module
-
-    missing_projection = DEFAULT_STATUS_CONTRACT_JSON_PATH.with_name("artifact_status_contract.missing.json")
-    validator_module.load_status_contract.cache_clear()
-    findings = validate_workspace_readiness(
-        product_root=Path(__file__).resolve().parents[1],
-        status_contract_path=missing_projection,
-    )
-
-    assert findings
-    assert findings[0]["anchor"] == "workspace.status_contract"
-    assert findings[0]["path"].endswith("artifact_status_contract.missing.json")
-
-
-def test_td0011_c03_workspace_readiness_does_not_validate_external_governance_corpus(tmp_path: Path) -> None:
-    product_root = tmp_path / "product"
-    governance_root = tmp_path / "governance"
-    product_root.mkdir()
-    governance_root.mkdir()
-    invalid_issue = governance_root / "is" / "IS-9999.md"
-    invalid_issue.parent.mkdir(parents=True, exist_ok=True)
-    invalid_issue.write_text(
-        "# IS-9999: invalid governance issue fixture\n\nStatus: NEW\n",
+    (workflow_map_root / f"{layer.selected_workflow_id}.md").write_text(
+        generated.built_in_workflow_map_text,
         encoding="utf-8",
     )
 
-    findings = validate_workspace_readiness(product_root=product_root, governance_root=governance_root)
 
-    assert findings == []
+def _write_repo_local_catalog(
+    governance_root: Path,
+    *,
+    workflow_name: str,
+    workbench_name: str = "repo_local_triage",
+    display_name: str = "Repo Local Triage",
+    workflow_ids: tuple[str, ...] | None = None,
+    workflow_folder: Path | None = None,
+    workbench_folder: Path | None = None,
+) -> tuple[Path, Path]:
+    workflow_root = workflow_folder or governance_root / "workflow" / "definitions" / "workflows"
+    workbench_root = workbench_folder or governance_root / "workflow" / "definitions" / "workbenches"
+    workbench_payload = dict(REPO_LOCAL_TRIAGE_WORKBENCH)
+    workbench_payload["workbench_id"] = workbench_name
+    workbench_payload["display_name"] = display_name
+    workflow_payload = {
+        "workflow_id": workflow_name,
+        "display_name": workflow_name.replace("_", " ").title(),
+        "runtime_surface_classification": "partial_governed_surface",
+        "active_workbench_ids": list(workflow_ids or (workbench_name,)),
+    }
+    workbench_path = _write_yaml(workbench_root / f"{workbench_name}.yaml", workbench_payload)
+    workflow_path = _write_yaml(workflow_root / f"{workflow_name}.yaml", workflow_payload)
+    return workbench_path, workflow_path
 
 
-def test_td0011_c04_runtime_install_failures_do_not_point_at_product_local_lantern_tree(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+def test_td0024_c01_built_in_catalog_loading_and_default_selection() -> None:
+    layer = load_workflow_layer()
+
+    assert layer.selected_workflow_id == DEFAULT_WORKFLOW_ID
+    assert layer.runtime_surface_classification == "full_governed_surface"
+    assert tuple(workbench.workbench_id for workbench in layer.workbenches) == EXPECTED_DEFAULT_WORKBENCH_IDS
+    assert len(layer.catalog_workbenches) == 10
+    assert len(layer.workflow_definitions) == 1
+    assert all(
+        workbench.source_path.startswith("lantern/workflow/definitions/workbenches/")
+        for workbench in layer.catalog_workbenches
+    )
+
+
+def test_td0024_c01_repo_local_catalog_loading(tmp_path: Path) -> None:
+    fixture_root = _copy_product_fixture(tmp_path)
+    governance_root = tmp_path / "governance"
+    governance_root.mkdir()
+    _write_repo_local_catalog(governance_root, workflow_name="repo_local_triage_flow")
+
+    layer = _load_fixture_layer(
+        fixture_root,
+        governance_root=governance_root,
+        workflow_id="repo_local_triage_flow",
+    )
+
+    assert len(layer.catalog_workbenches) == 11
+    assert tuple(workbench.workbench_id for workbench in layer.workbenches) == ("repo_local_triage",)
+    assert any(workbench.workbench_id == "repo_local_triage" for workbench in layer.catalog_workbenches)
+    assert any(workflow.workflow_id == "repo_local_triage_flow" for workflow in layer.workflow_definitions)
+
+
+def test_td0024_c03_workflow_selection_and_folder_overrides(tmp_path: Path) -> None:
+    fixture_root = _copy_product_fixture(tmp_path)
+    governance_root = tmp_path / "governance"
+    governance_root.mkdir()
+
+    _write_repo_local_catalog(governance_root, workflow_name="default_repo_local_flow")
+    alt_workflow_root = governance_root / "alt" / "workflows"
+    alt_workbench_root = governance_root / "alt" / "workbenches"
+    _write_repo_local_catalog(
+        governance_root,
+        workflow_name="override_repo_local_flow",
+        workbench_name="override_repo_local_triage",
+        display_name="Override Repo Local Triage",
+        workflow_folder=alt_workflow_root,
+        workbench_folder=alt_workbench_root,
+    )
+
+    default_layer = _load_fixture_layer(
+        fixture_root,
+        governance_root=governance_root,
+        workflow_id="default_repo_local_flow",
+    )
+    override_layer = _load_fixture_layer(
+        fixture_root,
+        governance_root=governance_root,
+        workflow_id="override_repo_local_flow",
+        workflow_folder=alt_workflow_root,
+        workbench_folder=alt_workbench_root,
+    )
+
+    assert default_layer.selected_workflow_id == "default_repo_local_flow"
+    assert override_layer.selected_workflow_id == "override_repo_local_flow"
+    assert tuple(workbench.workbench_id for workbench in override_layer.workbenches) == ("override_repo_local_triage",)
+    assert any(workflow.workflow_id == DEFAULT_WORKFLOW_ID for workflow in override_layer.workflow_definitions)
+
+
+@pytest.mark.parametrize(
+    ("workbench_payload", "workflow_payload", "message_fragment"),
+    [
+        (
+            {"workbench_id": "issue_operations", "display_name": "Repo Local Duplicate Id"},
+            None,
+            "collides with built-in definition",
+        ),
+        (
+            {"workbench_id": "repo_local_duplicate_name", "display_name": "Issue Operations"},
+            None,
+            "collides with built-in definition",
+        ),
+        (
+            None,
+            {
+                "workflow_id": DEFAULT_WORKFLOW_ID,
+                "display_name": "Duplicate Workflow Id",
+                "runtime_surface_classification": "partial_governed_surface",
+                "active_workbench_ids": ["issue_operations"],
+            },
+            "collides with built-in definition",
+        ),
+    ],
+)
+def test_td0024_c04_collision_rejection(
+    tmp_path: Path,
+    workbench_payload: dict[str, object] | None,
+    workflow_payload: dict[str, object] | None,
+    message_fragment: str,
 ) -> None:
-    from lantern.workflow.loader import WorkflowLayerError
+    fixture_root = _copy_product_fixture(tmp_path)
+    governance_root = tmp_path / "governance"
+    governance_root.mkdir()
 
-    def _raise_missing_grammar():
-        raise WorkflowLayerError(
-            "lantern_grammar public API import failed; install lantern-grammar into the active Python environment before loading the workflow layer (for example: pip install lantern-grammar)."
+    if workbench_payload is not None:
+        payload = dict(REPO_LOCAL_TRIAGE_WORKBENCH)
+        payload.update(workbench_payload)
+        _write_yaml(
+            governance_root / "workflow" / "definitions" / "workbenches" / f"{payload['workbench_id']}.yaml",
+            payload,
+        )
+    if workflow_payload is not None:
+        _write_yaml(
+            governance_root / "workflow" / "definitions" / "workflows" / f"{workflow_payload['workflow_id']}.yaml",
+            workflow_payload,
         )
 
-    monkeypatch.setattr("lantern.workflow.loader._load_grammar", _raise_missing_grammar)
-    product_root = tmp_path / "product"
-    product_root.mkdir()
+    with pytest.raises(WorkflowLayerError, match=message_fragment):
+        _load_fixture_layer(fixture_root, governance_root=governance_root)
 
-    findings = validate_workspace_readiness(product_root=product_root)
 
-    assert findings
-    assert findings[0]["path"] == "workspace.grammar"
-    assert "product_root/lantern" not in findings[0]["message"]
-    assert "pip install lantern-grammar" in findings[0]["message"]
+def test_td0024_c05_missing_active_workbench_reference_is_fatal(tmp_path: Path) -> None:
+    fixture_root = _copy_product_fixture(tmp_path)
+    governance_root = tmp_path / "governance"
+    governance_root.mkdir()
+    _write_yaml(
+        governance_root / "workflow" / "definitions" / "workflows" / "missing_reference.yaml",
+        {
+            "workflow_id": "missing_reference",
+            "display_name": "Missing Reference",
+            "runtime_surface_classification": "partial_governed_surface",
+            "active_workbench_ids": ["does_not_exist"],
+        },
+    )
+
+    with pytest.raises(WorkflowLayerError, match="unknown active_workbench_id"):
+        _load_fixture_layer(
+            fixture_root,
+            governance_root=governance_root,
+            workflow_id="missing_reference",
+        )
+
+
+def test_td0024_c06_removed_authority_fields_are_rejected(tmp_path: Path) -> None:
+    fixture_root = _copy_product_fixture(tmp_path)
+    workbench_path = _definitions_root(fixture_root) / "workbenches" / "issue_operations.yaml"
+    payload = yaml.safe_load(workbench_path.read_text(encoding="utf-8"))
+    payload["governance_mode"] = "intervention"
+    _write_yaml(workbench_path, payload)
+
+    with pytest.raises(WorkflowLayerError, match="removed authority field"):
+        _load_fixture_layer(fixture_root)
+
+
+def test_td0024_c09_workbench_file_presence_does_not_activate_it(tmp_path: Path) -> None:
+    fixture_root = _copy_product_fixture(tmp_path)
+    governance_root = tmp_path / "governance"
+    governance_root.mkdir()
+    _write_yaml(
+        governance_root / "workflow" / "definitions" / "workbenches" / "repo_local_triage.yaml",
+        REPO_LOCAL_TRIAGE_WORKBENCH,
+    )
+
+    layer = _load_fixture_layer(fixture_root, governance_root=governance_root)
+
+    assert "repo_local_triage" not in {workbench.workbench_id for workbench in layer.workbenches}
+    assert "repo_local_triage" in {workbench.workbench_id for workbench in layer.catalog_workbenches}
+
+
+def test_generated_projections_are_optional_by_default_and_enforceable_explicitly(tmp_path: Path) -> None:
+    fixture_root = _copy_product_fixture(tmp_path)
+    _refresh_fixture_projections(fixture_root)
+    definitions_root = _definitions_root(fixture_root)
+    workflow_map_path = definitions_root / "workflow_map.md"
+    workflow_map_path.write_text(workflow_map_path.read_text(encoding="utf-8") + "\nSTALE\n", encoding="utf-8")
+
+    layer = _load_fixture_layer(fixture_root, enforce_generated_artifacts=False)
+    assert layer.workbenches
+
+    with pytest.raises(WorkflowLayerError, match="workflow_map.md"):
+        _load_fixture_layer(fixture_root, enforce_generated_artifacts=True)

@@ -1,0 +1,14 @@
+workflow_id: default_full_governed_surface
+display_name: Default Full Governed Surface
+runtime_surface_classification: full_governed_surface
+active_workbench_ids:
+- upstream_intake_and_baselines
+- ch_and_td_readiness
+- design_candidate_authoring
+- design_selection
+- ci_authoring
+- ci_selection
+- selected_ci_application
+- verification_and_closure
+- issue_operations
+- governance_onboarding

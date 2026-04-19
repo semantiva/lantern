@@ -87,6 +87,10 @@ class MergeProvenance:
     main_yaml_hash: str | None
     launcher_overlay_folder: str | None
     launcher_overlay_hash: str | None
+    selected_workflow_id: str | None = None
+    selected_workflow_source_path: str | None = None
+    workflow_root: str | None = None
+    workbench_root: str | None = None
 
 
 @dataclass(frozen=True)
@@ -113,6 +117,12 @@ class EffectiveLayer:
     merged_workbench_overrides: dict[str, dict[str, Any]]
     merged_modes: tuple[WorkflowMode, ...]
     configuration_surface: ConfigurationSurface | None
+    selected_workflow_id: str | None = None
+    selected_workflow_display_name: str | None = None
+    selected_workflow_source_path: str | None = None
+    active_workbench_ids: tuple[str, ...] = ()
+    workflow_root: str | None = None
+    workbench_root: str | None = None
 
 
 class ConfigurationLoader:
@@ -232,8 +242,14 @@ class ConfigurationMerger:
         *,
         baseline_surface_classification: str,
         baseline_version: str,
-        configuration_surface: ConfigurationSurface | None,
+        configuration_surface: ConfigurationSurface | None = None,
         launcher_overlay_surface: ConfigurationSurface | None = None,
+        selected_workflow_id: str | None = None,
+        selected_workflow_display_name: str | None = None,
+        selected_workflow_source_path: str | None = None,
+        active_workbench_ids: tuple[str, ...] = (),
+        workflow_root: str | None = None,
+        workbench_root: str | None = None,
     ) -> EffectiveLayer:
         """Apply the three-phase deterministic merge and return an EffectiveLayer.
 
@@ -244,6 +260,46 @@ class ConfigurationMerger:
         The launcher overlay may NOT declare a different posture from Phase 2 when both are present.
         The launcher overlay may NOT add workbench override IDs not already in the Phase 2 surface.
         """
+        if selected_workflow_id is not None:
+            provenance = MergeProvenance(
+                baseline_version=baseline_version,
+                configuration_folder=None,
+                main_yaml_hash=None,
+                launcher_overlay_folder=None,
+                launcher_overlay_hash=None,
+                selected_workflow_id=selected_workflow_id,
+                selected_workflow_source_path=selected_workflow_source_path,
+                workflow_root=workflow_root,
+                workbench_root=workbench_root,
+            )
+            effective_classification = baseline_surface_classification
+            posture_result = PostureResult(
+                classification=effective_classification,
+                bounded_scope_markers=(
+                    tuple(active_workbench_ids) if effective_classification == "partial_governed_surface" else ()
+                ),
+                restricted_capabilities=(
+                    tuple(sorted(_INTERVENTION_FORBIDDEN_TRANSACTION_KINDS))
+                    if effective_classification == "intervention_surface"
+                    else ()
+                ),
+                provenance=provenance,
+            )
+            return EffectiveLayer(
+                baseline_surface_classification=baseline_surface_classification,
+                effective_surface_classification=effective_classification,
+                posture_result=posture_result,
+                merged_workbench_overrides={},
+                merged_modes=(),
+                configuration_surface=None,
+                selected_workflow_id=selected_workflow_id,
+                selected_workflow_display_name=selected_workflow_display_name,
+                selected_workflow_source_path=selected_workflow_source_path,
+                active_workbench_ids=tuple(active_workbench_ids),
+                workflow_root=workflow_root,
+                workbench_root=workbench_root,
+            )
+
         merged_overrides: dict[str, dict[str, Any]] = {}
         merged_modes: list[WorkflowMode] = []
 
@@ -319,6 +375,9 @@ class ConfigurationMerger:
             merged_workbench_overrides=merged_overrides,
             merged_modes=tuple(merged_modes),
             configuration_surface=configuration_surface,
+            active_workbench_ids=tuple(
+                o.workbench_id for o in (configuration_surface.workbench_overrides if configuration_surface else ())
+            ),
         )
 
     def validate_guide_consistency(
@@ -334,6 +393,9 @@ class ConfigurationMerger:
 
         Raises ConfigurationLoadError naming the diverging surface, mode_id, and refs.
         """
+        if effective_layer.selected_workflow_id is not None:
+            return
+
         overridden_ids = set(effective_layer.merged_workbench_overrides.keys())
         for mode in effective_layer.merged_modes:
             entry_wb_id = mode.entry_workbench
@@ -396,13 +458,9 @@ class PostureValidator:
         status_contract: dict[str, Any],
         provenance: MergeProvenance,
     ) -> PostureResult:
-        # Gate coverage: collect gates from all enabled, non-intervention built-in workbenches
+        # Gate coverage: collect gates from all active workbenches in the selected workflow.
         covered_gates: set[str] = set()
         for workbench in workflow_layer.workbenches:
-            if not workbench.enabled:
-                continue
-            if workbench.governance_mode == "intervention":
-                continue
             placement = workbench.lifecycle_placement
             if placement.kind == "covered_gates":
                 covered_gates.update(placement.covered_gates)
@@ -423,8 +481,6 @@ class PostureValidator:
         # Family admissibility: every artifact family in scope must exist in the status contract
         known_families = set(status_contract.get("families", {}).keys())
         for workbench in workflow_layer.workbenches:
-            if not workbench.enabled:
-                continue
             for family in workbench.artifacts_in_scope:
                 if family not in known_families:
                     raise PostureValidationError(
@@ -446,7 +502,7 @@ class PostureValidator:
         effective_layer: EffectiveLayer,
         provenance: MergeProvenance,
     ) -> PostureResult:
-        bounded_scope_markers = tuple(
+        bounded_scope_markers = effective_layer.active_workbench_ids or tuple(
             o.workbench_id
             for o in (
                 effective_layer.configuration_surface.workbench_overrides
@@ -470,10 +526,6 @@ class PostureValidator:
         # Verify no intervention workbench claims governed-closure gates (GT-120, GT-130)
         _governed_closure_gates = frozenset({"GT-120", "GT-130"})
         for workbench in workflow_layer.workbenches:
-            if not workbench.enabled:
-                continue
-            if workbench.governance_mode != "intervention":
-                continue
             placement = workbench.lifecycle_placement
             gates: list[str] = []
             if placement.kind == "covered_gates":
@@ -553,6 +605,14 @@ def build_runtime_posture_label(posture_result: PostureResult) -> dict[str, Any]
         )
     return {
         "classification": posture_result.classification,
+        "selected_workflow": {
+            "workflow_id": provenance.selected_workflow_id,
+            "source_path": provenance.selected_workflow_source_path,
+        },
+        "catalog_roots": {
+            "workflow_root": provenance.workflow_root,
+            "workbench_root": provenance.workbench_root,
+        },
         "bounded_scope_markers": list(posture_result.bounded_scope_markers),
         "configuration_provenance": {
             "folder": provenance.configuration_folder,

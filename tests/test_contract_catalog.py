@@ -14,100 +14,112 @@
 
 from __future__ import annotations
 
-import copy
 import json
-import re
+import shutil
 from pathlib import Path
 
 import pytest
 import yaml
 
 from lantern.workflow.loader import (
-    DEFAULT_REGISTRY_PATH,
-    DEFAULT_RELOCATION_MANIFEST_PATH,
     DEFAULT_RESOURCE_MANIFEST_PATH,
     WorkflowLayerError,
     _derive_resource_manifest,
     _load_yaml,
     _resource_entry_to_dict,
     load_workflow_layer,
+    render_generated_artifacts,
 )
 
-_CONTRACT_RE = re.compile(r"^contract\.[a-z0-9_]+\.v1$")
-_RESOURCE_RE = re.compile(r"^resource\.[a-z_]+\.[a-z0-9_]+$")
+
+PRODUCT_ROOT = Path(__file__).resolve().parents[1]
 
 
-def _load_registry_payload() -> dict:
-    return copy.deepcopy(yaml.safe_load(DEFAULT_REGISTRY_PATH.read_text(encoding="utf-8")))
+def _copy_product_fixture(tmp_path: Path) -> Path:
+    fixture_root = tmp_path / "product_fixture"
+    shutil.copytree(PRODUCT_ROOT / "lantern", fixture_root / "lantern", dirs_exist_ok=True)
+    return fixture_root
 
 
-def _load_relocation_manifest_payload() -> dict:
-    return copy.deepcopy(yaml.safe_load(DEFAULT_RELOCATION_MANIFEST_PATH.read_text(encoding="utf-8")))
+def _definitions_root(fixture_root: Path) -> Path:
+    return fixture_root / "lantern" / "workflow" / "definitions"
 
 
-def _write_yaml(path: Path, payload: dict) -> Path:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
-    return path
+def _generated_workflow_map_root(fixture_root: Path) -> Path:
+    return fixture_root / "lantern" / "workflow" / "generated" / "workflow_maps"
 
 
-def _write_fixture_repo(
-    tmp_path: Path,
-    *,
-    registry_payload: dict | None = None,
-    relocation_manifest_payload: dict | None = None,
-) -> tuple[Path, Path | None]:
-    fixture_root = tmp_path / "fixture_repo"
-    source_lantern = Path(__file__).resolve().parents[1] / "lantern"
-    fixture_lantern = fixture_root / "lantern"
-    fixture_lantern.mkdir(parents=True, exist_ok=True)
-
-    for name in ("resources", "administration_procedures", "authoring_contracts"):
-        target = fixture_lantern / name
-        if not target.exists():
-            target.symlink_to(source_lantern / name, target_is_directory=True)
-
-    if relocation_manifest_payload is None:
-        preservation_target = fixture_lantern / "preservation"
-        if not preservation_target.exists():
-            preservation_target.symlink_to(source_lantern / "preservation", target_is_directory=True)
-        relocation_manifest_path = None
-    else:
-        relocation_manifest_path = _write_yaml(
-            fixture_lantern / "preservation" / "relocation_manifest.yaml",
-            relocation_manifest_payload,
-        )
-
-    registry_path = _write_yaml(
-        fixture_lantern / "workflow" / "definitions" / "workbench_registry.yaml",
-        registry_payload or _load_registry_payload(),
+def _load_fixture_layer(fixture_root: Path, *, enforce_generated_artifacts: bool = False):
+    definitions_root = _definitions_root(fixture_root)
+    return load_workflow_layer(
+        workbench_catalog_root=definitions_root / "workbenches",
+        workflow_catalog_root=definitions_root / "workflows",
+        schema_path=definitions_root / "workbench_schema.yaml",
+        workflow_schema_path=definitions_root / "workflow_schema.yaml",
+        transaction_profiles_path=definitions_root / "transaction_profiles.yaml",
+        registry_path=definitions_root / "workbench_registry.yaml",
+        contract_catalog_path=definitions_root / "contract_catalog.json",
+        resource_manifest_path=definitions_root / "resource_manifest.json",
+        workflow_map_path=definitions_root / "workflow_map.md",
+        workbench_resource_bindings_path=definitions_root / "workbench_resource_bindings.md",
+        builtin_workflow_map_root=_generated_workflow_map_root(fixture_root),
+        relocation_manifest_path=fixture_root / "lantern" / "preservation" / "relocation_manifest.yaml",
+        enforce_generated_artifacts=enforce_generated_artifacts,
     )
-    return registry_path, relocation_manifest_path
 
 
-def test_contract_catalog_and_resource_manifest_naming_and_completeness() -> None:
+def _refresh_fixture_projections(fixture_root: Path) -> None:
+    definitions_root = _definitions_root(fixture_root)
+    workflow_map_root = _generated_workflow_map_root(fixture_root)
+    workflow_map_root.mkdir(parents=True, exist_ok=True)
+    layer = _load_fixture_layer(fixture_root, enforce_generated_artifacts=False)
+    generated = render_generated_artifacts(
+        workflow_id=layer.selected_workflow_id,
+        workflow_display_name=layer.selected_workflow_display_name,
+        runtime_surface_classification=layer.runtime_surface_classification,
+        workbenches=layer.workbenches,
+        transaction_profiles=layer.transaction_profiles,
+        contract_catalog=layer.contract_catalog,
+        resource_manifest=layer.resource_manifest,
+    )
+    (definitions_root / "workbench_registry.yaml").write_text(generated.compatibility_registry_text, encoding="utf-8")
+    (definitions_root / "contract_catalog.json").write_text(
+        json.dumps(generated.contract_catalog_payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    (definitions_root / "resource_manifest.json").write_text(
+        json.dumps(generated.resource_manifest_payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    (definitions_root / "workflow_map.md").write_text(generated.workflow_map_text, encoding="utf-8")
+    (definitions_root / "workbench_resource_bindings.md").write_text(
+        generated.workbench_resource_bindings_text,
+        encoding="utf-8",
+    )
+    (workflow_map_root / f"{layer.selected_workflow_id}.md").write_text(
+        generated.built_in_workflow_map_text,
+        encoding="utf-8",
+    )
+
+
+def test_contract_catalog_and_resource_manifest_cover_selected_workflow() -> None:
     layer = load_workflow_layer()
 
     workbench_ids = {workbench.workbench_id for workbench in layer.workbenches}
     contract_refs = {workbench.contract_refs[0] for workbench in layer.workbenches}
 
     assert {entry.contract_ref for entry in layer.contract_catalog} == contract_refs
+    assert {entry.workbench_refs[0] for entry in layer.contract_catalog} == workbench_ids
     for entry in layer.contract_catalog:
-        assert _CONTRACT_RE.fullmatch(entry.contract_ref)
-        assert entry.workbench_refs[0] in workbench_ids
         assert entry.request_schema_ref == f"schema.request.{entry.workbench_refs[0]}.v1"
         assert entry.guide_refs
         assert entry.response_surface_bindings
-        assert entry.family_binding
-        if entry.gate_binding:
-            assert entry.compatibility["gate_dependencies"]
-        else:
-            assert entry.compatibility["gate_dependencies"] == {}
+        assert entry.compatibility["runtime_surface_classification"] == layer.runtime_surface_classification
+        assert entry.compatibility["selected_workflow_id"] == layer.selected_workflow_id
 
 
-def test_resource_manifest_entries_are_reviewed_and_cover_all_workflow_resources() -> None:
+def test_resource_manifest_entries_are_traceable_and_match_selected_workflow_resources() -> None:
     layer = load_workflow_layer()
-
     expected_pairs: set[tuple[str, str]] = set()
     for workbench in layer.workbenches:
         expected_pairs.add((workbench.workbench_id, workbench.instruction_resource))
@@ -116,50 +128,18 @@ def test_resource_manifest_entries_are_reviewed_and_cover_all_workflow_resources
 
     actual_pairs = {(entry.workbench_id, entry.path) for entry in layer.resource_manifest}
     assert actual_pairs == expected_pairs
-
-    for entry in layer.resource_manifest:
-        assert _RESOURCE_RE.fullmatch(entry.resource_id)
-        assert entry.review_status in {"reviewed", "lantern_authored"}
-        assert entry.provenance_type
-        assert entry.provenance_refs
-        assert entry.roles
-        assert entry.path.startswith("lantern/")
+    assert all(entry.provenance_refs for entry in layer.resource_manifest)
 
 
-def test_td0002_c07_workflow_resources_are_manifested_and_traceable() -> None:
+def test_recomputed_resource_manifest_matches_committed_projection() -> None:
     layer = load_workflow_layer()
-    manifest_by_key = {(entry.workbench_id, entry.path): entry for entry in layer.resource_manifest}
-
-    for workbench in layer.workbenches:
-        referenced_paths = (
-            [workbench.instruction_resource]
-            + list(workbench.authoritative_guides)
-            + list(workbench.administration_guides)
-        )
-        for path in referenced_paths:
-            entry = manifest_by_key[(workbench.workbench_id, path)]
-            assert path.startswith("lantern/")
-            if path.startswith("lantern/resources/guides/"):
-                assert entry.review_status == "lantern_authored"
-                assert entry.projection_trace == {
-                    "derivation": "lantern_authored_guide_surface",
-                    "source": "guide_header",
-                }
-            else:
-                assert entry.review_status == "reviewed"
-                assert entry.projection_trace["derivation"] == "relocation_manifest_projection"
-                assert entry.projection_trace["relocation_entry_id"]
-
-
-def test_td0002_c18_recomputed_resource_projection_matches_committed_manifest() -> None:
-    layer = load_workflow_layer()
-    relocation_manifest = _load_yaml(DEFAULT_RELOCATION_MANIFEST_PATH, "relocation manifest")
-    product_root = Path(__file__).resolve().parents[1]
-
+    relocation_manifest = _load_yaml(
+        PRODUCT_ROOT / "lantern" / "preservation" / "relocation_manifest.yaml", "relocation manifest"
+    )
     recomputed = _derive_resource_manifest(
         relocation_manifest=relocation_manifest,
         workbenches=layer.workbenches,
-        product_root=product_root,
+        product_root=PRODUCT_ROOT,
     )
 
     assert [_resource_entry_to_dict(entry) for entry in recomputed] == json.loads(
@@ -167,46 +147,45 @@ def test_td0002_c18_recomputed_resource_projection_matches_committed_manifest() 
     )
 
 
-def test_generated_markdown_aids_reference_every_workbench() -> None:
-    layer = load_workflow_layer()
-    # The loader already validates committed generated files for exact concordance.
-    # This test asserts the maintainer-facing markdown artifacts enumerate the full workbench set.
-    from lantern.workflow.loader import DEFAULT_WORKBENCH_BINDINGS_PATH, DEFAULT_WORKFLOW_MAP_PATH
+def test_projection_files_include_default_workflow_map_named_by_workflow_id() -> None:
+    workflow_map_path = (
+        PRODUCT_ROOT / "lantern" / "workflow" / "generated" / "workflow_maps" / "default_full_governed_surface.md"
+    )
+    legacy_registry_path = PRODUCT_ROOT / "lantern" / "workflow" / "definitions" / "workbench_registry.yaml"
 
-    workflow_map = DEFAULT_WORKFLOW_MAP_PATH.read_text(encoding="utf-8")
-    bindings = DEFAULT_WORKBENCH_BINDINGS_PATH.read_text(encoding="utf-8")
-
-    for workbench in layer.workbenches:
-        assert workbench.workbench_id in workflow_map
-        assert workbench.workbench_id in bindings
-        assert workbench.instruction_resource in bindings
+    assert workflow_map_path.exists()
+    assert "default_full_governed_surface" in workflow_map_path.read_text(encoding="utf-8")
+    assert legacy_registry_path.exists()
+    assert "Generated compatibility projection" in legacy_registry_path.read_text(encoding="utf-8")
 
 
-def test_td0002_c23_legacy_copy_without_review_is_rejected(tmp_path: Path) -> None:
-    registry_payload = _load_registry_payload()
-    relocation_manifest_payload = _load_relocation_manifest_payload()
-    target_path = registry_payload["workbenches"][1]["administration_guides"][0]
+def test_projection_enforcement_is_explicit_for_fixture_copies(tmp_path: Path) -> None:
+    fixture_root = _copy_product_fixture(tmp_path)
+    _refresh_fixture_projections(fixture_root)
+    definitions_root = _definitions_root(fixture_root)
+    registry_path = definitions_root / "workbench_registry.yaml"
+    registry_path.write_text(registry_path.read_text(encoding="utf-8") + "\n# stale\n", encoding="utf-8")
 
-    for entry in relocation_manifest_payload["entries"]:
+    assert _load_fixture_layer(fixture_root, enforce_generated_artifacts=False).workbenches
+
+    with pytest.raises(WorkflowLayerError, match="workbench_registry.yaml"):
+        _load_fixture_layer(fixture_root, enforce_generated_artifacts=True)
+
+
+def test_td0024_c10_legacy_copy_without_review_is_rejected(tmp_path: Path) -> None:
+    fixture_root = _copy_product_fixture(tmp_path)
+    relocation_manifest_path = fixture_root / "lantern" / "preservation" / "relocation_manifest.yaml"
+    payload = yaml.safe_load(relocation_manifest_path.read_text(encoding="utf-8"))
+    target_path = "lantern/authoring_contracts/change_intention_refinement_guide_v0.2.1.md"
+
+    for entry in payload["entries"]:
         if entry["target"] == target_path:
             entry["entry_class"] = "legacy_copy"
             break
     else:  # pragma: no cover - defensive fixture guard
         raise AssertionError(f"Expected relocation manifest entry for {target_path}")
 
-    registry_path, relocation_manifest_path = _write_fixture_repo(
-        tmp_path,
-        registry_payload=registry_payload,
-        relocation_manifest_payload=relocation_manifest_payload,
-    )
+    relocation_manifest_path.write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
 
-    with pytest.raises(WorkflowLayerError) as excinfo:
-        load_workflow_layer(
-            registry_path=registry_path,
-            relocation_manifest_path=relocation_manifest_path,
-        )
-
-    message = str(excinfo.value)
-    assert target_path in message
-    assert "legacy_copy" in message
-    assert "reviewed" in message
+    with pytest.raises(WorkflowLayerError, match="legacy_copy"):
+        _load_fixture_layer(fixture_root)

@@ -1,0 +1,14 @@
+schema_id: lantern.workflow.workflow_schema.v1
+required_workflow_fields:
+- workflow_id
+- display_name
+- runtime_surface_classification
+- active_workbench_ids
+runtime_surface_classification_values:
+- full_governed_surface
+- partial_governed_surface
+- intervention_surface
+workflow_id_pattern: ^[a-z0-9_]+$
+rules:
+  active_workbench_ids_must_be_non_empty: true
+  duplicate_active_workbench_ids_forbidden: true

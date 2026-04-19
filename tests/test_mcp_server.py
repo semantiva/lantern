@@ -20,6 +20,7 @@ import asyncio
 from pathlib import Path
 
 import pytest
+import yaml
 
 from lantern.artifacts.renderers import canonical_render_markdown
 from lantern.mcp.catalog import FIXED_TOOL_SURFACE, get_allowed_roles_for_transaction
@@ -33,7 +34,12 @@ from lantern.mcp.inspect import (
     handle_inspect,
 )
 from lantern.mcp.orient import OrientResponse, handle_orient
-from lantern.mcp.server import configure_server_paths, inspect as server_inspect, mcp as mcp_server
+from lantern.mcp.server import (
+    configure_server_paths,
+    inspect as server_inspect,
+    orient as server_orient,
+    mcp as mcp_server,
+)
 from lantern.workflow.loader import load_workflow_layer
 
 PRODUCT_ROOT = Path(__file__).resolve().parents[1]
@@ -372,7 +378,11 @@ def test_td0006_c05_source_tree_startup_does_not_require_generated_skill_folders
         encoding="utf-8",
     )
 
-    configure_server_paths(product_root=product_root, governance_root=governance_root)
+    configure_server_paths(
+        product_root=product_root,
+        governance_root=governance_root,
+        workflow_id="default_full_governed_surface",
+    )
     result = server_inspect(kind="catalog")
 
     assert result["kind"] == "catalog"
@@ -423,10 +433,12 @@ def test_c11_workflow_readme_contains_all_required_anchors() -> None:
     assert workflow_readme.exists()
     content = workflow_readme.read_text(encoding="utf-8")
     for anchor in (
+        "workbenches/",
+        "workflows/default_full_governed_surface.yaml",
+        "workflow_schema.yaml",
+        "generated/workflow_maps/default_full_governed_surface.md",
         "workbench_registry.yaml",
-        "transaction_profiles.yaml",
         "workflow_map.md",
-        "workbench_resource_bindings.md",
     ):
         assert anchor in content
 
@@ -482,3 +494,55 @@ def test_td0011_c03_bootstrap_docs_forbid_runtime_vendoring_and_define_minimal_p
     assert ".vscode/mcp.json" in readme
     assert "Do **not** vendor or copy the Lantern runtime" in template
     assert "Do not instruct operators to vendor or copy the Lantern runtime" in onboarding
+
+
+def _write_subset_workflow(governance_root: Path, *, workflow_id: str = "change_readiness_only") -> None:
+    workflow_root = governance_root / "workflow" / "definitions" / "workflows"
+    workflow_root.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "workflow_id": workflow_id,
+        "display_name": "Change Readiness Only",
+        "runtime_surface_classification": "partial_governed_surface",
+        "active_workbench_ids": [
+            "ch_and_td_readiness",
+            "issue_operations",
+            "governance_onboarding",
+        ],
+    }
+    (workflow_root / f"{workflow_id}.yaml").write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
+
+
+def test_td0024_catalog_and_orient_surface_only_selected_subset(tmp_path: Path) -> None:
+    governance_root = tmp_path / "governance"
+    _write_subset_workflow(governance_root)
+    workflow_layer = load_workflow_layer(
+        governance_root=governance_root,
+        workflow_id="change_readiness_only",
+        enforce_generated_artifacts=False,
+    )
+
+    catalog = handle_inspect(kind="catalog", workflow_layer=workflow_layer)
+    orient = handle_orient(
+        workflow_layer=workflow_layer,
+        governance_state=_GT110_ACTIVE,
+        ch_id="CH-0003",
+    )
+
+    configure_server_paths(
+        product_root=PRODUCT_ROOT,
+        governance_root=governance_root,
+        workflow_id="change_readiness_only",
+    )
+    server_orient_result = server_orient(
+        ch_id="CH-0003",
+        active_gates="GT-110",
+        ch_statuses="CH-0003:Ready",
+    )
+
+    assert catalog.workbench_count == 3
+    assert set(orient.active_workbench_ids) == {
+        "ch_and_td_readiness",
+        "issue_operations",
+        "governance_onboarding",
+    }
+    assert server_orient_result["runtime_posture"]["selected_workflow"]["workflow_id"] == "change_readiness_only"

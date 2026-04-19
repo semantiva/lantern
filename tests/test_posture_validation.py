@@ -12,259 +12,157 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for TD-0005-C03 (full_governed fail-closed) and TD-0005-C04 (partial_governed acceptance).
-
-C03: PostureValidator raises PostureValidationError when full_governed_surface claim is invalid.
-C04: PostureValidator returns PostureResult with bounded_scope_markers for partial_governed_surface.
-"""
-
 from __future__ import annotations
 
-from pathlib import Path
-from unittest.mock import MagicMock
+from dataclasses import dataclass
+from types import SimpleNamespace
 
 import pytest
 
 from lantern.workflow.merger import (
-    ConfigurationLoader,
     ConfigurationMerger,
-    MergeProvenance,
     PostureValidationError,
     PostureValidator,
+    _INTERVENTION_FORBIDDEN_TRANSACTION_KINDS,
+    _REQUIRED_FULL_GOVERNED_GATES,
 )
 
 
-# ---------------------------------------------------------------------------
-# Helpers: minimal workflow_layer mock and status_contract fixture
-# ---------------------------------------------------------------------------
+@dataclass(frozen=True)
+class FakeWorkbench:
+    workbench_id: str
+    lifecycle_placement: object
+    artifacts_in_scope: tuple[str, ...]
 
 
-def _make_workflow_layer(
-    *,
-    governance_modes: dict[str, str] | None = None,
-    covered_gates: dict[str, list[str]] | None = None,
-    artifact_families: dict[str, list[str]] | None = None,
-) -> MagicMock:
-    """Build a minimal mock WorkflowLayer suitable for PostureValidator calls."""
-    governance_modes = governance_modes or {}
-    covered_gates = covered_gates or {}
-    artifact_families = artifact_families or {}
-
-    workbenches = []
-    for wb_id, gmode in governance_modes.items():
-        wb = MagicMock()
-        wb.workbench_id = wb_id
-        wb.enabled = True
-        wb.governance_mode = gmode
-        placement = MagicMock()
-        gates = covered_gates.get(wb_id, [])
-        if gates:
-            placement.kind = "covered_gates"
-            placement.covered_gates = gates
-        else:
-            placement.kind = "lifecycle-independent"
-        wb.lifecycle_placement = placement
-        wb.artifacts_in_scope = artifact_families.get(wb_id, [])
-        workbenches.append(wb)
-
-    layer = MagicMock()
-    layer.workbenches = workbenches
-    layer.runtime_surface_classification = "full_governed_surface"
-    layer.grammar_version = "1.0"
-    layer.grammar_package_version = "0.1"
-
-    def _get_workbench(wid: str) -> MagicMock:
-        for wb in workbenches:
-            if wb.workbench_id == wid:
-                return wb
-        raise KeyError(wid)
-
-    layer.get_workbench.side_effect = _get_workbench
-    return layer
+def _workbench(
+    *, workbench_id: str, kind: str, gates: tuple[str, ...] = (), families: tuple[str, ...] = ()
+) -> FakeWorkbench:
+    if kind == "covered_gates":
+        placement = SimpleNamespace(kind=kind, covered_gates=gates)
+    elif kind == "lifecycle_span":
+        placement = SimpleNamespace(kind=kind, start_gate=gates[0], end_gate=gates[1])
+    else:
+        placement = SimpleNamespace(kind=kind)
+    return FakeWorkbench(workbench_id=workbench_id, lifecycle_placement=placement, artifacts_in_scope=families)
 
 
-def _full_status_contract() -> dict:
-    """Minimal status contract with all families present (so family check passes)."""
-    families = {f: {} for f in ["CH", "CI", "DC", "DB", "DEC", "DIP", "EV", "INI", "IS", "SPEC", "ARCH", "TD"]}
-    return {"families": families}
+def _workflow_layer(*workbenches: FakeWorkbench):
+    return SimpleNamespace(workbenches=tuple(workbenches), runtime_surface_classification="full_governed_surface")
 
 
-def _make_provenance() -> MergeProvenance:
-    return MergeProvenance(
-        baseline_version="0.5.0",
-        configuration_folder=None,
-        main_yaml_hash=None,
-        launcher_overlay_folder=None,
-        launcher_overlay_hash=None,
-    )
+def _status_contract() -> dict:
+    return {
+        "families": {
+            family: {} for family in ["ARCH", "CH", "CI", "DB", "DC", "DEC", "DIP", "EV", "INI", "IS", "SPEC", "TD"]
+        }
+    }
 
 
-def _make_effective_layer_from_merger(
-    tmp_path: Path,
-    declared_posture: str,
-    governance_modes: dict[str, str] | None = None,
-    covered_gates: dict[str, list[str]] | None = None,
-) -> object:
-    import yaml as _yaml
-    from lantern.workflow.merger import ConfigurationLoader, ConfigurationMerger
-
-    cfg = tmp_path / "workflow" / "configuration"
-    for sub in ("instructions", "workbenches", "guides"):
-        (cfg / sub).mkdir(parents=True, exist_ok=True)
-    (cfg / "instructions" / "onboarding.md").write_text("# onboarding", encoding="utf-8")
-    main_yaml = {"configuration_version": "1", "declared_posture": declared_posture}
-    (cfg / "main.yaml").write_text(_yaml.safe_dump(main_yaml), encoding="utf-8")
-    loader = ConfigurationLoader()
-    surface = loader.load_and_validate(cfg)
+def _effective_layer(classification: str, active_workbench_ids: tuple[str, ...]):
     merger = ConfigurationMerger()
     return merger.merge(
-        baseline_surface_classification="full_governed_surface",
+        baseline_surface_classification=classification,
         baseline_version="0.5.0",
-        configuration_surface=surface,
+        configuration_surface=None,
+        selected_workflow_id=f"{classification}_workflow",
+        selected_workflow_display_name=classification,
+        selected_workflow_source_path=f"workflow/definitions/workflows/{classification}.yaml",
+        active_workbench_ids=active_workbench_ids,
+        workflow_root="workflow/definitions/workflows",
+        workbench_root="workflow/definitions/workbenches",
     )
 
 
-# ---------------------------------------------------------------------------
-# C03 — fail-closed full_governed_surface
-# ---------------------------------------------------------------------------
-
-
-def test_c03_full_governed_passes_when_gates_covered(tmp_path: Path) -> None:
-    from lantern.workflow.merger import _REQUIRED_FULL_GOVERNED_GATES
-
-    all_gates = list(_REQUIRED_FULL_GOVERNED_GATES)
-    layer = _make_workflow_layer(
-        governance_modes={"wb_all": "full"},
-        covered_gates={"wb_all": all_gates},
-        artifact_families={"wb_all": []},
+def test_full_governed_surface_passes_when_required_gates_and_families_are_covered() -> None:
+    all_gates = tuple(sorted(_REQUIRED_FULL_GOVERNED_GATES))
+    layer = _workflow_layer(
+        _workbench(
+            workbench_id="full_governed",
+            kind="covered_gates",
+            gates=all_gates,
+            families=("ARCH", "CH", "CI", "DB", "DC", "DEC", "DIP", "EV", "INI", "IS", "SPEC", "TD"),
+        )
     )
-    effective = _make_effective_layer_from_merger(tmp_path, "full_governed_surface")
-    validator = PostureValidator()
-    result = validator.validate(
-        effective_layer=effective,
+
+    result = PostureValidator().validate(
+        effective_layer=_effective_layer("full_governed_surface", ("full_governed",)),
         workflow_layer=layer,
-        status_contract=_full_status_contract(),
+        status_contract=_status_contract(),
     )
+
     assert result.classification == "full_governed_surface"
     assert result.bounded_scope_markers == ()
     assert result.restricted_capabilities == ()
 
 
-def test_c03_missing_required_gate_raises_fatal_error(tmp_path: Path) -> None:
-    # Only covers a subset of required gates
-    layer = _make_workflow_layer(
-        governance_modes={"wb_partial": "full"},
-        covered_gates={"wb_partial": ["GT-110", "GT-115"]},
-        artifact_families={"wb_partial": []},
+def test_full_governed_surface_fails_when_required_gates_are_missing() -> None:
+    layer = _workflow_layer(
+        _workbench(workbench_id="partial", kind="covered_gates", gates=("GT-110", "GT-115"), families=("CH",))
     )
-    effective = _make_effective_layer_from_merger(tmp_path, "full_governed_surface")
-    validator = PostureValidator()
+
     with pytest.raises(PostureValidationError, match="full_governed_surface claim is INVALID"):
-        validator.validate(
-            effective_layer=effective,
+        PostureValidator().validate(
+            effective_layer=_effective_layer("full_governed_surface", ("partial",)),
             workflow_layer=layer,
-            status_contract=_full_status_contract(),
+            status_contract=_status_contract(),
         )
 
 
-def test_c03_family_not_in_status_contract_raises_fatal_error(tmp_path: Path) -> None:
-    from lantern.workflow.merger import _REQUIRED_FULL_GOVERNED_GATES
-
-    all_gates = list(_REQUIRED_FULL_GOVERNED_GATES)
-    layer = _make_workflow_layer(
-        governance_modes={"wb_all": "full"},
-        covered_gates={"wb_all": all_gates},
-        artifact_families={"wb_all": ["UNKNOWN_FAMILY"]},
+def test_full_governed_surface_fails_when_family_is_absent_from_status_contract() -> None:
+    all_gates = tuple(sorted(_REQUIRED_FULL_GOVERNED_GATES))
+    layer = _workflow_layer(
+        _workbench(
+            workbench_id="unknown_family",
+            kind="covered_gates",
+            gates=all_gates,
+            families=("UNKNOWN",),
+        )
     )
-    effective = _make_effective_layer_from_merger(tmp_path, "full_governed_surface")
-    validator = PostureValidator()
-    with pytest.raises(PostureValidationError, match="artifact family.*absent from the packaged status contract"):
-        validator.validate(
-            effective_layer=effective,
+
+    with pytest.raises(PostureValidationError, match="absent from the packaged status contract"):
+        PostureValidator().validate(
+            effective_layer=_effective_layer("full_governed_surface", ("unknown_family",)),
             workflow_layer=layer,
-            status_contract=_full_status_contract(),
+            status_contract=_status_contract(),
         )
 
 
-def test_c03_intervention_workbench_not_counted_toward_gate_coverage(tmp_path: Path) -> None:
-    from lantern.workflow.merger import _REQUIRED_FULL_GOVERNED_GATES
-
-    all_gates = list(_REQUIRED_FULL_GOVERNED_GATES)
-    # Only the intervention workbench covers gates — this must NOT satisfy full_governed
-    layer = _make_workflow_layer(
-        governance_modes={"intervention_wb": "intervention"},
-        covered_gates={"intervention_wb": all_gates},
-        artifact_families={"intervention_wb": []},
-    )
-    effective = _make_effective_layer_from_merger(tmp_path, "full_governed_surface")
-    validator = PostureValidator()
-    with pytest.raises(PostureValidationError, match="full_governed_surface claim is INVALID"):
-        validator.validate(
-            effective_layer=effective,
-            workflow_layer=layer,
-            status_contract=_full_status_contract(),
-        )
-
-
-# ---------------------------------------------------------------------------
-# C04 — partial_governed_surface acceptance
-# ---------------------------------------------------------------------------
-
-
-def test_c04_partial_governed_accepted_with_bounded_scope_markers(tmp_path: Path) -> None:
-    import yaml as _yaml
-
-    cfg = tmp_path / "workflow" / "configuration"
-    for sub in ("instructions", "workbenches", "guides"):
-        (cfg / sub).mkdir(parents=True, exist_ok=True)
-    (cfg / "instructions" / "onboarding.md").write_text("# onboarding", encoding="utf-8")
-    wb_yaml = {
-        "workbench_id": "ci_authoring",
-        "instruction_resource": "instructions/onboarding.md",
-        "authoritative_guides": [],
-    }
-    (cfg / "workbenches" / "ci_authoring.yaml").write_text(_yaml.safe_dump(wb_yaml), encoding="utf-8")
-    main_yaml = {
-        "configuration_version": "1",
-        "declared_posture": "partial_governed_surface",
-        "workbench_overrides": [{"workbench_id": "ci_authoring", "file": "workbenches/ci_authoring.yaml"}],
-    }
-    (cfg / "main.yaml").write_text(_yaml.safe_dump(main_yaml), encoding="utf-8")
-
-    loader = ConfigurationLoader()
-    surface = loader.load_and_validate(cfg)
-    merger = ConfigurationMerger()
-    effective = merger.merge(
-        baseline_surface_classification="full_governed_surface",
-        baseline_version="0.5.0",
-        configuration_surface=surface,
+def test_partial_governed_surface_uses_active_workbench_ids_as_bounded_scope_markers() -> None:
+    result = PostureValidator().validate(
+        effective_layer=_effective_layer("partial_governed_surface", ("ci_authoring", "issue_operations")),
+        workflow_layer=_workflow_layer(),
+        status_contract=_status_contract(),
     )
 
-    layer = _make_workflow_layer(governance_modes={}, covered_gates={})
-    validator = PostureValidator()
-    result = validator.validate(
-        effective_layer=effective,
-        workflow_layer=layer,
-        status_contract=_full_status_contract(),
-    )
     assert result.classification == "partial_governed_surface"
-    assert "ci_authoring" in result.bounded_scope_markers
+    assert result.bounded_scope_markers == ("ci_authoring", "issue_operations")
     assert result.restricted_capabilities == ()
 
 
-def test_c04_partial_governed_baseline_only_returns_correct_classification() -> None:
-    merger = ConfigurationMerger()
-    effective = merger.merge(
-        baseline_surface_classification="partial_governed_surface",
-        baseline_version="0.5.0",
-        configuration_surface=None,
+def test_intervention_surface_restricts_mutation_capabilities() -> None:
+    result = PostureValidator().validate(
+        effective_layer=_effective_layer("intervention_surface", ("issue_operations",)),
+        workflow_layer=_workflow_layer(
+            _workbench(workbench_id="issue_operations", kind="lifecycle-independent", families=("IS",))
+        ),
+        status_contract=_status_contract(),
     )
-    layer = _make_workflow_layer(governance_modes={})
-    validator = PostureValidator()
-    result = validator.validate(
-        effective_layer=effective,
-        workflow_layer=layer,
-        status_contract=_full_status_contract(),
+
+    assert result.classification == "intervention_surface"
+    assert set(result.restricted_capabilities) == _INTERVENTION_FORBIDDEN_TRANSACTION_KINDS
+
+
+def test_intervention_surface_rejects_workflows_that_cover_closure_gates() -> None:
+    layer = _workflow_layer(
+        _workbench(
+            workbench_id="verification_and_closure", kind="covered_gates", gates=("GT-130",), families=("EV", "DEC")
+        )
     )
-    assert result.classification == "partial_governed_surface"
-    assert result.bounded_scope_markers == ()
+
+    with pytest.raises(PostureValidationError, match="covers governed-closure gates"):
+        PostureValidator().validate(
+            effective_layer=_effective_layer("intervention_surface", ("verification_and_closure",)),
+            workflow_layer=layer,
+            status_contract=_status_contract(),
+        )

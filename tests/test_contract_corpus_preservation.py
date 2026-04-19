@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Preservation checks keep workbench_registry.yaml only as a generated compatibility projection."""
+
 from __future__ import annotations
 
 import subprocess

@@ -70,16 +70,26 @@ _effective_layer: Optional[EffectiveLayer] = None
 _posture_result: Optional[PostureResult] = None
 _product_root: Optional[Path] = None
 _governance_root: Optional[Path] = None
+_workflow_id: str | None = None
+_workflow_folder: Optional[Path] = None
+_workbench_folder: Optional[Path] = None
 
 
 def configure_server_paths(
     *,
     product_root: Path,
     governance_root: Optional[Path] = None,
+    workflow_id: str | None = None,
+    workflow_folder: Optional[Path] = None,
+    workbench_folder: Optional[Path] = None,
 ) -> None:
     global _product_root, _governance_root, _workflow_layer, _effective_layer, _posture_result
+    global _workflow_id, _workflow_folder, _workbench_folder
     _product_root = Path(product_root).resolve()
     _governance_root = Path(governance_root).resolve() if governance_root is not None else None
+    _workflow_id = workflow_id
+    _workflow_folder = Path(workflow_folder).resolve() if workflow_folder is not None else None
+    _workbench_folder = Path(workbench_folder).resolve() if workbench_folder is not None else None
     _workflow_layer = None
     _effective_layer = None
     _posture_result = None
@@ -88,7 +98,12 @@ def configure_server_paths(
 def _get_workflow_layer() -> WorkflowLayer:
     global _workflow_layer, _effective_layer, _posture_result
     if _workflow_layer is None:
-        _workflow_layer = load_workflow_layer()
+        _workflow_layer = load_workflow_layer(
+            governance_root=_governance_root,
+            workflow_id=_workflow_id,
+            workflow_folder=_workflow_folder,
+            workbench_folder=_workbench_folder,
+        )
         _effective_layer, _posture_result = _run_startup_sequence(_workflow_layer)
         _configure_posture_result(_posture_result)
     return _workflow_layer
@@ -103,6 +118,9 @@ def _run_startup_sequence(
     effective_layer = load_effective_layer(
         workflow_layer=workflow_layer,
         configuration_root=_governance_root,
+        workflow_id=_workflow_id,
+        workflow_folder=_workflow_folder,
+        workbench_folder=_workbench_folder,
     )
 
     status_contract = load_status_contract()

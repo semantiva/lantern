@@ -1,0 +1,67 @@
+workbench_id: ci_selection
+display_name: CI Selection
+lifecycle_placement:
+  kind: covered_gates
+  covered_gates:
+  - GT-120
+artifacts_in_scope:
+- CI
+- EV
+- DEC
+intent_classes:
+- ci_selection
+posture_constraints:
+- requires_execution_grade_candidate
+workflow_surface:
+  allowed_transaction_kinds:
+  - inspect
+  - draft
+  - commit
+  - validate
+  draftable_artifact_families:
+  - EV
+  - DEC
+  contract_refs:
+  - contract.ci_selection.v1
+  inspect_views:
+  - catalog
+  - ci_selection
+  response_surface_bindings:
+  - transaction_kind: inspect
+    response_envelope: catalog
+    allowed_resource_roles:
+    - instruction_resource
+    - authoritative_guides
+    - artifact_templates
+  - transaction_kind: inspect
+    response_envelope: ci_selection
+    allowed_resource_roles:
+    - instruction_resource
+    - authoritative_guides
+    - artifact_templates
+  - transaction_kind: draft
+    response_envelope: default
+    allowed_resource_roles:
+    - instruction_resource
+    - authoritative_guides
+    - administration_guides
+  - transaction_kind: commit
+    response_envelope: default
+    allowed_resource_roles:
+    - instruction_resource
+    - administration_guides
+  - transaction_kind: validate
+    response_envelope: default
+    allowed_resource_roles:
+    - instruction_resource
+    - authoritative_guides
+instruction_resource: lantern/resources/instructions/ci_selection.md
+authoritative_guides:
+- lantern/resources/guides/ci_selection.md
+administration_guides:
+- lantern/authoring_contracts/change_increment_selection_guide_v0.2.1.md
+- lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION_v0.2.1.md
+entry_conditions:
+- GT-115 passed
+exit_conditions:
+- selected CI recorded

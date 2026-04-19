@@ -39,10 +39,16 @@ def build_parser() -> argparse.ArgumentParser:
     serve = subparsers.add_parser("serve", help="Start the bounded Lantern MCP server")
     serve.add_argument("--governance-root", type=Path, required=True)
     serve.add_argument("--product-root", type=Path)
+    serve.add_argument("--workflow-id")
+    serve.add_argument("--workflow-folder", type=Path)
+    serve.add_argument("--workbench-folder", type=Path)
 
     doctor = subparsers.add_parser("doctor", help="Report bounded diagnostics")
     doctor.add_argument("--governance-root", type=Path, required=True)
     doctor.add_argument("--product-root", type=Path)
+    doctor.add_argument("--workflow-id")
+    doctor.add_argument("--workflow-folder", type=Path)
+    doctor.add_argument("--workbench-folder", type=Path)
     doctor.add_argument("--json", action="store_true", dest="json_output")
 
     bootstrap = subparsers.add_parser("bootstrap-product", help="Preview or apply bootstrap")
@@ -63,6 +69,9 @@ def build_parser() -> argparse.ArgumentParser:
     list_parser.add_argument("--workbench")
     list_parser.add_argument("--logical-ref")
     list_parser.add_argument("--heading")
+    list_parser.add_argument("--workflow-id")
+    list_parser.add_argument("--workflow-folder", type=Path)
+    list_parser.add_argument("--workbench-folder", type=Path)
     list_parser.add_argument("--json", action="store_true", dest="json_output")
 
     show = subparsers.add_parser("show", help="Show one exact governed discovery record")
@@ -70,6 +79,9 @@ def build_parser() -> argparse.ArgumentParser:
     show.add_argument("--governance-root", type=Path, required=True)
     show.add_argument("--product-root", type=Path)
     show.add_argument("--entity-kind")
+    show.add_argument("--workflow-id")
+    show.add_argument("--workflow-folder", type=Path)
+    show.add_argument("--workbench-folder", type=Path)
     show.add_argument("--json", action="store_true", dest="json_output")
 
     return parser
@@ -97,6 +109,9 @@ def run_cli(
             payload = gather_doctor_report(
                 governance_root=context.governance_root,
                 product_root=context.product_root,
+                workflow_id=args.workflow_id,
+                workflow_folder=args.workflow_folder,
+                workbench_folder=args.workbench_folder,
             )
             blockers = [finding for finding in payload["findings"] if finding["classification"] == "blocker"]
             if blockers:
@@ -105,6 +120,9 @@ def run_cli(
             configure_server_paths(
                 product_root=context.product_root,
                 governance_root=context.governance_root,
+                workflow_id=args.workflow_id,
+                workflow_folder=args.workflow_folder,
+                workbench_folder=args.workbench_folder,
             )
             if run_server:
                 mcp_server.run()
@@ -123,6 +141,9 @@ def run_cli(
             payload = gather_doctor_report(
                 governance_root=context.governance_root,
                 product_root=context.product_root,
+                workflow_id=args.workflow_id,
+                workflow_folder=args.workflow_folder,
+                workbench_folder=args.workbench_folder,
             )
             _write_payload(payload, stdout=stdout, json_output=args.json_output)
             return 0
@@ -158,6 +179,9 @@ def run_cli(
             registry = build_discovery_registry(
                 product_root=context.product_root,
                 governance_root=context.governance_root,
+                workflow_id=args.workflow_id,
+                workflow_folder=args.workflow_folder,
+                workbench_folder=args.workbench_folder,
             )
             filters = {
                 "id": args.id,
@@ -189,6 +213,9 @@ def run_cli(
             registry = build_discovery_registry(
                 product_root=context.product_root,
                 governance_root=context.governance_root,
+                workflow_id=args.workflow_id,
+                workflow_folder=args.workflow_folder,
+                workbench_folder=args.workbench_folder,
             )
             payload = show_record(
                 registry,

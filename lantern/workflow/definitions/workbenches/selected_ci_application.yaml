@@ -1,0 +1,54 @@
+workbench_id: selected_ci_application
+display_name: Selected CI Application
+lifecycle_placement:
+  kind: lifecycle_span
+  start_gate: GT-120
+  end_gate: GT-130
+artifacts_in_scope:
+- CI
+intent_classes:
+- selected_ci_application
+posture_constraints:
+- product_writes_permitted
+workflow_surface:
+  allowed_transaction_kinds:
+  - inspect
+  - commit
+  - validate
+  draftable_artifact_families: []
+  contract_refs:
+  - contract.selected_ci_application.v1
+  inspect_views:
+  - catalog
+  - change_surface
+  response_surface_bindings:
+  - transaction_kind: inspect
+    response_envelope: catalog
+    allowed_resource_roles:
+    - instruction_resource
+    - authoritative_guides
+  - transaction_kind: inspect
+    response_envelope: change_surface
+    allowed_resource_roles:
+    - instruction_resource
+    - authoritative_guides
+  - transaction_kind: commit
+    response_envelope: default
+    allowed_resource_roles:
+    - instruction_resource
+    - administration_guides
+  - transaction_kind: validate
+    response_envelope: default
+    allowed_resource_roles:
+    - instruction_resource
+    - authoritative_guides
+instruction_resource: lantern/resources/instructions/selected_ci_application.md
+authoritative_guides:
+- lantern/resources/guides/selected_ci_application.md
+administration_guides:
+- lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION_v0.2.1.md
+- lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md
+entry_conditions:
+- GT-120 passed
+exit_conditions:
+- selected CI applied
