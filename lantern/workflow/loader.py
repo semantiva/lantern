@@ -32,14 +32,20 @@ from lantern._compat import GrammarCompatibilityError, require_supported_grammar
 
 _GRAMMAR_IMPORT_ERROR: Exception | None = None
 Grammar: Any = None
+Lifecycle: Any = None
 LanternGrammarLoadError: type[Exception] = RuntimeError
 
 try:
-    from lantern_grammar import Grammar as ImportedGrammar, LanternGrammarLoadError as ImportedLoadError
+    from lantern_grammar import (
+        Grammar as ImportedGrammar,
+        Lifecycle as ImportedLifecycle,
+        LanternGrammarLoadError as ImportedLoadError,
+    )
 except Exception as exc:  # pragma: no cover - exercised in runtime environments missing the package
     _GRAMMAR_IMPORT_ERROR = exc
 else:
     Grammar = ImportedGrammar
+    Lifecycle = ImportedLifecycle
     LanternGrammarLoadError = ImportedLoadError
     _GRAMMAR_IMPORT_ERROR = None
 
@@ -150,6 +156,186 @@ def _load_grammar():
     except GrammarCompatibilityError as exc:
         raise WorkflowLayerError(str(exc)) from exc
     return grammar
+
+
+_DEFAULT_STATUS_CONTRACT_PATH = DEFAULT_DEFINITIONS_ROOT / "artifact_status_contract.json"
+
+_LIFECYCLE_TO_PROJECTION_FAMILY: dict[str, str] = {
+    "lg:artifacts/initiative": "INI",
+    "lg:artifacts/dip": "DIP",
+    "lg:artifacts/spec": "SPEC",
+    "lg:artifacts/arch": "ARCH",
+    "lg:artifacts/td": "TD",
+    "lg:artifacts/ch": "CH",
+    "lg:artifacts/dc": "DC",
+    "lg:artifacts/db": "DB",
+    "lg:artifacts/ci": "CI",
+}
+
+
+def _validate_lifecycle_bundle(grammar: Any, manifest_path: Path | None = None) -> None:
+    if Lifecycle is None:
+        return
+    path = manifest_path or DEFAULT_LIFECYCLE_POLICY_MANIFEST_PATH
+    if not path.exists():
+        raise WorkflowLayerError(f"Lifecycle declaration bundle manifest not found: {path}")
+    try:
+        lc = Lifecycle.from_manifest(grammar, path)
+    except Exception as exc:
+        raise WorkflowLayerError(f"Lifecycle declaration bundle could not be loaded: {exc}") from exc
+    result = lc.validate()
+    if not result.ok:
+        messages = "; ".join(f"{issue.path}: {issue.message}" for issue in result.issues)
+        raise WorkflowLayerError(f"Lifecycle declaration bundle validation failed: {messages}")
+    _verify_lifecycle_projection_consistency(path)
+
+
+def _verify_lifecycle_projection_consistency(manifest_path: Path, status_contract_path: Path | None = None) -> None:
+    """Mechanically verify that lifecycle-declared family statuses and transitions match the retained status projection.
+
+    Detects divergence between the lifecycle bundle (authoritative) and artifact_status_contract.json
+    (compatibility projection) for lifecycle-declared grammar-semantic families. Reads the bundle's
+    family YAML files directly to get declared status IDs and transitions, then compares them against
+    the grammar_mapping and transitions in the status projection.
+    """
+    contract_path = status_contract_path if status_contract_path is not None else _DEFAULT_STATUS_CONTRACT_PATH
+    if not contract_path.exists():
+        raise WorkflowLayerError(
+            f"Lifecycle projection consistency check requires artifact_status_contract.json: {contract_path}"
+        )
+    projection = json.loads(contract_path.read_text(encoding="utf-8"))
+    projection_families = projection.get("families", {})
+
+    if not manifest_path.exists():
+        raise WorkflowLayerError(
+            f"Lifecycle declaration bundle manifest not found for consistency check: {manifest_path}"
+        )
+    manifest = yaml.safe_load(manifest_path.read_text(encoding="utf-8"))
+    if not isinstance(manifest, dict):
+        raise WorkflowLayerError(f"Lifecycle declaration bundle manifest is not a mapping: {manifest_path}")
+    family_files = manifest.get("families", [])
+
+    bundle_dir = manifest_path.parent
+    for family_file in family_files:
+        family_yaml_path = bundle_dir / family_file
+        if not family_yaml_path.exists():
+            raise WorkflowLayerError(
+                f"Lifecycle bundle family file declared in manifest but not found: {family_yaml_path}"
+            )
+        family_data = yaml.safe_load(family_yaml_path.read_text(encoding="utf-8"))
+        if not isinstance(family_data, dict):
+            raise WorkflowLayerError(f"Lifecycle bundle family file is not a mapping: {family_yaml_path}")
+
+        family_id = str(family_data.get("id", ""))
+        short = _LIFECYCLE_TO_PROJECTION_FAMILY.get(family_id)
+        if short is None:
+            continue
+        if short not in projection_families:
+            raise WorkflowLayerError(
+                f"Lifecycle bundle declares family {family_id!r} (projection key {short!r}) "
+                f"but that family is absent from artifact_status_contract.json. "
+                f"Regenerate artifact_status_contract.json from the lifecycle bundle."
+            )
+        grammar_mapping = projection_families[short].get("grammar_mapping", {})
+        if not grammar_mapping:
+            raise WorkflowLayerError(
+                f"Lifecycle projection for {short!r} has absent or empty grammar_mapping in artifact_status_contract.json. "
+                f"Regenerate artifact_status_contract.json from the lifecycle bundle."
+            )
+
+        # normal_path_policy must not be permissive for lifecycle-declared families
+        _lc_policy = projection_families[short].get("normal_path_policy", "")
+        _LIFECYCLE_ADMISSIBLE_POLICIES = {"reject_alias", "reject_unknown"}
+        if _lc_policy not in _LIFECYCLE_ADMISSIBLE_POLICIES:
+            raise WorkflowLayerError(
+                f"Lifecycle projection policy broadening detected for {short}: "
+                f"normal_path_policy {_lc_policy!r} is not permitted for lifecycle-declared families "
+                f"(expected one of {sorted(_LIFECYCLE_ADMISSIBLE_POLICIES)}). "
+                f"Regenerate artifact_status_contract.json from the lifecycle bundle."
+            )
+
+        # canonical_statuses parity: bundle status labels must exactly match projection canonical_statuses
+        bundle_status_labels = {
+            s["label"] for s in family_data.get("statuses", []) if isinstance(s, dict) and "label" in s
+        }
+        projection_canonical = set(projection_families[short].get("canonical_statuses") or [])
+        canonical_divergent = bundle_status_labels.symmetric_difference(projection_canonical)
+        if canonical_divergent:
+            raise WorkflowLayerError(
+                f"Lifecycle projection canonical_statuses divergence for {short}: "
+                f"lifecycle bundle declares status labels {sorted(bundle_status_labels)} "
+                f"but artifact_status_contract.json canonical_statuses is {sorted(projection_canonical)}. "
+                f"Divergent: {sorted(canonical_divergent)}. "
+                f"Regenerate artifact_status_contract.json from the lifecycle bundle."
+            )
+
+        # canonical_statuses ↔ grammar_mapping internal consistency: display key sets must agree
+        grammar_mapping_keys = set(grammar_mapping.keys())
+        if projection_canonical != grammar_mapping_keys:
+            raise WorkflowLayerError(
+                f"Lifecycle projection internal inconsistency for {short}: "
+                f"canonical_statuses {sorted(projection_canonical)} and grammar_mapping keys "
+                f"{sorted(grammar_mapping_keys)} disagree. "
+                f"Regenerate artifact_status_contract.json from the lifecycle bundle."
+            )
+
+        # Association parity: exact label→grammar-ID mapping from bundle must equal projection grammar_mapping
+        expected_mapping = {
+            s["label"]: s["id"]
+            for s in family_data.get("statuses", [])
+            if isinstance(s, dict) and "label" in s and "id" in s
+        }
+        if expected_mapping != grammar_mapping:
+            divergent_labels = {
+                k
+                for k in set(expected_mapping) | set(grammar_mapping)
+                if expected_mapping.get(k) != grammar_mapping.get(k)
+            }
+            raise WorkflowLayerError(
+                f"Lifecycle projection grammar_mapping association divergence for {short}: "
+                f"lifecycle bundle declares {sorted((k, v) for k, v in expected_mapping.items())} "
+                f"but artifact_status_contract.json grammar_mapping is "
+                f"{sorted((k, v) for k, v in grammar_mapping.items())}. "
+                f"Divergent label(s): {sorted(divergent_labels)}. "
+                f"Regenerate artifact_status_contract.json from the lifecycle bundle."
+            )
+
+        # Transition parity: compare bundle transitions vs projection transitions (via grammar_mapping)
+        bundle_transitions_raw = [
+            t for t in family_data.get("transitions", []) if isinstance(t, dict) and t.get("from") and t.get("to")
+        ]
+        projection_transitions_raw = projection_families[short].get("transitions", [])
+        if bundle_transitions_raw:
+            if not isinstance(projection_transitions_raw, list) or not projection_transitions_raw:
+                raise WorkflowLayerError(
+                    f"Lifecycle projection transition divergence for {short}: "
+                    f"lifecycle bundle declares {len(bundle_transitions_raw)} transition(s) but "
+                    f"artifact_status_contract.json has no transitions for this family. "
+                    f"Regenerate artifact_status_contract.json from the lifecycle bundle."
+                )
+            bundle_id_to_label = {
+                s["id"]: s["label"]
+                for s in family_data.get("statuses", [])
+                if isinstance(s, dict) and "id" in s and "label" in s
+            }
+            bundle_transitions_display: set[tuple[str, str]] = set()
+            for t in bundle_transitions_raw:
+                from_display = bundle_id_to_label.get(t["from"])
+                to_display = bundle_id_to_label.get(t["to"])
+                if from_display and to_display:
+                    bundle_transitions_display.add((from_display, to_display))
+            projection_transitions_display: set[tuple[str, str]] = {
+                (str(t["from"]), str(t["to"]))
+                for t in projection_transitions_raw
+                if isinstance(t, dict) and t.get("from") and t.get("to")
+            }
+            divergent_transitions = bundle_transitions_display.symmetric_difference(projection_transitions_display)
+            if divergent_transitions:
+                raise WorkflowLayerError(
+                    f"Lifecycle projection transition divergence for {short}: "
+                    f"divergent transitions: {sorted(str(p) for p in divergent_transitions)}. "
+                    f"Regenerate artifact_status_contract.json from the lifecycle bundle."
+                )
 
 
 def _load_yaml(path: Path, label: str) -> Any:
@@ -430,6 +616,8 @@ def re_sub_multi_underscore(value: str) -> str:
     return value
 
 
+DEFAULT_LIFECYCLE_POLICY_MANIFEST_PATH = DEFAULT_DEFINITIONS_ROOT / "lifecycle-policy" / "manifest.yaml"
+
 DEFAULT_WORKFLOW_ID = "default_full_governed_surface"
 DEFAULT_WORKBENCH_CATALOG_ROOT = DEFAULT_DEFINITIONS_ROOT / "workbenches"
 DEFAULT_WORKFLOW_CATALOG_ROOT = DEFAULT_DEFINITIONS_ROOT / "workflows"
@@ -553,9 +741,14 @@ def load_workflow_layer(
     workbench_resource_bindings_path: str | Path | None = None,
     builtin_workflow_map_root: str | Path | None = None,
     relocation_manifest_path: str | Path | None = None,
+    lifecycle_policy_manifest_path: str | Path | None = None,
     enforce_generated_artifacts: bool = False,
 ) -> WorkflowLayer:
     grammar = _load_grammar()
+    _validate_lifecycle_bundle(
+        grammar,
+        Path(lifecycle_policy_manifest_path).resolve() if lifecycle_policy_manifest_path is not None else None,
+    )
     grammar_manifest = dict(grammar.manifest())
     grammar_version = str(grammar_manifest.get("model_version", ""))
     grammar_package_version = str(grammar.package_version())

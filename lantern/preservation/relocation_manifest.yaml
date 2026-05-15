@@ -250,8 +250,8 @@ entries:
     - '## Definitions (for this procedure)'
     - '## Inputs (required)'
     - '## Outputs (what "done" means)'
-    - "## Procedure \u2014 GT-050 (ARCH Baseline Readiness)"
-    - "## Procedure \u2014 GT-060 (SPEC Baseline Readiness)"
+    - "## Procedure \u2014 GT-050 (SPEC Baseline Readiness)"
+    - "## Procedure \u2014 GT-060 (ARCH Baseline Readiness)"
     - "## Joint Step \u2014 Consistency checks (required; apply after both gates)"
     - '## Back-pressure notes'
     - "## After GT-050/GT-060 PASS \u2014 what comes next"
@@ -805,8 +805,8 @@ entries:
     required_headings:
     - '# Lantern workflow gate definitions'
     - "## GT-030 \u2014 Design Input Pack Lock"
-    - "## GT-050 \u2014 Architecture Definition Readiness"
-    - "## GT-060 \u2014 Requirements Specification Readiness"
+    - "## GT-050 \u2014 Requirements Specification Readiness"
+    - "## GT-060 \u2014 Architecture Definition Readiness"
     - "## GT-110 \u2014 Input Kit Readiness"
     - "## GT-115 \u2014 Design Baseline Selection"
     - "## GT-120 \u2014 Change Increment Selection"

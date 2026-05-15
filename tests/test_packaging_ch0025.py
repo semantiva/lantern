@@ -46,7 +46,7 @@ def test_td0025_c01_pyproject_declares_install_sufficient_runtime_dependencies()
     project = _read_project()
     deps = project["dependencies"]
     assert any(dep == "mcp" or dep.startswith("mcp") for dep in deps)
-    assert any(dep.startswith("lantern-grammar>=0.3.0,<0.4.0") for dep in deps)
+    assert any(dep.startswith("lantern-grammar>=0.4.0,<0.5.0") for dep in deps)
 
 
 def test_td0025_c05_dev_install_target_includes_typing_dependency_for_yaml() -> None:

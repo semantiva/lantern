@@ -4,7 +4,7 @@
 Status: **AUTHORITATIVE — Procedure**
 Date (UTC): 2026-03-15
 
-Purpose: approve an Architecture Definition (ARCH) at GT-050 and a Requirements Specification (SPEC) at GT-060 as reusable baselines that anchor downstream change work.
+Purpose: approve a Requirements Specification (SPEC) at GT-050 and an Architecture Definition (ARCH) at GT-060 as reusable baselines that anchor downstream change work.
 
 These two gates share a procedure structure and are typically run in the same session after the SPEC and ARCH drafts are derived and the required derivation/coherence evidence has been assembled. They are documented together to avoid duplication but are independent gates: GT-050 PASS and GT-060 PASS are separate decisions recorded in separate DEC artifacts.
 
@@ -60,9 +60,9 @@ Note: GT-050 and GT-060 produce separate EV and DEC records. The procedure steps
 ### PASS outcome (per gate)
 
 A) Artifact status is correct
-- GT-050 PASS: `ARCH_ID` has `Status: Approved`.
-- GT-060 PASS: `SPEC_ID` has `Status: Approved`.
-- If this ARCH/SPEC supersedes a prior one, the prior artifact has `Status: Superseded`.
+- GT-050 PASS: `SPEC_ID` has `Status: Approved`.
+- GT-060 PASS: `ARCH_ID` has `Status: Approved`.
+- If this SPEC/ARCH supersedes a prior one, the prior artifact has `Status: Superseded`.
 
 B) Audit trail exists (stored under canonical paths)
 - GT-050: one `EV-####.md` and one `DEC-####.md` in `ev/` and `dec/` respectively.
@@ -71,16 +71,100 @@ B) Audit trail exists (stored under canonical paths)
 ### FAIL outcome (per gate)
 
 A) Artifact status unchanged
-- The ARCH or SPEC remains `Status: Draft`.
+- The SPEC or ARCH remains `Status: Draft`.
 
 B) Audit trail exists
 - One `EV-####.md` and one `DEC-####.md` per failing gate.
 
 ---
 
-## Procedure — GT-050 (ARCH Baseline Readiness)
+## Procedure — GT-050 (SPEC Baseline Readiness)
 
-### GT-050 Step 1 — Evaluate ARCH completeness (STOP if violated)
+### GT-050 Step 1 — Evaluate SPEC completeness (STOP if violated)
+
+**S1) Header completeness**
+- `Status` is `Draft`.
+- `Derived from DIP` field exists and references an Approved DIP.
+- `Supersedes` field exists (may be `None`).
+- `Timestamp` is a valid ISO 8601 date.
+
+**S2) Summary is substantive**
+- `## Summary` non-empty; describes requirements scope without requiring DIP access for core semantics.
+
+**S3) Scope is bounded**
+- `## Scope` contains explicit "In scope" and "Out of scope" sub-lists.
+- Each entry is a specific, bounded statement — not a sentiment.
+
+**S4) Acceptance criteria are checkable**
+- `## Acceptance criteria` is non-empty with at least one `AC-###` entry.
+- Each AC is a checkable, binary claim (a reviewer can determine compliance without running code).
+- Invalid: "AC-001: The system should work well." | Placeholder ACs.
+
+**S5) Derivation linkage exists**
+- At least one AC or scope statement is traceable to a specific DIP source entry or DIP constraint.
+- The SPEC does not introduce scope that cannot be traced to the DIP.
+
+**S6) Questions are resolved or non-blocking**
+- All questions with `Blocking: YES` are `Status: Resolved`, OR carry an explicit waiver with rationale.
+
+**S7) SPEC does not contain architectural decisions**
+- No `## Key decisions` or explicit architectural choices.
+- A SPEC that reads like an ARCH has overstepped and must be refactored.
+
+**S8) Supersession is handled correctly (if applicable)**
+- If `Supersedes` is non-empty, the referenced prior SPEC exists and is currently `Approved`.
+- The SPEC body records the scope change.
+
+**S9) Validation target signals are coherent (if present)**
+- If `## Validation target signal definition` is present, each entry has a non-placeholder command and a binary expected signal.
+- Aspirational signals (e.g., "expected signal: looks correct") are invalid.
+
+### GT-050 Step 2 — Confirm or record baseline locator (SPEC)
+
+Same as GT-030 Step 2 (commit SHA, tag, or explicit waiver with rationale).
+
+### GT-050 Step 3 — Allocate EV and DEC ids (GT-050)
+
+- `python tools/allocate_lantern_id.py --artifact EV --repo <path-to-ssot-repo>`
+- `python tools/allocate_lantern_id.py --artifact DEC --repo <path-to-ssot-repo>`
+
+### GT-050 Step 4 — Create EV record (GT-050)
+
+Create: `ev/EV-####.md`
+
+Use template: `lantern/templates/EV_TEMPLATE.md` (with gate-specific adaptations)
+
+Header:
+- `evidence_type` SHOULD be `spec_readiness_assessment`
+- `artifacts` MUST include:
+  - `kind: "path"` for the SPEC file
+  - `kind: "path"` for the governing DIP file
+  - `kind: "path"` for any derivation/coherence evidence artifact or review note used in the readiness session
+  - `kind: "commit"` with repo name and baseline locator (or waiver)
+
+Body (minimum coverage):
+
+- **E1 — Completeness checklist**: outcome for each item S1–S9. For each FAIL, name the section and the specific deficiency.
+- **E2 — Derivation linkage summary**: one line per key SPEC section stating which DIP source or constraint it traces to.
+- **E3 — Baseline locator**: the SPEC baseline locator (commit SHA / tag / waiver rationale).
+- **E4 — Derivation/coherence evidence references**: locators or identifiers for the supporting evidence confirming the current drafts remain derivable from the approved DIP and mutually coherent.
+- **Human approval**: outcome (PASS/FAIL), approver, UTC timestamp.
+
+### GT-050 Step 5 — Create DEC record (GT-050)
+
+Gate: `GT-050`
+Body structure same as GT-030 Step 5.
+
+### GT-050 Step 6 — Update SPEC status (PASS action only)
+
+- PASS: set `SPEC_ID` `Status: Approved`. If supersession occurred, update the prior SPEC to `Status: Superseded`.
+- FAIL: leave `SPEC_ID` `Status: Draft`.
+
+---
+
+## Procedure — GT-060 (ARCH Baseline Readiness)
+
+### GT-060 Step 1 — Evaluate ARCH completeness (STOP if violated)
 
 **A1) Header completeness**
 - `Status` is `Draft`.
@@ -120,87 +204,7 @@ B) Audit trail exists
 - If `Supersedes` is non-empty, the referenced prior ARCH exists and is currently `Approved`.
 - The ARCH body records the scope change.
 
-### GT-050 Step 2 — Confirm or record baseline locator (ARCH)
-
-Same as GT-030 Step 2 (commit SHA, tag, or explicit waiver with rationale).
-
-### GT-050 Step 3 — Allocate EV and DEC ids (GT-050)
-
-- `python tools/allocate_lantern_id.py --artifact EV --repo <path-to-ssot-repo>`
-- `python tools/allocate_lantern_id.py --artifact DEC --repo <path-to-ssot-repo>`
-
-### GT-050 Step 4 — Create EV record (GT-050)
-
-Create: `ev/EV-####.md`
-
-Use template: `lantern/templates/EV_TEMPLATE.md` (with gate-specific adaptations)
-
-Header:
-- `evidence_type` SHOULD be `arch_readiness_assessment`
-- `artifacts` MUST include:
-  - `kind: "path"` for the ARCH file
-  - `kind: "path"` for the governing DIP file
-  - `kind: "path"` for any derivation/coherence evidence artifact or review note used in the readiness session
-  - `kind: "commit"` with repo name and baseline locator (or waiver)
-
-Body (minimum coverage):
-
-- **E1 — Completeness checklist**: outcome for each item A1–A9. For each FAIL, name the section and the specific deficiency.
-- **E2 — Derivation linkage summary**: one line per key ARCH section stating which DIP source or constraint it traces to.
-- **E3 — Baseline locator**: the ARCH baseline locator (commit SHA / tag / waiver rationale).
-- **E4 — Derivation/coherence evidence references**: locators or identifiers for the supporting evidence confirming the current drafts remain derivable from the approved DIP and mutually coherent.
-- **Human approval**: outcome (PASS/FAIL), approver, UTC timestamp.
-
-### GT-050 Step 5 — Create DEC record (GT-050)
-
-Gate: `GT-050`
-Body structure same as GT-030 Step 5.
-
-### GT-050 Step 6 — Update ARCH status (PASS action only)
-
-- PASS: set `ARCH_ID` `Status: Approved`. If supersession occurred, update the prior ARCH to `Status: Superseded`.
-- FAIL: leave `ARCH_ID` `Status: Draft`.
-
----
-
-## Procedure — GT-060 (SPEC Baseline Readiness)
-
-### GT-060 Step 1 — Evaluate SPEC completeness (STOP if violated)
-
-**S1) Header completeness**
-- Same as A1, adapted for SPEC fields.
-
-**S2) Summary is substantive**
-- `## Summary` non-empty; describes requirements scope without requiring DIP access for core semantics.
-
-**S3) Scope is bounded**
-- `## Scope` contains explicit "In scope" and "Out of scope" sub-lists.
-- Each entry is a specific, bounded statement — not a sentiment.
-
-**S4) Acceptance criteria are checkable**
-- `## Acceptance criteria` is non-empty with at least one `AC-###` entry.
-- Each AC is a checkable, binary claim (a reviewer can determine compliance without running code).
-- Invalid: "AC-001: The system should work well." | Placeholder ACs.
-
-**S5) Derivation linkage exists**
-- At least one AC or scope statement is traceable to a specific DIP source entry or DIP constraint.
-- The SPEC does not introduce scope that cannot be traced to the DIP.
-
-**S6) Questions are resolved or non-blocking**
-- Same as A7.
-
-**S7) SPEC does not contain architectural decisions**
-- No `## Key decisions` or explicit architectural choices.
-- A SPEC that reads like an ARCH has overstepped and must be refactored.
-
-**S8) Supersession is handled correctly (if applicable)**
-- Same as A9, adapted for SPEC.
-
-**S9) Validation target signals are coherent (if present)**
-- If `## Validation target signal definition` is present, each entry has a non-placeholder command and a binary expected signal.
-- Aspirational signals (e.g., "expected signal: looks correct") are invalid.
-
-### GT-060 Step 2 — Confirm or record baseline locator (SPEC)
+### GT-060 Step 2 — Confirm or record baseline locator (ARCH)
 
 Same as GT-030 Step 2.
 
@@ -210,18 +214,18 @@ Allocate separately from GT-050 ids.
 
 ### GT-060 Step 4 — Create EV record (GT-060)
 
-Same structure as GT-050 Step 4, adapted for SPEC:
-- `evidence_type` SHOULD be `spec_readiness_assessment`
-- `artifacts` reference the SPEC file instead of the ARCH file
-- Body covers S1–S9 checklist items and AC coverage summary
+Same structure as GT-050 Step 4, adapted for ARCH:
+- `evidence_type` SHOULD be `arch_readiness_assessment`
+- `artifacts` reference the ARCH file instead of the SPEC file
+- Body covers A1–A9 checklist items and key-decisions coverage summary
 
 ### GT-060 Step 5 — Create DEC record (GT-060)
 
 Gate: `GT-060`
 
-### GT-060 Step 6 — Update SPEC status (PASS action only)
+### GT-060 Step 6 — Update ARCH status (PASS action only)
 
-Same as GT-050 Step 6, adapted for SPEC.
+Same as GT-050 Step 6, adapted for ARCH.
 
 ---
 
@@ -229,8 +233,8 @@ Same as GT-050 Step 6, adapted for SPEC.
 
 Before considering GT-050 and GT-060 closed, verify:
 
-- `ARCH_ID` header `Status` is `Approved` (GT-050 PASS) or `Draft` (FAIL).
-- `SPEC_ID` header `Status` is `Approved` (GT-060 PASS) or `Draft` (FAIL).
+- `SPEC_ID` header `Status` is `Approved` (GT-050 PASS) or `Draft` (FAIL).
+- `ARCH_ID` header `Status` is `Approved` (GT-060 PASS) or `Draft` (FAIL).
 - If supersession occurred for either artifact, the prior artifact has `Status: Superseded`.
 - EV and DEC records for both gates exist with correct gate ids.
 - Baseline locators or waivers are recorded in both EV records.
@@ -244,7 +248,7 @@ If any check fails, treat the affected gate as incomplete.
 
 | Failure condition | Recovery path |
 |---|---|
-| Acceptance criteria non-checkable | Refine SPEC ACs to be binary and specific; re-run GT-060 |
+| Acceptance criteria non-checkable | Refine SPEC ACs to be binary and specific; re-run GT-050 |
 | Missing derivation linkage | Trace ARCH/SPEC sections to DIP; refactor scope if untraceable; refresh derivation evidence; re-run GT-050/060 |
 | ARCH/SPEC contains out-of-scope content | Refactor into correct artifact; refresh coherence evidence; re-run GT-050/060 |
 | Blocking question unresolved | Resolve and update artifact; re-run GT-050/060 |

@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Optional
 
 from lantern.mcp.catalog import (
@@ -55,6 +56,7 @@ def handle_orient(
     governance_state: dict[str, Any],
     intent: Optional[str] = None,
     ch_id: Optional[str] = None,
+    governance_root: Optional[Path] = None,
     posture_result: Optional[PostureResult] = None,
 ) -> OrientResponse:
     rp = _orient_runtime_posture_label(workflow_layer, posture_result)
@@ -87,11 +89,33 @@ def handle_orient(
         resolved=resolved,
     )
 
+    # B5: Lifecycle blocker exposure — when ch_id and governance_root are both available,
+    # read the CH artifact and surface lifecycle constraint violations as blockers.
+    lifecycle_blockers: tuple[str, ...] = ()
+    if ch_id and governance_root is not None:
+        ch_path = governance_root / "ch" / f"{ch_id}.md"
+        if ch_path.exists():
+            try:
+                from lantern.artifacts.renderers import parse_header_block
+                from lantern.artifacts.validator import (
+                    _validate_ch_lifecycle_state_constraints,
+                    load_status_contract,
+                )
+
+                header = parse_header_block(ch_path.read_text(encoding="utf-8"))
+                contract = load_status_contract()
+                lc_findings = _validate_ch_lifecycle_state_constraints(
+                    header, ch_id, governance_root=governance_root, contract=contract
+                )
+                lifecycle_blockers = tuple(f"lifecycle_constraint: {f['message']}" for f in lc_findings)
+            except Exception:
+                pass  # orient lifecycle check is advisory; never block orient itself
+
     return OrientResponse(
         active_workbench_ids=resolved.active_workbench_ids,
         preferred_workbench_id=resolved.preferred_workbench_id,
         surface_classification=resolved.runtime_surface_classification,
-        blockers=resolved.blockers,
+        blockers=resolved.blockers + lifecycle_blockers,
         preconditions=resolved.preconditions,
         runtime_exposure_posture=runtime_exposure,
         next_valid_actions=resolved.next_valid_actions,

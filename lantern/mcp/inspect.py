@@ -23,6 +23,7 @@ from typing import Any, Optional
 
 from lantern.artifacts.validator import DEFAULT_STATUS_CONTRACT_PATH, load_status_contract
 from lantern.artifacts.render_contracts import build_two_layer_contract
+from lantern.workflow.loader import DEFAULT_LIFECYCLE_POLICY_MANIFEST_PATH
 from lantern.mcp.catalog import (
     build_catalog_response,
     build_contract_response,
@@ -90,6 +91,16 @@ class InspectStatusContractResult:
 
 
 @dataclass(frozen=True)
+class InspectLifecyclePolicyResult:
+    kind: str
+    manifest_path: str
+    schema_version: str
+    grammar_compatibility: dict[str, Any]
+    families: tuple[dict[str, Any], ...]
+    runtime_posture: dict[str, Any]
+
+
+@dataclass(frozen=True)
 class InspectChangeSurfaceResult:
     kind: str
     workbench_id: str
@@ -118,6 +129,7 @@ def handle_inspect(
     | InspectContractResult
     | InspectWorkspaceResult
     | InspectStatusContractResult
+    | InspectLifecyclePolicyResult
     | InspectChangeSurfaceResult
 ):
     _rp = _default_runtime_posture_label(workflow_layer, posture_result)
@@ -129,6 +141,8 @@ def handle_inspect(
         return _handle_workspace(product_root, governance_root, _rp)
     if kind == "status_contract":
         return _handle_status_contract(_rp)
+    if kind == "lifecycle_policy":
+        return _handle_lifecycle_policy(_rp)
     if kind == "change_surface":
         return _handle_change_surface(
             workflow_layer=workflow_layer,
@@ -245,6 +259,71 @@ def _handle_status_contract(runtime_posture: dict[str, Any]) -> InspectStatusCon
         authoritative_source_path=str(payload["generated_from"]["authoritative_path"]),
         projection_sha256=sha256(raw.encode("utf-8")).hexdigest(),
         families=dict(payload["families"]),
+        runtime_posture=runtime_posture,
+    )
+
+
+def _handle_lifecycle_policy(runtime_posture: dict[str, Any]) -> InspectLifecyclePolicyResult:
+    import yaml as _yaml
+    from lantern_grammar import Grammar, Lifecycle
+
+    manifest_path = DEFAULT_LIFECYCLE_POLICY_MANIFEST_PATH
+    if not manifest_path.exists():
+        raise InspectError(f"Lifecycle declaration bundle manifest not found: {manifest_path}")
+    manifest = _yaml.safe_load(manifest_path.read_text(encoding="utf-8"))
+    grammar = Grammar.load()
+    lc = Lifecycle.from_manifest(grammar, manifest_path)
+    bundle_dir = manifest_path.parent
+    family_summaries: list[dict[str, Any]] = []
+    for family_file in manifest.get("families", []):
+        fpath = bundle_dir / family_file
+        if not fpath.exists():
+            continue
+        fdata = _yaml.safe_load(fpath.read_text(encoding="utf-8"))
+        family_id = str(fdata.get("id", ""))
+        statuses = [
+            {"id": s["id"], "label": s.get("label", "")} for s in fdata.get("statuses", []) if isinstance(s, dict)
+        ]
+        transitions = [
+            {"from": t.get("from"), "to": t.get("to")} for t in fdata.get("transitions", []) if isinstance(t, dict)
+        ]
+        constraints: list[dict[str, Any]] = []
+        for sc in lc.state_constraints_for(family_id):
+            slot_map: dict[str, Any] = {}
+            for traversal in sc.traversals:
+                rules_summary = []
+                for rule in traversal.rules:
+                    card = rule.cardinality
+                    rules_summary.append(
+                        {
+                            "statuses": list(rule.statuses),
+                            "cardinality": {
+                                "exact": card.exact,
+                                "min": card.min_count,
+                                "max": card.max_count,
+                                "all": card.is_all,
+                            },
+                        }
+                    )
+                slot_map[traversal.slot] = {
+                    "related_family_id": traversal.related_family_id,
+                    "rules": rules_summary,
+                }
+            constraints.append({"status_id": sc.status_id, "slots": slot_map})
+        family_summaries.append(
+            {
+                "family_id": family_id,
+                "statuses": statuses,
+                "transitions": transitions,
+                "state_constraints": constraints,
+            }
+        )
+    return InspectLifecyclePolicyResult(
+        kind="lifecycle_policy",
+        manifest_path=str(manifest_path),
+        schema_version=str(manifest.get("schema_version", "")),
+        grammar_compatibility=dict(manifest.get("grammar_compatibility", {})),
+        families=tuple(family_summaries),
         runtime_posture=runtime_posture,
     )
 

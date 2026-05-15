@@ -112,8 +112,8 @@ Outcome when complete:
 
 ### Step 4 — Approve SPEC/ARCH baselines
 
-1. Execute GT-050 for ARCH.
-2. Execute GT-060 for SPEC.
+1. Execute GT-050 for SPEC.
+2. Execute GT-060 for ARCH.
 
 Outcome on PASS:
 - Initiative upstream baselines are approved and pinned.

@@ -1,0 +1,15 @@
+id: lg:artifacts/ci
+statuses:
+  - {id: lg:statuses/draft,     label: Draft}
+  - {id: lg:statuses/candidate, label: Candidate}
+  - {id: lg:statuses/selected,  label: Selected}
+  - {id: lg:statuses/rejected,  label: Rejected}
+  - {id: lg:statuses/verified,  label: Verified}
+
+transitions:
+  - {from: lg:statuses/draft,     to: lg:statuses/candidate}
+  - {from: lg:statuses/candidate, to: lg:statuses/selected}
+  - {from: lg:statuses/candidate, to: lg:statuses/rejected}
+  - {from: lg:statuses/selected,  to: lg:statuses/verified}
+
+state_constraints: []

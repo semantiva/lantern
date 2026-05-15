@@ -408,7 +408,7 @@
     "workbench_id": "design_selection"
   },
   {
-    "content_hash": "731d4d12a3908b03bb976b9f791b9daa137c9c1ab21cb4d9650b57477b74c932",
+    "content_hash": "8f69eaa7b3bea37542b7cf0b3f76be41d782f7ce44de3c55b6791b0c119cb447",
     "kind": "administration_guide",
     "path": "lantern/administration_procedures/INITIATIVE__AUTHORING_AND_READYING_v0.1.0.md",
     "projection_trace": {
@@ -676,7 +676,7 @@
     "workbench_id": "selected_ci_application"
   },
   {
-    "content_hash": "d364927d362ac60f12b6f27da69c7e2df9084907ffbf07881ed93c9715dfe3a8",
+    "content_hash": "3f44541de28ba8985691e42fee11aa78d6ffae853a9ade12fc64dbd8b81754eb",
     "kind": "administration_guide",
     "path": "lantern/administration_procedures/GT-030__DIP_LOCK_ADMINISTRATION_v0.1.0.md",
     "projection_trace": {
@@ -698,7 +698,7 @@
     "workbench_id": "upstream_intake_and_baselines"
   },
   {
-    "content_hash": "3e3d981f56882ad9e7bd56ab561bcb89519400e97d46071f11c562bc2c43710d",
+    "content_hash": "91603296a65825dc0a015f0b6061665d6b6d8dd5957b2033f645b604fa3534c7",
     "kind": "administration_guide",
     "path": "lantern/administration_procedures/GT-050_GT-060__BASELINE_READINESS_ADMINISTRATION_v0.1.0.md",
     "projection_trace": {
@@ -720,7 +720,7 @@
     "workbench_id": "upstream_intake_and_baselines"
   },
   {
-    "content_hash": "731d4d12a3908b03bb976b9f791b9daa137c9c1ab21cb4d9650b57477b74c932",
+    "content_hash": "8f69eaa7b3bea37542b7cf0b3f76be41d782f7ce44de3c55b6791b0c119cb447",
     "kind": "administration_guide",
     "path": "lantern/administration_procedures/INITIATIVE__AUTHORING_AND_READYING_v0.1.0.md",
     "projection_trace": {

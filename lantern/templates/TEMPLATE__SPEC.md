@@ -32,7 +32,7 @@ Use explicit, checkable criteria.
 
 ## Validation target signal definition (recommended; gate-evaluated)
 
-Provide one or more commands and the expected signal(s) sufficient to later evaluate GT-060 (baseline readiness).
+Provide one or more commands and the expected signal(s) sufficient to later evaluate GT-050 (baseline readiness).
 
 - Command: `[[TEMPLATE:COMMAND]]`
   - Expected signal: `[[TEMPLATE:EXPECTED_SIGNAL]]`
@@ -44,7 +44,7 @@ Provide one or more commands and the expected signal(s) sufficient to later eval
 
 ## Pinning pointers (optional; informative)
 
-This section is optional. Baseline locator evidence is normally captured at GT-060 as an Evidence/Decision record.
+This section is optional. Baseline locator evidence is normally captured at GT-050 as an Evidence/Decision record.
 
 - Candidate baseline locator: `[[TEMPLATE:SPEC_PATH]]@[[TEMPLATE:COMMIT_HASH]]` (or equivalent immutable reference)
 

@@ -22,8 +22,8 @@ from typing import Any
 
 from lantern import GRAMMAR_COMPAT_RANGE
 
-_GRAMMAR_MIN = (0, 3, 0)
-_GRAMMAR_MAX_EXCLUSIVE = (0, 4, 0)
+_GRAMMAR_MIN = (0, 4, 0)
+_GRAMMAR_MAX_EXCLUSIVE = (0, 5, 0)
 _PACKAGE_ROOT = Path(__file__).resolve().parent
 
 
@@ -97,14 +97,23 @@ def _evaluate_versions(package_version: str | None, model_version: str | None) -
             ),
         )
 
-    if package_version and model_version and package_version != model_version:
+    parsed_model_version = _parse_version(model_version)
+    if not parsed_model_version:
         return _unsupported_result(
             package_version=package_version,
             model_version=model_version,
             message=(
-                "Lantern Runtime requires the first lantern-grammar release to keep package and model "
-                f"versions equal; installed package version is {package_version!r} and model version is "
-                f"{model_version!r}."
+                "Lantern Runtime could not determine the installed lantern-grammar model version. "
+                f"Install a compatible version in the supported range {GRAMMAR_COMPAT_RANGE}."
+            ),
+        )
+    if not (_GRAMMAR_MIN <= parsed_model_version < _GRAMMAR_MAX_EXCLUSIVE):
+        return _unsupported_result(
+            package_version=package_version,
+            model_version=model_version,
+            message=(
+                f"Installed lantern-grammar model version {model_version!r} is outside the supported "
+                f"range {GRAMMAR_COMPAT_RANGE}."
             ),
         )
 

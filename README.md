@@ -75,7 +75,7 @@ pip install -e ".[dev,release]"
 Run the authoritative local release gate:
 
 ```bash
-python scripts/check_version_alignment.py --require-grammar-first-release-equality
+python scripts/check_version_alignment.py
 python scripts/check_repo_hygiene.py
 pylint --fail-under=7.5 lantern/
 ruff check lantern/ tests/ scripts/

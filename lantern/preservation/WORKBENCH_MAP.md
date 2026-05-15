@@ -202,8 +202,8 @@ Track observed bugs, defects, and regressions through the governed issue lifecyc
 | Gate | Workbench family | Purpose |
 |---|---|---|
 | GT-030 | Upstream Intake and Baselines | DIP baseline lock |
-| GT-050 | Upstream Intake and Baselines | Architecture definition readiness |
-| GT-060 | Upstream Intake and Baselines | Requirements specification readiness |
+| GT-050 | Upstream Intake and Baselines | Requirements specification readiness |
+| GT-060 | Upstream Intake and Baselines | Architecture definition readiness |
 | GT-110 | CH and TD Readiness | Input kit readiness — CH + TD → CH Ready |
 | GT-115 | Design Selection | Design baseline selection → DB Approved |
 | GT-120 | CI Selection | Change increment selection → CI Selected |

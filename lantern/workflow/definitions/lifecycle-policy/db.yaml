@@ -1,0 +1,9 @@
+id: lg:artifacts/db
+statuses:
+  - {id: lg:statuses/draft,    label: Draft}
+  - {id: lg:statuses/approved, label: Approved}
+
+transitions:
+  - {from: lg:statuses/draft, to: lg:statuses/approved}
+
+state_constraints: []

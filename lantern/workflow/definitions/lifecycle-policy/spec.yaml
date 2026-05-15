@@ -1,0 +1,11 @@
+id: lg:artifacts/spec
+statuses:
+  - {id: lg:statuses/draft,      label: Draft}
+  - {id: lg:statuses/approved,   label: Approved}
+  - {id: lg:statuses/superseded, label: Superseded}
+
+transitions:
+  - {from: lg:statuses/draft,    to: lg:statuses/approved}
+  - {from: lg:statuses/approved, to: lg:statuses/superseded}
+
+state_constraints: []

@@ -55,7 +55,7 @@ def test_no_forbidden_patterns_in_corpus() -> None:
 def test_binding_uses_current_grammar_namespace() -> None:
     content = (PRODUCT_ROOT / "lantern/preservation/LANTERN_MODEL_BINDING.md").read_text(encoding="utf-8")
     assert "lg:artifacts/ch" in content
-    assert "lg:statuses/draft_initiative" in content
+    assert "lg:statuses/draft_initiative" not in content
     assert "th:" not in content
 
 

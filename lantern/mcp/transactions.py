@@ -30,7 +30,10 @@ from lantern.artifacts.allocator import allocate_artifact_id, artifact_path
 from lantern.workflow.merger import InterventionRestrictionGuard, PostureResult
 from lantern.artifacts.renderers import canonical_render_markdown, parse_header_block
 from lantern.artifacts.validator import (
+    _validate_ch_lifecycle_state_constraints,
+    _validate_family_status,
     extract_allowed_change_surface,
+    load_status_contract,
     resolve_gt130_extension_surface,
     validate_artifact_file,
     validate_commit_request,
@@ -180,6 +183,34 @@ class TransactionEngine:
             }
         assert payload is not None
         header = dict(payload["header"])
+        # CH pre-checks: status admissibility + lifecycle target-state constraints.
+        if artifact_family.lower() == "ch":
+            proposed_artifact_id = str(header.get("ch_id", "")).strip() or "CH-DRAFT"
+            _contract = load_status_contract()
+            status_findings = _validate_family_status(
+                "CH",
+                header.get("status"),
+                artifact_id=proposed_artifact_id,
+                contract=_contract,
+            )
+            if status_findings:
+                return {
+                    "status": "invalid",
+                    "contract_ref": contract_ref,
+                    "findings": status_findings,
+                }
+            governance_root = self.governance_root or self.product_root
+            lc_findings = _validate_ch_lifecycle_state_constraints(
+                header,
+                proposed_artifact_id,
+                governance_root=governance_root,
+            )
+            if lc_findings:
+                return {
+                    "status": "invalid",
+                    "contract_ref": contract_ref,
+                    "findings": lc_findings,
+                }
         ch_id = str(header.get("ch_id", "")).strip() or None
         artifact_id_key = f"{artifact_family.lower()}_id"
         artifact_id = str(header.get(artifact_id_key, "")).strip()
@@ -243,6 +274,35 @@ class TransactionEngine:
             return {"status": "invalid", "findings": findings}
         draft_path = self.runtime_root / "drafts" / f"{draft_id}.json"
         draft = json.loads(draft_path.read_text(encoding="utf-8"))
+        # CH pre-checks: status admissibility + lifecycle constraints (before acquiring lock).
+        if str(draft.get("artifact_family", "")).lower() == "ch":
+            ch_header = draft.get("header", {})
+            ch_artifact_id = str(draft.get("artifact_id", ""))
+            _contract = load_status_contract()
+            status_findings = _validate_family_status(
+                "CH",
+                ch_header.get("status"),
+                artifact_id=ch_artifact_id,
+                contract=_contract,
+            )
+            if status_findings:
+                return {
+                    "status": "rejected",
+                    "reason": "invalid_status",
+                    "findings": status_findings,
+                }
+            governance_root = self.governance_root or self.product_root
+            lc_findings = _validate_ch_lifecycle_state_constraints(
+                ch_header,
+                ch_artifact_id,
+                governance_root=governance_root,
+            )
+            if lc_findings:
+                return {
+                    "status": "rejected",
+                    "reason": "lifecycle_constraints",
+                    "findings": lc_findings,
+                }
         acquired = _TRANSACTION_LOCK.acquire(blocking=False)
         if not acquired:
             return {
@@ -535,6 +595,23 @@ class TransactionEngine:
             findings = []
             if not draft.get("preview"):
                 findings.append({"path": "preview", "message": "draft preview missing", "anchor": "draft.preview"})
+            if str(draft.get("artifact_family", "")).lower() == "ch":
+                _contract = load_status_contract()
+                findings.extend(
+                    _validate_family_status(
+                        "CH",
+                        draft.get("header", {}).get("status"),
+                        artifact_id=str(draft.get("artifact_id", "CH-DRAFT")),
+                        contract=_contract,
+                    )
+                )
+                governance_root = self.governance_root or self.product_root
+                lc_findings = _validate_ch_lifecycle_state_constraints(
+                    draft.get("header", {}),
+                    str(draft.get("artifact_id", "CH-DRAFT")),
+                    governance_root=governance_root,
+                )
+                findings.extend(lc_findings)
             return {
                 "scope": "draft",
                 "draft_id": draft_id,

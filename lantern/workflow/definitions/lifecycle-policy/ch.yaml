@@ -1,0 +1,46 @@
+id: lg:artifacts/ch
+statuses:
+  - {id: lg:statuses/proposed,    label: Proposed}
+  - {id: lg:statuses/ready,       label: Ready}
+  - {id: lg:statuses/in_progress, label: In Progress}
+  - {id: lg:statuses/addressed,   label: Addressed}
+
+transitions:
+  - {from: lg:statuses/proposed,    to: lg:statuses/ready}
+  - {from: lg:statuses/ready,       to: lg:statuses/in_progress}
+  - {from: lg:statuses/in_progress, to: lg:statuses/addressed}
+  - {from: lg:statuses/ready,       to: lg:statuses/addressed}
+
+state_constraints:
+  - status: lg:statuses/ready
+    rules:
+      inputs_specs:
+        related_family_id: lg:artifacts/spec
+        constraints:
+          - statuses: [lg:statuses/approved]
+            cardinality: {min: 1}
+          - statuses: [lg:statuses/approved]
+            cardinality: {all: true}
+      inputs_arch:
+        related_family_id: lg:artifacts/arch
+        constraints:
+          - statuses: [lg:statuses/approved]
+            cardinality: {min: 1}
+          - statuses: [lg:statuses/approved]
+            cardinality: {all: true}
+      test_definition_refs:
+        related_family_id: lg:artifacts/td
+        constraints:
+          - statuses: [lg:statuses/approved]
+            cardinality: {min: 1}
+          - statuses: [lg:statuses/approved]
+            cardinality: {all: true}
+  - status: lg:statuses/addressed
+    rules:
+      related_cis:
+        related_family_id: lg:artifacts/ci
+        constraints:
+          - statuses: [lg:statuses/verified]
+            cardinality: {exact: 1}
+          - statuses: [lg:statuses/verified, lg:statuses/rejected]
+            cardinality: {all: true}

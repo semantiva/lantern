@@ -13,20 +13,7 @@ Evidence/Decision:
 Output posture:
 - DIP approved or blocked; SPEC/ARCH drafting may begin on PASS.
 
-## GT-050 — Architecture Definition Readiness
-Purpose:
-- approve ARCH as a reusable baseline for downstream change work.
-
-Required inputs:
-- Approved DIP
-- Draft ARCH
-- Derivation and coherence evidence for the current DIP/SPEC/ARCH draft set
-Evidence/Decision:
-- EV + DEC
-Output posture:
-- ARCH Approved or blocked.
-
-## GT-060 — Requirements Specification Readiness
+## GT-050 — Requirements Specification Readiness
 Purpose:
 - approve SPEC as a reusable baseline for downstream change work.
 
@@ -38,6 +25,19 @@ Evidence/Decision:
 - EV + DEC
 Output posture:
 - SPEC Approved or blocked.
+
+## GT-060 — Architecture Definition Readiness
+Purpose:
+- approve ARCH as a reusable baseline for downstream change work.
+
+Required inputs:
+- Approved DIP
+- Draft ARCH
+- Derivation and coherence evidence for the current DIP/SPEC/ARCH draft set
+Evidence/Decision:
+- EV + DEC
+Output posture:
+- ARCH Approved or blocked.
 
 ## GT-110 — Input Kit Readiness
 Purpose:

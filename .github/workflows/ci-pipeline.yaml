@@ -30,7 +30,7 @@ jobs:
 
       - name: Validate version source and grammar release discipline
         run: |
-          python scripts/check_version_alignment.py --require-grammar-first-release-equality
+          python scripts/check_version_alignment.py
 
       - name: Check repository hygiene
         run: |

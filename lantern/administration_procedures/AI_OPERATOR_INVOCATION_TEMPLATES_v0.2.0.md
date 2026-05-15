@@ -276,16 +276,16 @@ Deliverables:
 ## Template G — Execute GT-050 and GT-060 (baseline readiness)
 
 ```
-We are working on ARCH-#### and SPEC-#### baselines.
+We are working on SPEC-#### and ARCH-#### baselines.
 
 Your task is to execute:
-- `GT-050: Architecture Definition Readiness (ARCH baseline readiness)`
-- `GT-060: Requirements Specification Readiness (SPEC baseline readiness)`
+- `GT-050: Requirements Specification Readiness (SPEC baseline readiness)`
+- `GT-060: Architecture Definition Readiness (ARCH baseline readiness)`
 
 Required fields:
 - ssot_root: <path-to-lantern-workflow-ssot-repo-root>
-- arch_id: ARCH-####
 - spec_id: SPEC-####
+- arch_id: ARCH-####
 
 Scope:
 - In scope: completeness checks, acceptance criteria checks (SPEC), baseline locator or waiver handling, supersession handling, review summary capture, DEC outcomes.

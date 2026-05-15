@@ -41,8 +41,8 @@ Out of scope:
 
 ## Readiness conditions
 - Initiative-owned DIP is Approved (GT-030 PASS)
-- Initiative-owned SPEC is Approved (GT-060 with derivation/coherence evidence satisfied)
-- Initiative-owned ARCH is Approved (GT-050 with derivation/coherence evidence satisfied)
+- Initiative-owned SPEC is Approved (GT-050 with derivation/coherence evidence satisfied)
+- Initiative-owned ARCH is Approved (GT-060 with derivation/coherence evidence satisfied)
 - At least one bounded CH slice is identified and can proceed to GT-110 refinement
 
 ## Inputs / evidence

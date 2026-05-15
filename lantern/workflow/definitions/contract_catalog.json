@@ -30,8 +30,8 @@
           ]
         }
       },
-      "grammar_package_version": "0.3.0",
-      "grammar_version": "0.3.0",
+      "grammar_package_version": "0.4.0",
+      "grammar_version": "0.4.0",
       "runtime_surface_classification": "full_governed_surface",
       "selected_workflow_id": "default_full_governed_surface"
     },
@@ -183,8 +183,8 @@
           ]
         }
       },
-      "grammar_package_version": "0.3.0",
-      "grammar_version": "0.3.0",
+      "grammar_package_version": "0.4.0",
+      "grammar_version": "0.4.0",
       "runtime_surface_classification": "full_governed_surface",
       "selected_workflow_id": "default_full_governed_surface"
     },
@@ -287,8 +287,8 @@
           ]
         }
       },
-      "grammar_package_version": "0.3.0",
-      "grammar_version": "0.3.0",
+      "grammar_package_version": "0.4.0",
+      "grammar_version": "0.4.0",
       "runtime_surface_classification": "full_governed_surface",
       "selected_workflow_id": "default_full_governed_surface"
     },
@@ -429,8 +429,8 @@
           ]
         }
       },
-      "grammar_package_version": "0.3.0",
-      "grammar_version": "0.3.0",
+      "grammar_package_version": "0.4.0",
+      "grammar_version": "0.4.0",
       "runtime_surface_classification": "full_governed_surface",
       "selected_workflow_id": "default_full_governed_surface"
     },
@@ -534,8 +534,8 @@
           ]
         }
       },
-      "grammar_package_version": "0.3.0",
-      "grammar_version": "0.3.0",
+      "grammar_package_version": "0.4.0",
+      "grammar_version": "0.4.0",
       "runtime_surface_classification": "full_governed_surface",
       "selected_workflow_id": "default_full_governed_surface"
     },
@@ -618,8 +618,8 @@
   {
     "compatibility": {
       "gate_dependencies": {},
-      "grammar_package_version": "0.3.0",
-      "grammar_version": "0.3.0",
+      "grammar_package_version": "0.4.0",
+      "grammar_version": "0.4.0",
       "runtime_surface_classification": "full_governed_surface",
       "selected_workflow_id": "default_full_governed_surface"
     },
@@ -692,8 +692,8 @@
   {
     "compatibility": {
       "gate_dependencies": {},
-      "grammar_package_version": "0.3.0",
-      "grammar_version": "0.3.0",
+      "grammar_package_version": "0.4.0",
+      "grammar_version": "0.4.0",
       "runtime_surface_classification": "full_governed_surface",
       "selected_workflow_id": "default_full_governed_surface"
     },
@@ -829,8 +829,8 @@
           ]
         }
       },
-      "grammar_package_version": "0.3.0",
-      "grammar_version": "0.3.0",
+      "grammar_package_version": "0.4.0",
+      "grammar_version": "0.4.0",
       "runtime_surface_classification": "full_governed_surface",
       "selected_workflow_id": "default_full_governed_surface"
     },
@@ -924,33 +924,10 @@
           "relation_ids": [
             "lg:rel/gt_050.requires_evidence.dec",
             "lg:rel/gt_050.requires_evidence.ev",
-            "lg:rel/gt_050.requires_input.arch",
             "lg:rel/gt_050.requires_input.dip",
+            "lg:rel/gt_050.requires_input.spec",
             "lg:rel/gt_050.requires_status.approved",
             "lg:rel/gt_050.requires_status.draft"
-          ],
-          "requires_evidence": [
-            "lg:records/dec",
-            "lg:records/ev"
-          ],
-          "requires_input": [
-            "lg:artifacts/arch",
-            "lg:artifacts/dip"
-          ],
-          "requires_status": [
-            "lg:statuses/approved",
-            "lg:statuses/draft"
-          ]
-        },
-        "GT-060": {
-          "gate_id": "lg:gates/gt_060",
-          "relation_ids": [
-            "lg:rel/gt_060.requires_evidence.dec",
-            "lg:rel/gt_060.requires_evidence.ev",
-            "lg:rel/gt_060.requires_input.dip",
-            "lg:rel/gt_060.requires_input.spec",
-            "lg:rel/gt_060.requires_status.approved",
-            "lg:rel/gt_060.requires_status.draft"
           ],
           "requires_evidence": [
             "lg:records/dec",
@@ -964,10 +941,33 @@
             "lg:statuses/approved",
             "lg:statuses/draft"
           ]
+        },
+        "GT-060": {
+          "gate_id": "lg:gates/gt_060",
+          "relation_ids": [
+            "lg:rel/gt_060.requires_evidence.dec",
+            "lg:rel/gt_060.requires_evidence.ev",
+            "lg:rel/gt_060.requires_input.arch",
+            "lg:rel/gt_060.requires_input.dip",
+            "lg:rel/gt_060.requires_status.approved",
+            "lg:rel/gt_060.requires_status.draft"
+          ],
+          "requires_evidence": [
+            "lg:records/dec",
+            "lg:records/ev"
+          ],
+          "requires_input": [
+            "lg:artifacts/arch",
+            "lg:artifacts/dip"
+          ],
+          "requires_status": [
+            "lg:statuses/approved",
+            "lg:statuses/draft"
+          ]
         }
       },
-      "grammar_package_version": "0.3.0",
-      "grammar_version": "0.3.0",
+      "grammar_package_version": "0.4.0",
+      "grammar_version": "0.4.0",
       "runtime_surface_classification": "full_governed_surface",
       "selected_workflow_id": "default_full_governed_surface"
     },
@@ -1092,8 +1092,8 @@
           ]
         }
       },
-      "grammar_package_version": "0.3.0",
-      "grammar_version": "0.3.0",
+      "grammar_package_version": "0.4.0",
+      "grammar_version": "0.4.0",
       "runtime_surface_classification": "full_governed_surface",
       "selected_workflow_id": "default_full_governed_surface"
     },

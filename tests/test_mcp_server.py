@@ -139,9 +139,9 @@ def test_c01_status_contract_inspect_is_machine_readable(workflow_layer) -> None
     result = handle_inspect(kind="status_contract", workflow_layer=workflow_layer)
 
     assert isinstance(result, InspectStatusContractResult)
-    assert result.authoritative_source_path == "workflow/artifact_status_contract.yaml"
+    assert result.authoritative_source_path == "lantern/workflow/definitions/lifecycle-policy/manifest.yaml"
     assert len(result.projection_sha256) == 64
-    assert result.families["CH"]["canonical_statuses"] == ["Proposed", "Ready", "Addressed"]
+    assert result.families["CH"]["canonical_statuses"] == ["Proposed", "Ready", "In Progress", "Addressed"]
     assert result.families["IS"]["canonical_statuses"] == [
         "NEW",
         "NEEDS_INFO",

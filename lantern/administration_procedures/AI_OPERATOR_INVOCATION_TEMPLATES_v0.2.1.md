@@ -413,17 +413,17 @@ Deliverables:
 ## Template G — Execute GT-050 and GT-060 (baseline readiness)
 
 ```text
-We are working on ARCH-#### and SPEC-#### baselines.
+We are working on SPEC-#### and ARCH-#### baselines.
 
 Your task is to execute:
-- `GT-050: Architecture Definition Readiness (ARCH baseline readiness)`
-- `GT-060: Requirements Specification Readiness (SPEC baseline readiness)`
+- `GT-050: Requirements Specification Readiness (SPEC baseline readiness)`
+- `GT-060: Architecture Definition Readiness (ARCH baseline readiness)`
 
 Required fields:
 - governance_root: <path-to-lantern-workflow-ssot-repo-root>
 - dip_id: DIP-####
-- arch_id: ARCH-####
 - spec_id: SPEC-####
+- arch_id: ARCH-####
 
 Scope:
 - In scope: completeness checks, derivation/coherence evidence review, acceptance criteria checks (SPEC), baseline locator or waiver handling, supersession handling, review summary capture, DEC outcomes.
@@ -438,7 +438,7 @@ Stop condition:
 Deliverables:
 - New `EV-####.md` + `DEC-####.md` for GT-050 (allocate ids with `python tools/allocate_lantern_id.py`)
 - New `EV-####.md` + `DEC-####.md` for GT-060 (allocate ids with `python tools/allocate_lantern_id.py`)
-- Updated ARCH/SPEC statuses (Draft -> Approved on PASS)
+- Updated SPEC/ARCH statuses (Draft -> Approved on PASS)
 - Updated `INDEX.md` at the governance repo root
 ```
 

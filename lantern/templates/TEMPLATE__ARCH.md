@@ -38,7 +38,7 @@ List decisions explicitly (or reference DEC records, if your repo has them).
 
 ## Pinning pointers (optional; informative)
 
-This section is optional. Baseline locator evidence is normally captured at GT-050 as an Evidence/Decision record.
+This section is optional. Baseline locator evidence is normally captured at GT-060 as an Evidence/Decision record.
 
 - Candidate baseline locator: `[[TEMPLATE:ARCH_PATH]]@[[TEMPLATE:COMMIT_HASH]]` (or equivalent immutable reference)
 

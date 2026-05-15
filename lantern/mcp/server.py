@@ -187,6 +187,7 @@ def orient(
         governance_state=governance_state,
         intent=intent or None,
         ch_id=ch_id or None,
+        governance_root=_governance_root,
         posture_result=_get_posture_result(),
     )
     return _to_dict(result)

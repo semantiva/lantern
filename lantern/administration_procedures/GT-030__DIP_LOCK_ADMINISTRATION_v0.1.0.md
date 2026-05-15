@@ -229,7 +229,7 @@ If any check fails, treat GT-030 as incomplete.
 1. Author SPEC draft from the Approved DIP.
 2. Author ARCH draft from the Approved DIP.
 3. Record the derivation and coherence evidence that GT-050 and GT-060 will review.
-4. Run GT-050 (ARCH baseline readiness) and GT-060 (SPEC baseline readiness).
+4. Run GT-050 (SPEC baseline readiness) and GT-060 (ARCH baseline readiness).
 
 These steps are covered by:
 - `guides/GT-050_GT-060__BASELINE_READINESS_ADMINISTRATION_v0.1.0.md`

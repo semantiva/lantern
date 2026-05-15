@@ -77,10 +77,7 @@ def _copy_repo(staging_root: Path) -> None:
 
 def _regenerate_packaged_surface(staging_root: Path) -> tuple[Path, Path]:
     env = os.environ.copy()
-    existing_pythonpath = env.get("PYTHONPATH")
-    env["PYTHONPATH"] = (
-        str(staging_root) if not existing_pythonpath else f"{staging_root}{os.pathsep}{existing_pythonpath}"
-    )
+    env["PYTHONPATH"] = str(staging_root)
     result = subprocess.run(
         [
             sys.executable,

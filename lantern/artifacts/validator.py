@@ -58,6 +58,96 @@ DEFAULT_STATUS_CONTRACT_PATH = (
 )
 _ISSUE_STATUS_RE = re.compile(r"^Status:\s*(?P<status>[A-Za-z_][A-Za-z_ ]*)\s*$", re.MULTILINE)
 _ACTIVE_CI_STATUSES = {"Draft", "Candidate", "Selected"}
+
+# --- Lifecycle-bundle-driven CH constraint enforcement (CH-0027) ---
+
+_FAMILY_ID_TO_DIR: dict[str, str] = {
+    "lg:artifacts/spec": "spec",
+    "lg:artifacts/arch": "arch",
+    "lg:artifacts/td": "td",
+    "lg:artifacts/ci": "ci",
+    "lg:artifacts/ch": "ch",
+    "lg:artifacts/dip": "dip",
+    "lg:artifacts/db": "db",
+    "lg:artifacts/dc": "dc",
+}
+
+_GRAMMAR_CH_STATUS_TO_DISPLAY = {
+    "lg:statuses/ready": "Ready",
+    "lg:statuses/addressed": "Addressed",
+    "lg:statuses/proposed": "Proposed",
+    "lg:statuses/in_progress": "In Progress",
+}
+
+_CH_CUTOVER_ID = 27
+
+
+@lru_cache(maxsize=1)
+def _get_ch_lifecycle_constraints() -> tuple:
+    """Load CH state constraints from the lifecycle declaration bundle (cached)."""
+    try:
+        from lantern_grammar import Grammar, Lifecycle
+    except ImportError:
+        return ()
+    from lantern._compat import get_package_resource_path
+
+    grammar = Grammar.load()
+    manifest_path = get_package_resource_path("workflow/definitions/lifecycle-policy/manifest.yaml")
+    lc = Lifecycle.from_manifest(grammar, manifest_path)
+    return tuple(lc.state_constraints_for("lg:artifacts/ch"))
+
+
+def _as_refs(value: Any) -> list[str]:
+    if isinstance(value, list):
+        return [str(v).strip() for v in value if str(v).strip()]
+    if isinstance(value, str) and value.strip():
+        return [value.strip()]
+    return []
+
+
+_CH_SLOT_EXTRACTORS: dict[str, Any] = {
+    "inputs_specs": lambda h: _as_refs((h.get("inputs") or {}).get("specs")),
+    "inputs_arch": lambda h: _as_refs((h.get("inputs") or {}).get("arch")),
+    "test_definition_refs": lambda h: _as_refs(h.get("test_definition_refs")),
+    "related_cis": lambda h: _as_refs(h.get("related_cis")),
+}
+
+
+def _grammar_to_display_for_family(family_dir: str, contract: Mapping[str, Any]) -> dict[str, str]:
+    families = contract.get("families", {})
+    data = families.get(family_dir.upper(), {})
+    mapping = data.get("grammar_mapping", {})
+    return {gid: display for display, gid in mapping.items()}
+
+
+def _resolve_artifact_status_from_corpus(governance_root: Path, artifact_id: str) -> tuple[str | None, str | None]:
+    """Return (status, resolved_family_id). Status is None if artifact not found or cannot be parsed."""
+    prefix = artifact_id.split("-")[0].lower()
+    candidate_family_id = f"lg:artifacts/{prefix}"
+    if candidate_family_id in _FAMILY_ID_TO_DIR:
+        resolved_family_id: str | None = candidate_family_id
+        family_dir = _FAMILY_ID_TO_DIR[candidate_family_id]
+    else:
+        resolved_family_id = None
+        family_dir = prefix
+    artifact_file = governance_root / family_dir / f"{artifact_id}.md"
+    if not artifact_file.exists():
+        return None, resolved_family_id
+    try:
+        header = parse_header_block(artifact_file.read_text(encoding="utf-8"))
+        status = str(header.get("status", "")).strip() or None
+        return status, resolved_family_id
+    except Exception:
+        return None, resolved_family_id
+
+
+def _ch_numeric_id(artifact_id: str) -> int:
+    try:
+        return int(artifact_id.replace("CH-", "").split("-")[0])
+    except (ValueError, IndexError):
+        return 9999
+
+
 _GT130_EXTENSION_REQUIRED_FLAGS = (
     "discovered_during_gt130",
     "bounded_integration_gap",
@@ -325,6 +415,16 @@ def validate_artifact_file(path: Path) -> list[ValidationFinding]:
         findings.append(_finding("header.title", "header title must be a non-empty string", anchor="artifact.header"))
     if "# " not in text:
         findings.append(_finding("body", "artifact body must contain a level-1 title", anchor="artifact.body"))
+    family = path.parent.name
+    if family == "ch":
+        governance_root = path.parent.parent if path.parent.parent.is_dir() else None
+        contract = load_status_contract()
+        findings.extend(_validate_family_status("CH", header.get("status"), artifact_id=path.stem, contract=contract))
+        findings.extend(
+            _validate_ch_lifecycle_state_constraints(
+                header, path.stem, governance_root=governance_root, contract=contract
+            )
+        )
     return findings
 
 
@@ -569,11 +669,13 @@ def validate_governance_corpus(governance_root: Path) -> list[ValidationFinding]
         if not base.is_dir():
             continue
         for path in sorted(base.glob("*.md")):
-            findings.extend(_validate_governed_artifact(path, contract))
+            findings.extend(_validate_governed_artifact(path, contract, governance_root))
     return findings
 
 
-def _validate_governed_artifact(path: Path, contract: Mapping[str, Any]) -> list[ValidationFinding]:
+def _validate_governed_artifact(
+    path: Path, contract: Mapping[str, Any], governance_root: Path | None = None
+) -> list[ValidationFinding]:
     family = path.parent.name
     artifact_id = path.stem
     if family == "is":
@@ -636,6 +738,12 @@ def _validate_governed_artifact(path: Path, contract: Mapping[str, Any]) -> list
     )
     if family == "ci":
         findings.extend(_validate_ci_change_surface_justifications(header, artifact_id))
+    elif family == "ch":
+        findings.extend(
+            _validate_ch_lifecycle_state_constraints(
+                header, artifact_id, governance_root=governance_root, contract=contract
+            )
+        )
     elif family == "ev":
         findings.extend(_validate_gt130_extension_evidence(header, artifact_id))
     elif family == "dec":
@@ -692,6 +800,152 @@ def _extract_h1(text: str) -> str:
         if stripped.startswith("# "):
             return stripped[2:].strip()
     return ""
+
+
+def _validate_ch_lifecycle_state_constraints(
+    header: Mapping[str, Any],
+    artifact_id: str,
+    *,
+    governance_root: Path | None = None,
+    contract: Mapping[str, Any] | None = None,
+) -> list[ValidationFinding]:
+    """Enforce CH lifecycle state constraints using rules from the lifecycle declaration bundle.
+
+    CHs with numeric ID >= _CH_CUTOVER_ID receive full enforcement: referenced artifacts must
+    exist in the corpus and must have the required statuses. Pre-cutover CHs receive presence-only
+    checks to preserve the historical-evidence posture.
+    """
+    findings: list[ValidationFinding] = []
+    status = str(header.get("status", "")).strip()
+    constraints = _get_ch_lifecycle_constraints()
+    if not constraints:
+        return findings
+
+    if contract is None:
+        contract = load_status_contract()
+
+    ch_num = _ch_numeric_id(artifact_id)
+    full_enforcement = (governance_root is not None) and (ch_num >= _CH_CUTOVER_ID)
+
+    for state_constraint in constraints:
+        expected_display = _GRAMMAR_CH_STATUS_TO_DISPLAY.get(state_constraint.status_id)
+        if expected_display is None or status != expected_display:
+            continue
+        anchor = f"lifecycle_policy.ch_{status.lower().replace(' ', '_')}_constraints"
+
+        for traversal in state_constraint.traversals:
+            slot = traversal.slot
+            extract = _CH_SLOT_EXTRACTORS.get(slot)
+            if extract is None:
+                continue
+            refs = extract(header)
+            family_dir = _FAMILY_ID_TO_DIR.get(traversal.related_family_id, "")
+            g2d = _grammar_to_display_for_family(family_dir, contract)
+
+            if not full_enforcement:
+                # Presence-only: any reference satisfies the slot
+                needs_min = any(
+                    r.cardinality.min_count is not None or r.cardinality.exact is not None for r in traversal.rules
+                )
+                if needs_min and not refs:
+                    findings.append(
+                        _finding(
+                            f"{artifact_id}.{slot}",
+                            f"CH in {status} status must declare at least one {slot} reference",
+                            anchor=anchor,
+                            artifact_id=artifact_id,
+                        )
+                    )
+                continue
+
+            # Full enforcement: resolve all references once — returns (status, resolved_family_id)
+            resolved: dict[str, tuple[str | None, str | None]] = {}
+            for ref_id in refs:
+                resolved[ref_id] = _resolve_artifact_status_from_corpus(governance_root, ref_id)  # type: ignore[arg-type]
+
+            # Check family mismatches and missing artifacts (once, not per rule)
+            family_mismatches: set[str] = set()
+            for ref_id, (ref_status, ref_family_id) in resolved.items():
+                if ref_family_id is not None and ref_family_id != traversal.related_family_id:
+                    findings.append(
+                        _finding(
+                            f"{artifact_id}.{slot}",
+                            (
+                                f"CH {status}: {slot} references {ref_id!r} which belongs to family "
+                                f"{ref_family_id!r}; expected family {traversal.related_family_id!r}"
+                            ),
+                            anchor=anchor,
+                            artifact_id=artifact_id,
+                        )
+                    )
+                    family_mismatches.add(ref_id)
+                elif ref_status is None:
+                    findings.append(
+                        _finding(
+                            f"{artifact_id}.{slot}",
+                            f"CH {status}: referenced {slot} artifact {ref_id!r} does not exist in the governance corpus",
+                            anchor=anchor,
+                            artifact_id=artifact_id,
+                        )
+                    )
+
+            # For cardinality rules, only consider correctly-typed (non-mismatched) refs
+            eligible: dict[str, str | None] = {
+                ref: st for ref, (st, _fam) in resolved.items() if ref not in family_mismatches
+            }
+
+            for rule in traversal.rules:
+                allowed_display = {g2d.get(gid, gid) for gid in rule.statuses}
+                cardinality = rule.cardinality
+
+                if cardinality.min_count is not None:
+                    matching = [ref for ref, st in eligible.items() if st in allowed_display]
+                    if len(matching) < cardinality.min_count:
+                        findings.append(
+                            _finding(
+                                f"{artifact_id}.{slot}",
+                                (
+                                    f"CH {status}: at least {cardinality.min_count} {slot} reference(s) must have "
+                                    f"status in {sorted(allowed_display)}; "
+                                    f"found {len(matching)} of {len(eligible)} with required status"
+                                ),
+                                anchor=anchor,
+                                artifact_id=artifact_id,
+                            )
+                        )
+
+                elif cardinality.is_all:
+                    for ref_id, ref_status in eligible.items():
+                        if ref_status is not None and ref_status not in allowed_display:
+                            findings.append(
+                                _finding(
+                                    f"{artifact_id}.{slot}",
+                                    (
+                                        f"CH {status}: {slot} artifact {ref_id!r} has status {ref_status!r}; "
+                                        f"all referenced {slot} artifacts must have status in {sorted(allowed_display)}"
+                                    ),
+                                    anchor=anchor,
+                                    artifact_id=artifact_id,
+                                )
+                            )
+
+                elif cardinality.exact is not None:
+                    matching = [ref for ref, st in eligible.items() if st in allowed_display]
+                    if len(matching) != cardinality.exact:
+                        findings.append(
+                            _finding(
+                                f"{artifact_id}.{slot}",
+                                (
+                                    f"CH {status}: exactly {cardinality.exact} {slot} reference(s) must have "
+                                    f"status in {sorted(allowed_display)}; "
+                                    f"found {len(matching)} of {len(eligible)}"
+                                ),
+                                anchor=anchor,
+                                artifact_id=artifact_id,
+                            )
+                        )
+
+    return findings
 
 
 def _validate_ci_change_surface_justifications(

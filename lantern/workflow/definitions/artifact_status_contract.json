@@ -1,10 +1,11 @@
 {
   "projection_kind": "artifact_status_contract",
+  "posture": "compatibility_projection_bridge",
   "generated_from": {
-    "authoritative_path": "workflow/artifact_status_contract.yaml",
-    "schema_path": "workflow/artifact_status_contract.schema.json",
+    "authoritative_path": "lantern/workflow/definitions/lifecycle-policy/manifest.yaml",
+    "bridge_authority": "lifecycle_declaration_bundle",
     "version": "1.0.0",
-    "date": "2026-04-08"
+    "date": "2026-05-14"
   },
   "families": {
     "INI": {
@@ -17,11 +18,11 @@
         {"from": "In Progress", "to": "Concluded"}
       ],
       "grammar_mapping": {
-        "Draft": "lg:statuses/draft_initiative",
-        "Proposed": "lg:statuses/proposed_initiative",
-        "Ready": "lg:statuses/ready_initiative",
-        "In Progress": "lg:statuses/in_progress_initiative",
-        "Concluded": "lg:statuses/concluded_initiative"
+        "Draft": "lg:statuses/draft",
+        "Proposed": "lg:statuses/proposed",
+        "Ready": "lg:statuses/ready",
+        "In Progress": "lg:statuses/in_progress",
+        "Concluded": "lg:statuses/concluded"
       },
       "aliases": {
         "InProgress": "In Progress"
@@ -90,19 +91,21 @@
     },
     "CH": {
       "ownership": "grammar_semantic",
-      "canonical_statuses": ["Proposed", "Ready", "Addressed"],
+      "canonical_statuses": ["Proposed", "Ready", "In Progress", "Addressed"],
       "transitions": [
         {"from": "Proposed", "to": "Ready"},
+        {"from": "Ready", "to": "In Progress"},
+        {"from": "In Progress", "to": "Addressed"},
         {"from": "Ready", "to": "Addressed"}
       ],
       "grammar_mapping": {
         "Proposed": "lg:statuses/proposed",
         "Ready": "lg:statuses/ready",
+        "In Progress": "lg:statuses/in_progress",
         "Addressed": "lg:statuses/addressed"
       },
       "aliases": {
         "Draft": null,
-        "InProgress": null,
         "Selected": null
       },
       "normal_path_policy": "reject_alias"

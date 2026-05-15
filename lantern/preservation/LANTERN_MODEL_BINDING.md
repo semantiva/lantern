@@ -42,11 +42,11 @@ This document maps workflow terms and gates to Lantern model semantic identifier
 - `Selected` -> `lg:statuses/selected`
 - `Rejected` -> `lg:statuses/rejected`
 - `Verified` -> `lg:statuses/verified`
-- `Draft` (Initiative) -> `lg:statuses/draft_initiative`
-- `Proposed` (Initiative) -> `lg:statuses/proposed_initiative`
-- `Ready` (Initiative) -> `lg:statuses/ready_initiative`
-- `InProgress` -> `lg:statuses/in_progress_initiative`
-- `Concluded` -> `lg:statuses/concluded_initiative`
+- `Draft` (Initiative) -> `lg:statuses/draft`
+- `Proposed` (Initiative) -> `lg:statuses/proposed`
+- `Ready` (Initiative) -> `lg:statuses/ready`
+- `In Progress` (Initiative/CH) -> `lg:statuses/in_progress`
+- `Concluded` (Initiative) -> `lg:statuses/concluded`
 
 ## Binding rule
 

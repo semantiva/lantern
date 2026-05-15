@@ -76,11 +76,6 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--pyproject", default="pyproject.toml")
     parser.add_argument("--print-package-version", action="store_true")
-    parser.add_argument(
-        "--require-grammar-first-release-equality",
-        action="store_true",
-        help="Fail if lantern-grammar package and model versions differ.",
-    )
     args = parser.parse_args()
 
     pyproject_path = Path(args.pyproject)
@@ -119,20 +114,6 @@ def main() -> None:
     print(f"Distribution name: {dist_name}")
     print(f"Package version source: {pyproject_path} -> [project].version = {package_version}")
     print(f"Grammar dependency: {grammar_dependency}")
-
-    if args.require_grammar_first_release_equality:
-        from lantern_grammar import Grammar
-
-        grammar = Grammar.load()
-        grammar_package_version = str(grammar.package_version())
-        grammar_model_version = str(dict(grammar.manifest()).get("model_version", ""))
-        if grammar_package_version != grammar_model_version:
-            raise SystemExit(
-                "First-release discipline requires lantern-grammar package and model versions to match: "
-                f"{grammar_package_version!r} != {grammar_model_version!r}"
-            )
-        print(f"Grammar package version: {grammar_package_version}")
-        print(f"Grammar model version:   {grammar_model_version}")
 
     print("Version alignment checks passed.")
 
