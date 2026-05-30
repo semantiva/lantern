@@ -4,12 +4,23 @@ statuses:
   - {id: lg:statuses/ready,       label: Ready}
   - {id: lg:statuses/in_progress, label: In Progress}
   - {id: lg:statuses/addressed,   label: Addressed}
+  - {id: lg:statuses/rejected,    label: Rejected}
 
 transitions:
+  # Forward
   - {from: lg:statuses/proposed,    to: lg:statuses/ready}
   - {from: lg:statuses/ready,       to: lg:statuses/in_progress}
   - {from: lg:statuses/in_progress, to: lg:statuses/addressed}
   - {from: lg:statuses/ready,       to: lg:statuses/addressed}
+  # Backward — demotion for adaptation when upstream changes (CH-0028, IS-0033)
+  - {from: lg:statuses/ready,       to: lg:statuses/proposed}
+  - {from: lg:statuses/in_progress, to: lg:statuses/ready}
+  # Rejection — terminal-ish but reversible via resurrection (CH-0028, IS-0033)
+  - {from: lg:statuses/proposed,    to: lg:statuses/rejected}
+  - {from: lg:statuses/ready,       to: lg:statuses/rejected}
+  - {from: lg:statuses/in_progress, to: lg:statuses/rejected}
+  # Resurrection from Rejected (CH-0028, IS-0033) — via Proposed only; Ready skipped to preserve GT-110 gate discipline
+  - {from: lg:statuses/rejected,    to: lg:statuses/proposed}
 
 state_constraints:
   - status: lg:statuses/ready

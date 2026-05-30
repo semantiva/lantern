@@ -1,9 +1,11 @@
 id: lg:artifacts/td
 statuses:
-  - {id: lg:statuses/draft,    label: Draft}
-  - {id: lg:statuses/approved, label: Approved}
+  - {id: lg:statuses/draft,      label: Draft}
+  - {id: lg:statuses/approved,   label: Approved}
+  - {id: lg:statuses/superseded, label: Superseded}
 
 transitions:
-  - {from: lg:statuses/draft, to: lg:statuses/approved}
+  - {from: lg:statuses/draft,    to: lg:statuses/approved}
+  - {from: lg:statuses/approved, to: lg:statuses/superseded}  # CH-0028, IS-0033
 
 state_constraints: []
