@@ -170,6 +170,7 @@ _LIFECYCLE_TO_PROJECTION_FAMILY: dict[str, str] = {
     "lg:artifacts/dc": "DC",
     "lg:artifacts/db": "DB",
     "lg:artifacts/ci": "CI",
+    "lg:artifacts/issue": "IS",
 }
 
 

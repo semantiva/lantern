@@ -75,9 +75,24 @@ def _copy_repo(staging_root: Path) -> None:
             shutil.copy2(item, destination)
 
 
+def _pythonpath_for_staging(staging_root: Path) -> str:
+    entries = [str(staging_root)]
+    inherited = os.environ.get("PYTHONPATH", "")
+    cwd = Path.cwd().resolve()
+    for raw_entry in inherited.split(os.pathsep):
+        entry = raw_entry.strip()
+        if not entry:
+            continue
+        entry_path = Path(entry)
+        if not entry_path.is_absolute():
+            entry_path = cwd / entry_path
+        entries.append(str(entry_path.resolve()))
+    return os.pathsep.join(entries)
+
+
 def _regenerate_packaged_surface(staging_root: Path) -> tuple[Path, Path]:
     env = os.environ.copy()
-    env["PYTHONPATH"] = str(staging_root)
+    env["PYTHONPATH"] = _pythonpath_for_staging(staging_root)
     result = subprocess.run(
         [
             sys.executable,

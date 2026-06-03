@@ -123,9 +123,9 @@
   ],
   "workflow_release": {
     "contract_catalog_hash": "5ff5781dc573b5ce144a21099771945958af9d54f7fe7a9f5ed7ad1cef455cdd",
-    "grammar_package_version": "0.4.1",
-    "grammar_version": "0.4.1",
+    "grammar_package_version": "0.5.0",
+    "grammar_version": "0.5.0",
     "resource_manifest_hash": "a096de06cc0c3e4e7ef32cb5d3f5fd933a3d064348eaf6d30756515b6b41dfa3",
-    "workflow_layer_hash": "69835d993c199600acc71c0cc79c7ce1fbdb55bdd242448a865eeb4d4417dfcf"
+    "workflow_layer_hash": "26badf1a76451b42c85ac9ac153da283e051bfaa4ec7b386d76d35338af2aed1"
   }
 }

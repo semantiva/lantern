@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""TD-0027 proxy tests for CH-0027: Lantern Grammar 0.4.0 Runtime and Lifecycle Compatibility."""
+"""TD-0027 proxy tests for CH-0027: Lantern Grammar lifecycle compatibility."""
 
 from __future__ import annotations
 
@@ -32,28 +32,28 @@ def _grammar():
     return Grammar.load()
 
 
-# ── TC-001 / TC-002: Runtime and package metadata agree on 0.4.x ─────────────
+# ── TC-001 / TC-002: Runtime and package metadata agree on current grammar ───
 
 
-def test_tc001_runtime_accepts_grammar_040() -> None:
+def test_tc001_runtime_accepts_current_grammar() -> None:
     from lantern._compat import check_grammar_compatibility
     from lantern.workflow import load_workflow_layer
 
     result = check_grammar_compatibility()
     assert result["status"] == "ok", result
     wl = load_workflow_layer(enforce_generated_artifacts=True)
-    assert wl.grammar_version.startswith("0.4.")
-    assert wl.grammar_package_version.startswith("0.4.")
+    assert wl.grammar_version.startswith("0.5.")
+    assert wl.grammar_package_version.startswith("0.5.")
 
 
-def test_tc002_compat_check_accepts_040_model_and_package() -> None:
+def test_tc002_compat_check_accepts_current_model_and_package() -> None:
     from lantern._compat import check_grammar_compatibility
 
     result = check_grammar_compatibility()
     assert result["status"] == "ok"
-    assert result["installed_model_version"].startswith("0.4.")
-    assert result["installed_package_version"].startswith("0.4.")
-    assert result["supported_range"] == ">=0.4.0,<0.5.0"
+    assert result["installed_model_version"].startswith("0.5.")
+    assert result["installed_package_version"].startswith("0.5.")
+    assert result["supported_range"] == ">=0.5.0,<0.6.0"
 
 
 # ── TC-003: Removed _initiative status IDs absent from live surfaces ──────────
@@ -76,10 +76,10 @@ def test_tc003_removed_initiative_ids_absent_from_status_contract() -> None:
             ), f"Removed _initiative ID {status_id!r} in status contract family {family_id}"
 
 
-# ── TC-004: Live status IDs resolve through Grammar 0.4.0 ─────────────────────
+# ── TC-004: Live status IDs resolve through current Grammar ───────────────────
 
 
-def test_tc004_live_grammar_ids_resolve_in_040() -> None:
+def test_tc004_live_grammar_ids_resolve() -> None:
     grammar = _grammar()
     contract = json.loads(STATUS_CONTRACT_PATH.read_text(encoding="utf-8"))
     for family_id, family_data in contract["families"].items():
@@ -88,7 +88,7 @@ def test_tc004_live_grammar_ids_resolve_in_040() -> None:
             entity = grammar.get_entity(grammar_id)
             assert entity is not None, (
                 f"Grammar ID {grammar_id!r} (family={family_id}, status={display_name!r}) "
-                f"does not resolve in grammar 0.4.0"
+                "does not resolve in the current grammar"
             )
 
 
@@ -105,7 +105,7 @@ def test_tc005_lifecycle_bundle_validates_against_grammar() -> None:
     from lantern_grammar import Grammar, Lifecycle
 
     grammar = Grammar.load()
-    assert grammar.manifest()["model_version"].startswith("0.4.")
+    assert grammar.manifest()["model_version"].startswith("0.5.")
     lc = Lifecycle.from_manifest(grammar, LIFECYCLE_POLICY_MANIFEST)
     result = lc.validate()
     assert result.ok, [f"{i.path}: {i.message}" for i in result.issues]
@@ -115,7 +115,7 @@ def test_tc005_lifecycle_manifest_schema_version() -> None:
     manifest = yaml.safe_load(LIFECYCLE_POLICY_MANIFEST.read_text(encoding="utf-8"))
     assert manifest["schema_version"] == "1.0"
     min_version = manifest["grammar_compatibility"]["min_model_version"]
-    assert min_version == "0.4.0"
+    assert min_version == "0.5.0"
 
 
 # ── TC-006: Family coverage and lifecycle derivation completeness ──────────────
@@ -136,6 +136,7 @@ def test_tc006_lifecycle_family_coverage_is_complete() -> None:
         "lg:artifacts/dc",
         "lg:artifacts/db",
         "lg:artifacts/ci",
+        "lg:artifacts/issue",
     }
     assert set(lc.artifact_families()) == expected
 
@@ -478,10 +479,10 @@ def test_tc014_lifecycle_projection_divergence_is_rejected(tmp_path: Path) -> No
 def test_tc002_missing_model_version_is_rejected() -> None:
     from lantern._compat import _evaluate_versions
 
-    result = _evaluate_versions("0.4.0", "")
+    result = _evaluate_versions("0.5.0", "")
     assert result["status"] == "unsupported", "Missing model version must be reported as unsupported, not ok"
 
-    result2 = _evaluate_versions("0.4.0", None)
+    result2 = _evaluate_versions("0.5.0", None)
     assert result2["status"] == "unsupported", "None model version must be reported as unsupported, not ok"
 
 
@@ -500,7 +501,7 @@ def test_tc003_no_live_procedure_inverts_gt050_gt060() -> None:
         ), f"{proc_file.name}: still describes GT-060 as SPEC baseline readiness"
 
 
-# ── TC-012: GT-050/GT-060 live semantics match Grammar 0.4.0 ─────────────────
+# ── TC-012: GT-050/GT-060 live semantics match current grammar ────────────────
 
 
 def test_tc012_gt050_maps_to_spec_readiness() -> None:
@@ -534,10 +535,10 @@ def test_tc013_generated_artifacts_pass_enforcement() -> None:
     from lantern.workflow import load_workflow_layer
 
     wl = load_workflow_layer(enforce_generated_artifacts=True)
-    assert wl.grammar_version.startswith("0.4.")
+    assert wl.grammar_version.startswith("0.5.")
 
 
-def test_tc013_contract_catalog_records_040_grammar() -> None:
+def test_tc013_contract_catalog_records_current_grammar() -> None:
     from lantern.workflow import load_workflow_layer
 
     wl = load_workflow_layer(enforce_generated_artifacts=False)
@@ -545,8 +546,8 @@ def test_tc013_contract_catalog_records_040_grammar() -> None:
         compat = entry.compatibility
         grammar_version = compat.get("grammar_version", "")
         assert grammar_version.startswith(
-            "0.4."
-        ), f"Expected grammar 0.4.x in contract_catalog entry, got: {grammar_version!r}"
+            "0.5."
+        ), f"Expected grammar 0.5.x in contract_catalog entry, got: {grammar_version!r}"
 
 
 # ── TC-017: Repository boundary respected ─────────────────────────────────────

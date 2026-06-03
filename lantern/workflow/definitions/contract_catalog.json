@@ -75,8 +75,8 @@
       }
     ],
     "compatibility": {
-      "grammar_version": "0.4.1",
-      "grammar_package_version": "0.4.1",
+      "grammar_version": "0.5.0",
+      "grammar_package_version": "0.5.0",
       "gate_dependencies": {
         "GT-110": {
           "gate_id": "lg:gates/gt_110",
@@ -177,8 +177,8 @@
       }
     ],
     "compatibility": {
-      "grammar_version": "0.4.1",
-      "grammar_package_version": "0.4.1",
+      "grammar_version": "0.5.0",
+      "grammar_package_version": "0.5.0",
       "gate_dependencies": {
         "GT-115": {
           "gate_id": "lg:gates/gt_115",
@@ -321,8 +321,8 @@
       }
     ],
     "compatibility": {
-      "grammar_version": "0.4.1",
-      "grammar_package_version": "0.4.1",
+      "grammar_version": "0.5.0",
+      "grammar_package_version": "0.5.0",
       "gate_dependencies": {
         "GT-120": {
           "gate_id": "lg:gates/gt_120",
@@ -424,8 +424,8 @@
       }
     ],
     "compatibility": {
-      "grammar_version": "0.4.1",
-      "grammar_package_version": "0.4.1",
+      "grammar_version": "0.5.0",
+      "grammar_package_version": "0.5.0",
       "gate_dependencies": {
         "GT-110": {
           "gate_id": "lg:gates/gt_110",
@@ -567,8 +567,8 @@
       }
     ],
     "compatibility": {
-      "grammar_version": "0.4.1",
-      "grammar_package_version": "0.4.1",
+      "grammar_version": "0.5.0",
+      "grammar_package_version": "0.5.0",
       "gate_dependencies": {
         "GT-115": {
           "gate_id": "lg:gates/gt_115",
@@ -673,8 +673,8 @@
       }
     ],
     "compatibility": {
-      "grammar_version": "0.4.1",
-      "grammar_package_version": "0.4.1",
+      "grammar_version": "0.5.0",
+      "grammar_package_version": "0.5.0",
       "gate_dependencies": {},
       "runtime_surface_classification": "full_governed_surface",
       "selected_workflow_id": "default_full_governed_surface"
@@ -751,8 +751,8 @@
       }
     ],
     "compatibility": {
-      "grammar_version": "0.4.1",
-      "grammar_package_version": "0.4.1",
+      "grammar_version": "0.5.0",
+      "grammar_package_version": "0.5.0",
       "gate_dependencies": {},
       "runtime_surface_classification": "full_governed_surface",
       "selected_workflow_id": "default_full_governed_surface"
@@ -822,8 +822,8 @@
       }
     ],
     "compatibility": {
-      "grammar_version": "0.4.1",
-      "grammar_package_version": "0.4.1",
+      "grammar_version": "0.5.0",
+      "grammar_package_version": "0.5.0",
       "gate_dependencies": {
         "GT-120": {
           "gate_id": "lg:gates/gt_120",
@@ -977,8 +977,8 @@
       }
     ],
     "compatibility": {
-      "grammar_version": "0.4.1",
-      "grammar_package_version": "0.4.1",
+      "grammar_version": "0.5.0",
+      "grammar_package_version": "0.5.0",
       "gate_dependencies": {
         "GT-030": {
           "gate_id": "lg:gates/gt_030",
@@ -1134,8 +1134,8 @@
       }
     ],
     "compatibility": {
-      "grammar_version": "0.4.1",
-      "grammar_package_version": "0.4.1",
+      "grammar_version": "0.5.0",
+      "grammar_package_version": "0.5.0",
       "gate_dependencies": {
         "GT-130": {
           "gate_id": "lg:gates/gt_130",

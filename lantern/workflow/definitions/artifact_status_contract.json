@@ -5,7 +5,7 @@
     "authoritative_path": "lantern/workflow/definitions/lifecycle-policy/manifest.yaml",
     "bridge_authority": "lifecycle_declaration_bundle",
     "version": "1.0.0",
-    "date": "2026-05-30"
+    "date": "2026-06-03"
   },
   "families": {
     "INI": {
@@ -301,7 +301,7 @@
       "normal_path_policy": "reject_unknown"
     },
     "IS": {
-      "ownership": "workflow_operational",
+      "ownership": "grammar_semantic",
       "canonical_statuses": [
         "NEW",
         "NEEDS_INFO",
@@ -329,6 +329,10 @@
         },
         {
           "from": "NEEDS_INFO",
+          "to": "NEW"
+        },
+        {
+          "from": "NEEDS_INFO",
           "to": "ACCEPTED"
         },
         {
@@ -352,7 +356,14 @@
           "to": "REJECTED"
         }
       ],
-      "grammar_mapping": {},
+      "grammar_mapping": {
+        "NEW": "lg:statuses/new",
+        "NEEDS_INFO": "lg:statuses/needs_info",
+        "ACCEPTED": "lg:statuses/accepted",
+        "DEFERRED": "lg:statuses/deferred",
+        "REJECTED": "lg:statuses/rejected",
+        "RESOLVED": "lg:statuses/resolved"
+      },
       "aliases": {
         "Open": null,
         "Closed": null,

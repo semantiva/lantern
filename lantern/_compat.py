@@ -22,8 +22,8 @@ from typing import Any
 
 from lantern import GRAMMAR_COMPAT_RANGE
 
-_GRAMMAR_MIN = (0, 4, 0)
-_GRAMMAR_MAX_EXCLUSIVE = (0, 5, 0)
+_GRAMMAR_MIN = (0, 5, 0)
+_GRAMMAR_MAX_EXCLUSIVE = (0, 6, 0)
 _PACKAGE_ROOT = Path(__file__).resolve().parent
 
 
