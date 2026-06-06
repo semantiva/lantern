@@ -3,31 +3,18 @@ Operator instruction resource for workbench selected_ci_application.
 ## Workbench
 Display name: Selected CI Application
 Lifecycle kind: lifecycle_span
+Transaction posture: inspect, commit, validate
 
 ## Artifacts in scope
 CI
 
-## Key actions
-- Read and follow Lantern-local guidance in lantern/preservation/WORKSPACE_TOPOLOGY.md.
-- Use companion guidance in lantern/preservation/WORKBENCH_MAP.md when the workbench crosses a gate boundary.
-- Keep all emitted references inside the approved Lantern-local corpus.
+## Bound resource roles
+Consult, via MCP, the resources the workflow layer binds to this workbench. Route to them; do not restate their content. This workbench binds:
+- administration guides (authoring contracts and administration procedures bound to this workbench)
+- artifact templates for the families in scope
 
-## MCP usage
-- Inspect the selected change increment before changing product files.
-- Apply only the approved Lantern-local change surface.
-- Collect executable verification evidence for closure preparation.
-
-## Constraints
-- Respect posture constraints: product_writes_permitted.
-- Do not emit references outside Lantern-local paths.
-- Keep the workbench guidance inside the approved CH-0007 change surface.
-
-Referenced Lantern-local guides:
-- lantern/preservation/WORKSPACE_TOPOLOGY.md
-- lantern/preservation/WORKBENCH_MAP.md
-
-
-## Post-application administration
-- Inspect the selected CI change surface before writing product files.
-- Treat `.gitignore` hygiene as runtime-managed; do not author `.gitignore` mutations in the operator payload.
-- After commit, capture the emitted `application_handoff` metadata and use its next-step anchors to prepare GT-130 verification.
+## Hard stops
+- Each gate requires explicit human approval by default. Bounded multi-gate authorization applies only when the human names the authorized scope; it stops at any blocker, ambiguity, failed check, dirty worktree, or scope change.
+- Operate within the workspace boundary defined in AGENTS.md: write governed records only in the governance workspace.
+- Emit references only to resources delivered through this workbench's bound roles.
+- Respect posture constraint: product_writes_permitted.

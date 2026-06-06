@@ -73,12 +73,11 @@ workbenches:
       - instruction_resource
       - authoritative_guides
   instruction_resource: lantern/resources/instructions/upstream_intake_and_baselines.md
-  authoritative_guides:
-  - lantern/resources/guides/upstream_intake_and_baselines.md
+  authoritative_guides: []
   administration_guides:
-  - lantern/administration_procedures/GT-030__DIP_LOCK_ADMINISTRATION_v0.1.0.md
-  - lantern/administration_procedures/GT-050_GT-060__BASELINE_READINESS_ADMINISTRATION_v0.1.0.md
-  - lantern/administration_procedures/INITIATIVE__AUTHORING_AND_READYING_v0.1.0.md
+  - lantern/administration_procedures/GT-030__DIP_LOCK_ADMINISTRATION.md
+  - lantern/administration_procedures/GT-050_GT-060__BASELINE_READINESS_ADMINISTRATION.md
+  - lantern/administration_procedures/INITIATIVE__AUTHORING_AND_READYING.md
   entry_conditions:
   - governance workspace bootstrapped
   exit_conditions:
@@ -152,10 +151,9 @@ workbenches:
       - instruction_resource
       - authoritative_guides
   instruction_resource: lantern/resources/instructions/ch_and_td_readiness.md
-  authoritative_guides:
-  - lantern/resources/guides/ch_and_td_readiness.md
+  authoritative_guides: []
   administration_guides:
-  - lantern/authoring_contracts/change_intention_refinement_guide_v0.2.1.md
+  - lantern/authoring_contracts/change_intention_refinement_guide.md
   entry_conditions:
   - upstream baselines approved
   exit_conditions:
@@ -209,10 +207,9 @@ workbenches:
       - instruction_resource
       - authoritative_guides
   instruction_resource: lantern/resources/instructions/design_candidate_authoring.md
-  authoritative_guides:
-  - lantern/resources/guides/design_candidate_authoring.md
+  authoritative_guides: []
   administration_guides:
-  - lantern/authoring_contracts/design_candidate_authoring_guide_v0.1.0.md
+  - lantern/authoring_contracts/design_candidate_authoring_guide.md
   entry_conditions:
   - GT-110 passed
   exit_conditions:
@@ -277,11 +274,10 @@ workbenches:
       - instruction_resource
       - authoritative_guides
   instruction_resource: lantern/resources/instructions/design_selection.md
-  authoritative_guides:
-  - lantern/resources/guides/design_selection.md
+  authoritative_guides: []
   administration_guides:
-  - lantern/authoring_contracts/design_candidate_selection_guide_v0.1.0.md
-  - lantern/administration_procedures/GT-115__DESIGN_BASELINE_SELECTION_v0.1.0.md
+  - lantern/authoring_contracts/design_candidate_selection_guide.md
+  - lantern/administration_procedures/GT-115__DESIGN_BASELINE_SELECTION.md
   entry_conditions:
   - GT-110 passed
   exit_conditions:
@@ -335,8 +331,7 @@ workbenches:
       - instruction_resource
       - authoritative_guides
   instruction_resource: lantern/resources/instructions/ci_authoring.md
-  authoritative_guides:
-  - lantern/resources/guides/ci_authoring.md
+  authoritative_guides: []
   administration_guides:
   - lantern/authoring_contracts/change_increment_authoring_guide.md
   - lantern/authoring_contracts/allowed_change_surface_flexibilization.md
@@ -402,11 +397,10 @@ workbenches:
       - instruction_resource
       - authoritative_guides
   instruction_resource: lantern/resources/instructions/ci_selection.md
-  authoritative_guides:
-  - lantern/resources/guides/ci_selection.md
+  authoritative_guides: []
   administration_guides:
-  - lantern/authoring_contracts/change_increment_selection_guide_v0.2.1.md
-  - lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION_v0.2.1.md
+  - lantern/authoring_contracts/change_increment_selection_guide.md
+  - lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION.md
   entry_conditions:
   - GT-115 passed
   exit_conditions:
@@ -456,10 +450,9 @@ workbenches:
       - instruction_resource
       - authoritative_guides
   instruction_resource: lantern/resources/instructions/selected_ci_application.md
-  authoritative_guides:
-  - lantern/resources/guides/selected_ci_application.md
+  authoritative_guides: []
   administration_guides:
-  - lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION_v0.2.1.md
+  - lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION.md
   - lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md
   entry_conditions:
   - GT-120 passed
@@ -530,8 +523,7 @@ workbenches:
       - instruction_resource
       - authoritative_guides
   instruction_resource: lantern/resources/instructions/verification_and_closure.md
-  authoritative_guides:
-  - lantern/resources/guides/verification_and_closure.md
+  authoritative_guides: []
   administration_guides:
   - lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md
   entry_conditions:
@@ -592,10 +584,9 @@ workbenches:
       - instruction_resource
       - authoritative_guides
   instruction_resource: lantern/resources/instructions/issue_operations.md
-  authoritative_guides:
-  - lantern/resources/guides/issue_operations.md
+  authoritative_guides: []
   administration_guides:
-  - lantern/administration_procedures/ISSUE__INTAKE_TRIAGE_RESOLUTION_v0.2.0.md
+  - lantern/administration_procedures/ISSUE__INTAKE_TRIAGE_RESOLUTION.md
   entry_conditions:
   - issue exists
   exit_conditions:
@@ -652,12 +643,10 @@ workbenches:
       - instruction_resource
       - authoritative_guides
   instruction_resource: lantern/resources/instructions/governance_onboarding.md
-  authoritative_guides:
-  - lantern/resources/guides/governance_onboarding.md
+  authoritative_guides: []
   administration_guides:
-  - lantern/administration_procedures/SSOT_BLOB_INGESTION_v0.2.0.md
-  - lantern/administration_procedures/INITIATIVE__AUTHORING_AND_READYING_v0.1.0.md
-  - lantern/administration_procedures/INITIATIVE__DECOMPOSITION_AND_CH_SIZING_v0.1.0.md
+  - lantern/administration_procedures/INITIATIVE__AUTHORING_AND_READYING.md
+  - lantern/administration_procedures/INITIATIVE__DECOMPOSITION_AND_CH_SIZING.md
   entry_conditions:
   - governance repo not yet prepared or needs inspection
   exit_conditions:

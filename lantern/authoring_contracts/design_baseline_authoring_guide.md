@@ -1,4 +1,4 @@
-# Design Baseline authoring guide — v0.1.0
+# Design Baseline authoring guide
 
 
 Status: AUTHORITATIVE — Normative
@@ -9,12 +9,7 @@ Applies to:
 - AI-assisted execution following GT-115 selection of a Design Candidate
 
 Normative anchors:
-- `lantern/preservation/EPISTEMIC_FRAME.md`
-- `lantern/preservation/GATES.md`
-- `lantern/preservation/WORKSPACE_TOPOLOGY.md`
-- `lantern/preservation/LANTERN_MODEL_BINDING.md`
-- `lantern/preservation/ARTIFACT_ID_ALLOCATION.md`
-- `lantern/authoring_contracts/design_candidate_authoring_guide_v0.1.0.md`
+- `lantern/authoring_contracts/design_candidate_authoring_guide.md`
 
 ---
 

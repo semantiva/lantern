@@ -1,4 +1,4 @@
-# Test Definition authoring guide — v0.1.0
+# Test Definition authoring guide
 
 
 Status: AUTHORITATIVE — Normative
@@ -9,11 +9,7 @@ Applies to:
 - AI-assisted execution under a locked `CH` upstream envelope at and before GT-110
 
 Normative anchors:
-- `lantern/preservation/EPISTEMIC_FRAME.md`
-- `lantern/preservation/GATES.md`
-- `lantern/preservation/UPSTREAM_INPUT_ARTIFACTS.md`
-- `lantern/preservation/LANTERN_MODEL_BINDING.md`
-- `lantern/preservation/ARTIFACT_ID_ALLOCATION.md`
+- lantern-grammar (gate, status, artifact-family, and ID semantics)
 
 ---
 

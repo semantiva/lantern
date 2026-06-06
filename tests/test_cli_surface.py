@@ -78,8 +78,8 @@ REPO_LOCAL_TRIAGE_WORKBENCH = {
         ],
     },
     "instruction_resource": "lantern/resources/instructions/issue_operations.md",
-    "authoritative_guides": ["lantern/resources/guides/issue_operations.md"],
-    "administration_guides": ["lantern/administration_procedures/ISSUE__INTAKE_TRIAGE_RESOLUTION_v0.2.0.md"],
+    "authoritative_guides": [],
+    "administration_guides": ["lantern/administration_procedures/ISSUE__INTAKE_TRIAGE_RESOLUTION.md"],
     "entry_conditions": ["repo local issue intake"],
     "exit_conditions": ["repo local issue resolved"],
 }

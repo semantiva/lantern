@@ -3,31 +3,18 @@ Operator instruction resource for workbench verification_and_closure.
 ## Workbench
 Display name: Verification and Closure
 Lifecycle kind: covered_gates
+Transaction posture: inspect, draft, commit, validate
 
 ## Artifacts in scope
 CI, EV, DEC
 
-## Key actions
-- Read and follow Lantern-local guidance in lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md.
-- Keep all emitted references inside the approved Lantern-local corpus.
+## Bound resource roles
+Consult, via MCP, the resources the workflow layer binds to this workbench. Route to them; do not restate their content. This workbench binds:
+- administration guides (authoring contracts and administration procedures bound to this workbench)
+- artifact templates for the families in scope
 
-## MCP usage
-- Resolve the verification packet before gate execution.
-- Run the declared verification commands against the product repo.
-- Record Lantern-local evidence and decision references only.
-
-## Constraints
-- Respect posture constraints: requires_selected_ci.
-- Do not emit references outside Lantern-local paths.
-- Keep the workbench guidance inside the approved CH-0007 change surface.
-
-Referenced Lantern-local guides:
-- lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md
-
-
-## Required GT-130 review anchors
-- Record initiative objective and roadmap role before judging local test output.
-- Map each approved TD case to actual verification evidence.
-- Confirm architectural fit against the approved ARCH baseline.
-- Capture clean-state and reproducibility evidence together with command output.
-- Treat local test passage alone as insufficient for GT-130 PASS.
+## Hard stops
+- Each gate requires explicit human approval by default. Bounded multi-gate authorization applies only when the human names the authorized scope; it stops at any blocker, ambiguity, failed check, dirty worktree, or scope change.
+- Operate within the workspace boundary defined in AGENTS.md: write governed records only in the governance workspace.
+- Emit references only to resources delivered through this workbench's bound roles.
+- Respect posture constraint: requires_selected_ci.

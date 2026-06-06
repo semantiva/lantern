@@ -457,9 +457,6 @@ def test_server_registers_fixed_five_tool_names() -> None:
 
 
 def test_td0009_c06_gt130_docs_require_expectation_to_delivery_review() -> None:
-    guide = (PRODUCT_ROOT / "lantern" / "resources" / "guides" / "verification_and_closure.md").read_text(
-        encoding="utf-8"
-    )
     admin = (
         PRODUCT_ROOT / "lantern" / "administration_procedures" / "GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md"
     ).read_text(encoding="utf-8")
@@ -471,7 +468,7 @@ def test_td0009_c06_gt130_docs_require_expectation_to_delivery_review() -> None:
         "clean-state",
         "reproducibility",
     ):
-        assert anchor in guide.lower() or anchor in admin.lower()
+        assert anchor in admin.lower()
 
 
 def test_td0009_c07_readme_documents_manual_install_and_native_smoke_path() -> None:

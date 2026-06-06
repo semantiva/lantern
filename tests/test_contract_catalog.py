@@ -176,7 +176,7 @@ def test_td0024_c10_legacy_copy_without_review_is_rejected(tmp_path: Path) -> No
     fixture_root = _copy_product_fixture(tmp_path)
     relocation_manifest_path = fixture_root / "lantern" / "preservation" / "relocation_manifest.yaml"
     payload = yaml.safe_load(relocation_manifest_path.read_text(encoding="utf-8"))
-    target_path = "lantern/authoring_contracts/change_intention_refinement_guide_v0.2.1.md"
+    target_path = "lantern/authoring_contracts/change_intention_refinement_guide.md"
 
     for entry in payload["entries"]:
         if entry["target"] == target_path:

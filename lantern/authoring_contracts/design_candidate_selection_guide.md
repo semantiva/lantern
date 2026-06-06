@@ -1,12 +1,12 @@
-# Design Candidate Selection Guide (v0.1.0)
+# Design Candidate Selection Guide
 
 
 Status: AUTHORITATIVE — Guide (selection analysis; must not conflict with SSOT specs or authoring contract)
 Date (UTC): 2026-03-15
 Gate: GT-115 (Design Baseline Selection)
 
-Note: This guide assumes the multi-repo workspace posture defined in `lantern/preservation/WORKSPACE_TOPOLOGY.md`.
-Semantic identifiers (statuses, gate ids) are bound via `lantern/preservation/LANTERN_MODEL_BINDING.md`.
+Note: This guide assumes the multi-repo workspace posture defined in the workspace boundary posture in AGENTS.md.
+Semantic identifiers (statuses, gate ids) are bound via lantern-grammar.
 
 CH_ID: `CH-####`
 
@@ -30,7 +30,7 @@ The GT-115 EV is the one authoritative rich findings artifact. Record all materi
 Scope: selection analysis only.
 
 After the selection report is produced and a human approves the chosen candidate, GT-115 status administration MUST be completed using:
-- `lantern/administration_procedures/GT-115__DESIGN_BASELINE_SELECTION_v0.1.0.md`
+- `lantern/administration_procedures/GT-115__DESIGN_BASELINE_SELECTION.md`
 
 Until that point, do not update DC statuses and do not create DEC/EV records.
 
@@ -41,19 +41,17 @@ Until that point, do not update DC statuses and do not create DEC/EV records.
 
 ## SSOT (must use; do not substitute)
 
-- `lantern/preservation/EPISTEMIC_FRAME.md` (objects, IDs, statuses, anchoring)
-- `lantern/preservation/GATES.md` (GT-110/115/120 decision logic and GT-115 output semantics)
-- `lantern/authoring_contracts/design_candidate_authoring_guide_v0.1.0.md` (normative DC/CH record shape; required DC sections)
+- `lantern/authoring_contracts/design_candidate_authoring_guide.md` (normative DC/CH record shape; required DC sections)
 - The provided CH file for `CH_ID`: `ch/CH-####.md` (authoritative assessment criteria, constraints, validation target)
 - The provided SPEC file(s): (authoritative requirements baseline)
 - The provided ARCH file(s): (authoritative architecture baseline)
 - The provided TD files for `CH_ID`: `td/TD-####.md` (authoritative test-definition coverage)
 
 This guide is intentionally paired with:
-- `change_intention_refinement_guide_v0.2.1.md` (how CH becomes `Ready` at GT-110 with approved TD coverage)
-- `design_candidate_authoring_guide_v0.1.0.md` (what a DC must contain to be selection-eligible)
-- `lantern/administration_procedures/GT-115__DESIGN_BASELINE_SELECTION_v0.1.0.md` (how to administer the gate after the recommendation)
-- `design_baseline_authoring_guide_v0.1.0.md` (what the Approved DB must contain after DC selection)
+- `change_intention_refinement_guide.md` (how CH becomes `Ready` at GT-110 with approved TD coverage)
+- `design_candidate_authoring_guide.md` (what a DC must contain to be selection-eligible)
+- `lantern/administration_procedures/GT-115__DESIGN_BASELINE_SELECTION.md` (how to administer the gate after the recommendation)
+- `design_baseline_authoring_guide.md` (what the Approved DB must contain after DC selection)
 
 ## Hard anti-drift rules (apply regardless of stage)
 
@@ -140,7 +138,7 @@ For each DC candidate:
 - DC header exists and parses as YAML.
 - `ch_id` equals `CH_ID`.
 - `dc_id` format matches `DC-<CH_NUM>-<UUID>`, where `CH_NUM` equals the numeric suffix of `CH_ID`.
-- `status` is a DC status defined by `lantern/preservation/EPISTEMIC_FRAME.md`.
+- `status` is a DC status defined by lantern-grammar.
 
 Hard rule:
 - A DC MUST NOT be compared/selected at GT-115 unless its status is `Candidate`.

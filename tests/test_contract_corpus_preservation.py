@@ -52,25 +52,12 @@ def test_no_forbidden_patterns_in_corpus() -> None:
     assert "FORBIDDEN_PATTERN" not in _fatal_checks(findings)
 
 
-def test_binding_uses_current_grammar_namespace() -> None:
-    content = (PRODUCT_ROOT / "lantern/preservation/LANTERN_MODEL_BINDING.md").read_text(encoding="utf-8")
-    assert "lg:artifacts/ch" in content
-    assert "lg:statuses/draft_initiative" not in content
-    assert "th:" not in content
-
-
 def test_removed_preflight_gates_absent_from_active_corpus() -> None:
     targets = [
-        PRODUCT_ROOT / "lantern/preservation/GATES.md",
-        PRODUCT_ROOT / "lantern/preservation/WORKBENCH_MAP.md",
-        PRODUCT_ROOT / "lantern/preservation/LANTERN_MODEL_BINDING.md",
         PRODUCT_ROOT / "lantern/preservation/relocation_manifest.yaml",
-        PRODUCT_ROOT / "lantern/administration_procedures/GT-030__DIP_LOCK_ADMINISTRATION_v0.1.0.md",
-        PRODUCT_ROOT / "lantern/administration_procedures/GT-050_GT-060__BASELINE_READINESS_ADMINISTRATION_v0.1.0.md",
-        PRODUCT_ROOT / "lantern/administration_procedures/INITIATIVE__AUTHORING_AND_READYING_v0.1.0.md",
-        PRODUCT_ROOT / "lantern/administration_procedures/SSOT_BLOB_INGESTION_v0.2.0.md",
-        PRODUCT_ROOT / "lantern/administration_procedures/AI_OPERATOR_INVOCATION_TEMPLATES_v0.2.0.md",
-        PRODUCT_ROOT / "lantern/administration_procedures/AI_OPERATOR_INVOCATION_TEMPLATES_v0.2.1.md",
+        PRODUCT_ROOT / "lantern/administration_procedures/GT-030__DIP_LOCK_ADMINISTRATION.md",
+        PRODUCT_ROOT / "lantern/administration_procedures/GT-050_GT-060__BASELINE_READINESS_ADMINISTRATION.md",
+        PRODUCT_ROOT / "lantern/administration_procedures/INITIATIVE__AUTHORING_AND_READYING.md",
         PRODUCT_ROOT / "lantern/templates/TEMPLATE__INITIATIVE.md",
         PRODUCT_ROOT / "lantern/templates/TEMPLATE__SPEC.md",
     ]
@@ -92,7 +79,7 @@ def test_preservation_checker_fails_on_drift(tmp_path: Path) -> None:
     shutil.copytree(PRODUCT_ROOT, sandbox)
     target = sandbox / "lantern/resources/instructions/ci_authoring.md"
     original = target.read_text(encoding="utf-8")
-    target.write_text(original.replace("## MCP usage\n", "", 1), encoding="utf-8")
+    target.write_text(original.replace("## Hard stops\n", "", 1), encoding="utf-8")
     findings = validate_manifest(
         sandbox / "lantern/preservation/relocation_manifest.yaml",
         sandbox,

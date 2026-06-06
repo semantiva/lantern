@@ -1,17 +1,13 @@
-# GT-120 Administration Guide — v0.2.1
+# GT-120 Administration Guide
 
 
 Status: **AUTHORITATIVE — Procedure**
 Date (UTC): 2026-03-15
-Supersedes: v0.2.0
 
 Purpose: complete the required administration tasks for a GT-120 selection decision, in a way that is reproducible and mechanically checkable.
 
 Normative anchors:
 - `change_increment_authoring_guide.md` (record shapes + directory structure)
-- `lantern/preservation/EPISTEMIC_FRAME.md` (record invariants)
-- `lantern/preservation/GATES.md` (GT-120 requirements)
-- `lantern/preservation/WORKSPACE_TOPOLOGY.md` (multi-repo posture)
 
 ### 0. Preconditions (before running GT-120)
 
@@ -38,7 +34,7 @@ These are administrative requirements, not evaluation criteria.
 ## Definitions (for this procedure)
 
 - “Candidate pool”: the set of CI ids actively considered at GT-120 for a given `CH-####`.
-- "Selection report": the human-readable evaluation output produced by running `lantern/authoring_contracts/change_increment_selection_guide_v0.2.1.md` (Lantern Runtime packaged resource).
+- "Selection report": the human-readable evaluation output produced by running `lantern/authoring_contracts/change_increment_selection_guide.md` (Lantern Runtime packaged resource).
 
 This procedure assumes the selection report already exists (as chat output or a draft file) and a human has approved the chosen candidate (or explicitly overridden the assistant’s recommendation).
 
@@ -78,6 +74,12 @@ C) No CH status drift
 
 ## Procedure (deterministic)
 
+### Step 0 — Confirm authority-model replacement posture
+
+If any candidate CI replaces an authority model, confirm before selection that its drop-ins identify the replacement type and include removal of superseded runtime definitions. The candidate must also account for tests tied to superseded authority: delete them, rewrite them for the new authority, or relabel them as compatibility-projection tests.
+
+A CI that leaves superseded authority or old tests unresolved is weaker unless the Approved DB explicitly requires compatibility-only retention and the CI explains that retention.
+
 ### Step 1 — Freeze the candidate pool (status hygiene)
 
 For each CI in the candidate pool:
@@ -88,7 +90,7 @@ For each CI in the candidate pool:
 
 Do NOT change anything else in CI files at this step.
 
-Rationale: `Candidate` is the explicit “submitted for selection” status in `lantern/preservation/EPISTEMIC_FRAME.md`. It makes the GT-120 decision auditable even if selection is delayed.
+Rationale: `Candidate` is the explicit “submitted for selection” status in lantern-grammar. It makes the GT-120 decision auditable even if selection is delayed.
 
 ### Step 2 — Allocate new EV/DEC ids
 
@@ -112,7 +114,7 @@ Header requirements:
 - `artifacts` MUST include at least:
   - `kind: "path"` pointing to the CH file path
   - `kind: "path"` pointing to each CI file path (candidate pool)
-  - `kind: "path"` pointing to `lantern/authoring_contracts/change_increment_selection_guide_v0.2.1.md` (Lantern Runtime packaged resource)
+  - `kind: "path"` pointing to `lantern/authoring_contracts/change_increment_selection_guide.md` (Lantern Runtime packaged resource)
   - `kind: "path"` pointing to the Approved DB file
   - `kind: "path"` pointing to each Approved TD file used for the gate
 

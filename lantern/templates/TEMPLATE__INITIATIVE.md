@@ -40,10 +40,9 @@ Out of scope:
 <Explain why the proposed CH slices are bounded, independently refinable, and suitable for GT-110. Explicitly address the compromise between gate-overhead from overly small CHs and LLM/session risk from overly large CHs.>
 
 ## Readiness conditions
-- Initiative-owned DIP is Approved (GT-030 PASS)
-- Initiative-owned SPEC is Approved (GT-050 with derivation/coherence evidence satisfied)
-- Initiative-owned ARCH is Approved (GT-060 with derivation/coherence evidence satisfied)
-- At least one bounded CH slice is identified and can proceed to GT-110 refinement
+- Initiative is bounded with a coherent decomposition posture.
+- At least one decomposed or referenced CH is Ready. GT-110 readiness carries the upstream DIP/SPEC/ARCH sufficiency check for that CH.
+- Upstream DIP/SPEC/ARCH baselines are referenced where applicable; the Initiative does not own them.
 
 ## Inputs / evidence
 - <pointer 1>

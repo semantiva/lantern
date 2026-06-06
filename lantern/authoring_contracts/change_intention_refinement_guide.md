@@ -1,9 +1,8 @@
-# Change Intent refinement guide — GT-110 (Proposed → Ready) — v0.2.1
+# Change Intent refinement guide — GT-110 (Proposed → Ready)
 
 
 Status: **Guide** (execution guidance; MUST NOT conflict with the authoring contract)  
 Date (UTC): 2026-03-01  
-Supersedes: `change_intention_refinement_guide_v0.2.0.md`
 
 ## Purpose
 
@@ -16,11 +15,6 @@ This guide is designed for **AI-assisted execution** with human review.
 ## Normative anchors
 
 - `change_increment_authoring_guide.md` (record shapes + storage locations + boundaries)
-- `lantern/preservation/EPISTEMIC_FRAME.md` (record invariants)
-- `lantern/preservation/GATES.md` (GT-110 gate expectations)
-- `lantern/preservation/WORKSPACE_TOPOLOGY.md` (multi-repo posture)
-- `lantern/preservation/LANTERN_MODEL_BINDING.md` (canonical statuses + gate ids)
-- `lantern/preservation/UPSTREAM_INPUT_ARTIFACTS.md` (TD posture)
 
 ## Scope
 
@@ -62,7 +56,7 @@ Identify and pin (as applicable):
 - Issue(s) / legacy SSOT references (paths or external ids)
 - Blocking Questions (must be `Resolved` or explicitly waived in the DEC)
 
-If upstream inputs do not exist yet, create them first (see `guides/SSOT_BLOB_INGESTION_v0.2.0.md`).
+If upstream inputs do not exist yet, create them first using the DIP, SPEC, and ARCH authoring guides.
 
 ### Step 1 — Create or update the CH record
 
@@ -75,7 +69,7 @@ If a new CH is being created, allocate the identifier using the authoritative al
 Rules:
 - keep status `Proposed` until GT-110 evidence and decision exist
 - if the problem statement changes materially, record a supersession Decision (DEC) or create a new CH
-- if the CH is derived from an Initiative, ensure the CH is a bounded slice of that Initiative using `guides/INITIATIVE__DECOMPOSITION_AND_CH_SIZING_v0.1.0.md`
+- if the CH is derived from an Initiative, ensure the CH is a bounded slice of that Initiative
 
 Dependency rule:
 - If the CH depends on other CHs, declare them in the CH header field:

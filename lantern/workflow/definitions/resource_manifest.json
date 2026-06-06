@@ -1,858 +1,596 @@
 [
   {
-    "resource_id": "resource.authoring_contract.ch_and_td_readiness_administration_guides_change_intention_refinement_guide_v0_2_1",
+    "content_hash": "e959423d6d5991c40b9a051055f0f2e4bf02b07a2d603ae6c9a900f317657bde",
     "kind": "authoring_contract",
-    "workbench_id": "ch_and_td_readiness",
-    "path": "lantern/authoring_contracts/change_intention_refinement_guide_v0.2.1.md",
-    "content_hash": "09379c7403a046e60d7b28b52989e0b8f84a947568d490baf50032468b512692",
-    "review_status": "reviewed",
-    "provenance_type": "bridge_copy",
-    "provenance_refs": [
-      {
-        "path": "authoring_contracts/change_intention_refinement_guide_v0.2.1.md",
-        "relocation_entry_id": "AC-003"
-      }
-    ],
-    "roles": [
-      "administration_guides"
-    ],
+    "path": "lantern/authoring_contracts/change_intention_refinement_guide.md",
     "projection_trace": {
       "derivation": "relocation_manifest_projection",
       "relocation_entry_id": "AC-003"
-    }
-  },
-  {
-    "resource_id": "resource.authoritative_guide.ch_and_td_readiness_authoritative_guides_ch_and_td_readiness",
-    "kind": "authoritative_guide",
-    "workbench_id": "ch_and_td_readiness",
-    "path": "lantern/resources/guides/ch_and_td_readiness.md",
-    "content_hash": "7c4d9426d1b68c018c5bf1d49a6a5a29b3b6f5f11fbde02b6b2b819b88585fb4",
-    "review_status": "lantern_authored",
-    "provenance_type": "lantern_authored_projection",
+    },
     "provenance_refs": [
       {
-        "path": "lantern/authoring_contracts/change_intention_refinement_guide_v0.2.1.md",
+        "path": "authoring_contracts/change_intention_refinement_guide.md",
         "relocation_entry_id": "AC-003"
       }
     ],
+    "provenance_type": "bridge_copy",
+    "resource_id": "resource.authoring_contract.ch_and_td_readiness_administration_guides_change_intention_refinement_guide",
+    "review_status": "reviewed",
     "roles": [
-      "authoritative_guides"
+      "administration_guides"
     ],
-    "projection_trace": {
-      "derivation": "lantern_authored_guide_surface",
-      "source": "guide_header"
-    }
+    "workbench_id": "ch_and_td_readiness"
   },
   {
-    "resource_id": "resource.instruction.ch_and_td_readiness_instruction_resource_ch_and_td_readiness",
+    "content_hash": "87ac43f523fb37929c396fbaa1aa454a2df9619917bcd123f994af0a5fa291ca",
     "kind": "instruction",
-    "workbench_id": "ch_and_td_readiness",
     "path": "lantern/resources/instructions/ch_and_td_readiness.md",
-    "content_hash": "d38f9a8be8a0a1e68ab3f5f488d0da82e1faa8b3cb2beaf5314839a8b9aaa5a4",
-    "review_status": "reviewed",
-    "provenance_type": "product_owned",
+    "projection_trace": {
+      "derivation": "relocation_manifest_projection",
+      "relocation_entry_id": "IR-002"
+    },
     "provenance_refs": [
       {
         "path": "instruction_snapshot/ch_and_td_readiness.md",
         "relocation_entry_id": "IR-002"
       }
     ],
+    "provenance_type": "product_owned",
+    "resource_id": "resource.instruction.ch_and_td_readiness_instruction_resource_ch_and_td_readiness",
+    "review_status": "reviewed",
     "roles": [
       "instruction_resource"
     ],
-    "projection_trace": {
-      "derivation": "relocation_manifest_projection",
-      "relocation_entry_id": "IR-002"
-    }
+    "workbench_id": "ch_and_td_readiness"
   },
   {
-    "resource_id": "resource.authoring_contract.ci_authoring_administration_guides_allowed_change_surface_flexibilization",
-    "kind": "authoring_contract",
-    "workbench_id": "ci_authoring",
-    "path": "lantern/authoring_contracts/allowed_change_surface_flexibilization.md",
     "content_hash": "7632a02a0b60df373e7d1996cbd4b5b1e9829187c23346c63fed22eee7b95c64",
-    "review_status": "reviewed",
-    "provenance_type": "product_owned",
+    "kind": "authoring_contract",
+    "path": "lantern/authoring_contracts/allowed_change_surface_flexibilization.md",
+    "projection_trace": {
+      "derivation": "relocation_manifest_projection",
+      "relocation_entry_id": "AC-009"
+    },
     "provenance_refs": [
       {
         "path": "authoring_contracts/allowed_change_surface_flexibilization.md",
         "relocation_entry_id": "AC-009"
       }
     ],
+    "provenance_type": "product_owned",
+    "resource_id": "resource.authoring_contract.ci_authoring_administration_guides_allowed_change_surface_flexibilization",
+    "review_status": "reviewed",
     "roles": [
       "administration_guides"
     ],
-    "projection_trace": {
-      "derivation": "relocation_manifest_projection",
-      "relocation_entry_id": "AC-009"
-    }
+    "workbench_id": "ci_authoring"
   },
   {
-    "resource_id": "resource.authoring_contract.ci_authoring_administration_guides_change_increment_authoring_guide",
+    "content_hash": "fdf6ed946ea46e9da5c2fc91cfc088348e881676b3df877e86fc390b1197f525",
     "kind": "authoring_contract",
-    "workbench_id": "ci_authoring",
     "path": "lantern/authoring_contracts/change_increment_authoring_guide.md",
-    "content_hash": "8645a5d103a04ac4e0d22921d6c1d189e33a74b96cd65008b28b1cad7f8b32fb",
-    "review_status": "reviewed",
-    "provenance_type": "bridge_copy",
+    "projection_trace": {
+      "derivation": "relocation_manifest_projection",
+      "relocation_entry_id": "AC-001"
+    },
     "provenance_refs": [
       {
         "path": "authoring_contracts/change_increment_authoring_guide.md",
         "relocation_entry_id": "AC-001"
       }
     ],
+    "provenance_type": "bridge_copy",
+    "resource_id": "resource.authoring_contract.ci_authoring_administration_guides_change_increment_authoring_guide",
+    "review_status": "reviewed",
     "roles": [
       "administration_guides"
     ],
+    "workbench_id": "ci_authoring"
+  },
+  {
+    "content_hash": "8cfd23bf10e9fc97bf61ca824e991a142dddafdb5bf80c7ff0b58badec5f0e07",
+    "kind": "instruction",
+    "path": "lantern/resources/instructions/ci_authoring.md",
     "projection_trace": {
       "derivation": "relocation_manifest_projection",
-      "relocation_entry_id": "AC-001"
-    }
-  },
-  {
-    "resource_id": "resource.authoritative_guide.ci_authoring_authoritative_guides_ci_authoring",
-    "kind": "authoritative_guide",
-    "workbench_id": "ci_authoring",
-    "path": "lantern/resources/guides/ci_authoring.md",
-    "content_hash": "10466f7aa81ffdab0c32e24b8e5d989d4ac7f9b0bd90b3342ec1bba917dbe2c5",
-    "review_status": "lantern_authored",
-    "provenance_type": "lantern_authored_projection",
-    "provenance_refs": [
-      {
-        "path": "lantern/authoring_contracts/change_increment_authoring_guide.md",
-        "relocation_entry_id": "AC-001"
-      },
-      {
-        "path": "lantern/authoring_contracts/allowed_change_surface_flexibilization.md",
-        "relocation_entry_id": "AC-009"
-      }
-    ],
-    "roles": [
-      "authoritative_guides"
-    ],
-    "projection_trace": {
-      "derivation": "lantern_authored_guide_surface",
-      "source": "guide_header"
-    }
-  },
-  {
-    "resource_id": "resource.instruction.ci_authoring_instruction_resource_ci_authoring",
-    "kind": "instruction",
-    "workbench_id": "ci_authoring",
-    "path": "lantern/resources/instructions/ci_authoring.md",
-    "content_hash": "b9a3a903f58a8346d0506cc2d4b089153cb49b0fdea745f2e30bf8f920c8a6e4",
-    "review_status": "reviewed",
-    "provenance_type": "product_owned",
+      "relocation_entry_id": "IR-005"
+    },
     "provenance_refs": [
       {
         "path": "instruction_snapshot/ci_authoring.md",
         "relocation_entry_id": "IR-005"
       }
     ],
+    "provenance_type": "product_owned",
+    "resource_id": "resource.instruction.ci_authoring_instruction_resource_ci_authoring",
+    "review_status": "reviewed",
     "roles": [
       "instruction_resource"
     ],
-    "projection_trace": {
-      "derivation": "relocation_manifest_projection",
-      "relocation_entry_id": "IR-005"
-    }
+    "workbench_id": "ci_authoring"
   },
   {
-    "resource_id": "resource.administration_guide.ci_selection_administration_guides_gt_120_ci_selection_administration_v0_2_1",
+    "content_hash": "65bd79d7f4ca5c14b64bd877726b1cf7ddbe5fd638427e3f2931de36ec973f9a",
     "kind": "administration_guide",
-    "workbench_id": "ci_selection",
-    "path": "lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION_v0.2.1.md",
-    "content_hash": "1da7e5a55e0ecd269003eb84d36a94c1ded070f7b81950a1dd25bc6b7caaf47a",
-    "review_status": "reviewed",
-    "provenance_type": "bridge_copy",
-    "provenance_refs": [
-      {
-        "path": "administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION_v0.2.1.md",
-        "relocation_entry_id": "AP-006"
-      }
-    ],
-    "roles": [
-      "administration_guides"
-    ],
+    "path": "lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION.md",
     "projection_trace": {
       "derivation": "relocation_manifest_projection",
       "relocation_entry_id": "AP-006"
-    }
-  },
-  {
-    "resource_id": "resource.authoring_contract.ci_selection_administration_guides_change_increment_selection_guide_v0_2_1",
-    "kind": "authoring_contract",
-    "workbench_id": "ci_selection",
-    "path": "lantern/authoring_contracts/change_increment_selection_guide_v0.2.1.md",
-    "content_hash": "c67464e327cd7da5f7d94b218b4cb82f8dda8475845d746501439e7161a63ebb",
-    "review_status": "reviewed",
-    "provenance_type": "bridge_copy",
+    },
     "provenance_refs": [
       {
-        "path": "authoring_contracts/change_increment_selection_guide_v0.2.1.md",
-        "relocation_entry_id": "AC-002"
-      }
-    ],
-    "roles": [
-      "administration_guides"
-    ],
-    "projection_trace": {
-      "derivation": "relocation_manifest_projection",
-      "relocation_entry_id": "AC-002"
-    }
-  },
-  {
-    "resource_id": "resource.authoritative_guide.ci_selection_authoritative_guides_ci_selection",
-    "kind": "authoritative_guide",
-    "workbench_id": "ci_selection",
-    "path": "lantern/resources/guides/ci_selection.md",
-    "content_hash": "814bc02330a7479127a9ccf5763c773e9054016bf690ed6974dee47f6512b6bd",
-    "review_status": "lantern_authored",
-    "provenance_type": "lantern_authored_projection",
-    "provenance_refs": [
-      {
-        "path": "lantern/authoring_contracts/change_increment_selection_guide_v0.2.1.md",
-        "relocation_entry_id": "AC-002"
-      },
-      {
-        "path": "lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION_v0.2.1.md",
+        "path": "administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION.md",
         "relocation_entry_id": "AP-006"
       }
     ],
+    "provenance_type": "bridge_copy",
+    "resource_id": "resource.administration_guide.ci_selection_administration_guides_gt_120_ci_selection_administration",
+    "review_status": "reviewed",
     "roles": [
-      "authoritative_guides"
+      "administration_guides"
     ],
-    "projection_trace": {
-      "derivation": "lantern_authored_guide_surface",
-      "source": "guide_header"
-    }
+    "workbench_id": "ci_selection"
   },
   {
-    "resource_id": "resource.instruction.ci_selection_instruction_resource_ci_selection",
-    "kind": "instruction",
-    "workbench_id": "ci_selection",
-    "path": "lantern/resources/instructions/ci_selection.md",
-    "content_hash": "c8ec3986bb77942323942d69debd2d7f72085bfbb6e645b8201d9ec5fdf56750",
+    "content_hash": "f50631638fd3df7c6f2db7d3f25b5ce0f93444389dea807999ad442421dc538b",
+    "kind": "authoring_contract",
+    "path": "lantern/authoring_contracts/change_increment_selection_guide.md",
+    "projection_trace": {
+      "derivation": "relocation_manifest_projection",
+      "relocation_entry_id": "AC-002"
+    },
+    "provenance_refs": [
+      {
+        "path": "authoring_contracts/change_increment_selection_guide.md",
+        "relocation_entry_id": "AC-002"
+      }
+    ],
+    "provenance_type": "bridge_copy",
+    "resource_id": "resource.authoring_contract.ci_selection_administration_guides_change_increment_selection_guide",
     "review_status": "reviewed",
-    "provenance_type": "product_owned",
+    "roles": [
+      "administration_guides"
+    ],
+    "workbench_id": "ci_selection"
+  },
+  {
+    "content_hash": "a76db2503d9f8ecbcb183f72178852ec16c1f5a92bf79afdb73d5106f408e519",
+    "kind": "instruction",
+    "path": "lantern/resources/instructions/ci_selection.md",
+    "projection_trace": {
+      "derivation": "relocation_manifest_projection",
+      "relocation_entry_id": "IR-006"
+    },
     "provenance_refs": [
       {
         "path": "instruction_snapshot/ci_selection.md",
         "relocation_entry_id": "IR-006"
       }
     ],
+    "provenance_type": "product_owned",
+    "resource_id": "resource.instruction.ci_selection_instruction_resource_ci_selection",
+    "review_status": "reviewed",
     "roles": [
       "instruction_resource"
     ],
-    "projection_trace": {
-      "derivation": "relocation_manifest_projection",
-      "relocation_entry_id": "IR-006"
-    }
+    "workbench_id": "ci_selection"
   },
   {
-    "resource_id": "resource.authoring_contract.design_candidate_authoring_administration_guides_design_candidate_authoring_guide_v0_1_0",
+    "content_hash": "467300ab1b57d757e1cf2f13454bf15cd47fbfe478a70280bff7d6490d019ae3",
     "kind": "authoring_contract",
-    "workbench_id": "design_candidate_authoring",
-    "path": "lantern/authoring_contracts/design_candidate_authoring_guide_v0.1.0.md",
-    "content_hash": "1966afb7948cae598e2bcadd8b2cafa540286f932b19c5b6e332a71f4df45c0e",
-    "review_status": "reviewed",
-    "provenance_type": "bridge_copy",
-    "provenance_refs": [
-      {
-        "path": "authoring_contracts/design_candidate_authoring_guide_v0.1.0.md",
-        "relocation_entry_id": "AC-005"
-      }
-    ],
-    "roles": [
-      "administration_guides"
-    ],
+    "path": "lantern/authoring_contracts/design_candidate_authoring_guide.md",
     "projection_trace": {
       "derivation": "relocation_manifest_projection",
       "relocation_entry_id": "AC-005"
-    }
-  },
-  {
-    "resource_id": "resource.authoritative_guide.design_candidate_authoring_authoritative_guides_design_candidate_authoring",
-    "kind": "authoritative_guide",
-    "workbench_id": "design_candidate_authoring",
-    "path": "lantern/resources/guides/design_candidate_authoring.md",
-    "content_hash": "2d3299bfacc4ad6e738dc3987e0865291085ac39bf501fe0b9abfc85a453f02e",
-    "review_status": "lantern_authored",
-    "provenance_type": "lantern_authored_projection",
+    },
     "provenance_refs": [
       {
-        "path": "lantern/authoring_contracts/design_candidate_authoring_guide_v0.1.0.md",
+        "path": "authoring_contracts/design_candidate_authoring_guide.md",
         "relocation_entry_id": "AC-005"
       }
     ],
+    "provenance_type": "bridge_copy",
+    "resource_id": "resource.authoring_contract.design_candidate_authoring_administration_guides_design_candidate_authoring_guide",
+    "review_status": "reviewed",
     "roles": [
-      "authoritative_guides"
+      "administration_guides"
     ],
-    "projection_trace": {
-      "derivation": "lantern_authored_guide_surface",
-      "source": "guide_header"
-    }
+    "workbench_id": "design_candidate_authoring"
   },
   {
-    "resource_id": "resource.instruction.design_candidate_authoring_instruction_resource_design_candidate_authoring",
+    "content_hash": "fda1c2d1ecc0459f92f574093c35088e9c3a3c307f673b76cc3d72dce199045d",
     "kind": "instruction",
-    "workbench_id": "design_candidate_authoring",
     "path": "lantern/resources/instructions/design_candidate_authoring.md",
-    "content_hash": "be18a2c33ab7ee14a11477e68b5ebfe01a97dab3bfbeed9b66ef91081a7b602b",
-    "review_status": "reviewed",
-    "provenance_type": "product_owned",
+    "projection_trace": {
+      "derivation": "relocation_manifest_projection",
+      "relocation_entry_id": "IR-003"
+    },
     "provenance_refs": [
       {
         "path": "instruction_snapshot/design_candidate_authoring.md",
         "relocation_entry_id": "IR-003"
       }
     ],
+    "provenance_type": "product_owned",
+    "resource_id": "resource.instruction.design_candidate_authoring_instruction_resource_design_candidate_authoring",
+    "review_status": "reviewed",
     "roles": [
       "instruction_resource"
     ],
-    "projection_trace": {
-      "derivation": "relocation_manifest_projection",
-      "relocation_entry_id": "IR-003"
-    }
+    "workbench_id": "design_candidate_authoring"
   },
   {
-    "resource_id": "resource.administration_guide.design_selection_administration_guides_gt_115_design_baseline_selection_v0_1_0",
+    "content_hash": "480659d9b9d0da61c46c232be09a5209362d51fe675629c7676714417f03fda9",
     "kind": "administration_guide",
-    "workbench_id": "design_selection",
-    "path": "lantern/administration_procedures/GT-115__DESIGN_BASELINE_SELECTION_v0.1.0.md",
-    "content_hash": "7c44a1fc280c54064031316bf0318f624a82f3c6c5c5cf0c96159c77de819444",
-    "review_status": "reviewed",
-    "provenance_type": "bridge_copy",
-    "provenance_refs": [
-      {
-        "path": "administration_procedures/GT-115__DESIGN_BASELINE_SELECTION_v0.1.0.md",
-        "relocation_entry_id": "AP-005"
-      }
-    ],
-    "roles": [
-      "administration_guides"
-    ],
+    "path": "lantern/administration_procedures/GT-115__DESIGN_BASELINE_SELECTION.md",
     "projection_trace": {
       "derivation": "relocation_manifest_projection",
       "relocation_entry_id": "AP-005"
-    }
-  },
-  {
-    "resource_id": "resource.authoring_contract.design_selection_administration_guides_design_candidate_selection_guide_v0_1_0",
-    "kind": "authoring_contract",
-    "workbench_id": "design_selection",
-    "path": "lantern/authoring_contracts/design_candidate_selection_guide_v0.1.0.md",
-    "content_hash": "aa5e5855819fd2960ac0f8f872e25c4cea0ebfdf73bbc2320baee50d61b20d14",
-    "review_status": "reviewed",
-    "provenance_type": "bridge_copy",
+    },
     "provenance_refs": [
       {
-        "path": "authoring_contracts/design_candidate_selection_guide_v0.1.0.md",
-        "relocation_entry_id": "AC-006"
-      }
-    ],
-    "roles": [
-      "administration_guides"
-    ],
-    "projection_trace": {
-      "derivation": "relocation_manifest_projection",
-      "relocation_entry_id": "AC-006"
-    }
-  },
-  {
-    "resource_id": "resource.authoritative_guide.design_selection_authoritative_guides_design_selection",
-    "kind": "authoritative_guide",
-    "workbench_id": "design_selection",
-    "path": "lantern/resources/guides/design_selection.md",
-    "content_hash": "b926f61b10230b2768ba325dea06f52476eaca24df9cb925dd76b5b74e4c319f",
-    "review_status": "lantern_authored",
-    "provenance_type": "lantern_authored_projection",
-    "provenance_refs": [
-      {
-        "path": "lantern/authoring_contracts/design_candidate_selection_guide_v0.1.0.md",
-        "relocation_entry_id": "AC-006"
-      },
-      {
-        "path": "lantern/administration_procedures/GT-115__DESIGN_BASELINE_SELECTION_v0.1.0.md",
+        "path": "administration_procedures/GT-115__DESIGN_BASELINE_SELECTION.md",
         "relocation_entry_id": "AP-005"
       }
     ],
+    "provenance_type": "bridge_copy",
+    "resource_id": "resource.administration_guide.design_selection_administration_guides_gt_115_design_baseline_selection",
+    "review_status": "reviewed",
     "roles": [
-      "authoritative_guides"
+      "administration_guides"
     ],
-    "projection_trace": {
-      "derivation": "lantern_authored_guide_surface",
-      "source": "guide_header"
-    }
+    "workbench_id": "design_selection"
   },
   {
-    "resource_id": "resource.instruction.design_selection_instruction_resource_design_selection",
-    "kind": "instruction",
-    "workbench_id": "design_selection",
-    "path": "lantern/resources/instructions/design_selection.md",
-    "content_hash": "2d18224d2dc2a04ef1062c045d8fc37a95179c1a1774446d934df4d58e13aa5d",
+    "content_hash": "dd57f2d6a4166c13eaef33b8a60b6302cc8d39711004cb2d9db7c3f17c561c6c",
+    "kind": "authoring_contract",
+    "path": "lantern/authoring_contracts/design_candidate_selection_guide.md",
+    "projection_trace": {
+      "derivation": "relocation_manifest_projection",
+      "relocation_entry_id": "AC-006"
+    },
+    "provenance_refs": [
+      {
+        "path": "authoring_contracts/design_candidate_selection_guide.md",
+        "relocation_entry_id": "AC-006"
+      }
+    ],
+    "provenance_type": "bridge_copy",
+    "resource_id": "resource.authoring_contract.design_selection_administration_guides_design_candidate_selection_guide",
     "review_status": "reviewed",
-    "provenance_type": "product_owned",
+    "roles": [
+      "administration_guides"
+    ],
+    "workbench_id": "design_selection"
+  },
+  {
+    "content_hash": "4c1a786f448a65abf0efdc378a298761b1dd9983ed9b6eab01c6cfede3027b8f",
+    "kind": "instruction",
+    "path": "lantern/resources/instructions/design_selection.md",
+    "projection_trace": {
+      "derivation": "relocation_manifest_projection",
+      "relocation_entry_id": "IR-004"
+    },
     "provenance_refs": [
       {
         "path": "instruction_snapshot/design_selection.md",
         "relocation_entry_id": "IR-004"
       }
     ],
+    "provenance_type": "product_owned",
+    "resource_id": "resource.instruction.design_selection_instruction_resource_design_selection",
+    "review_status": "reviewed",
     "roles": [
       "instruction_resource"
     ],
-    "projection_trace": {
-      "derivation": "relocation_manifest_projection",
-      "relocation_entry_id": "IR-004"
-    }
+    "workbench_id": "design_selection"
   },
   {
-    "resource_id": "resource.administration_guide.governance_onboarding_administration_guides_initiative_authoring_and_readying_v0_1_0",
+    "content_hash": "a074681deac3a85b8035b802ac7815a60c57281f6a3794039ed2f9b521fc35c5",
     "kind": "administration_guide",
-    "workbench_id": "governance_onboarding",
-    "path": "lantern/administration_procedures/INITIATIVE__AUTHORING_AND_READYING_v0.1.0.md",
-    "content_hash": "8f69eaa7b3bea37542b7cf0b3f76be41d782f7ce44de3c55b6791b0c119cb447",
-    "review_status": "reviewed",
-    "provenance_type": "bridge_copy",
-    "provenance_refs": [
-      {
-        "path": "administration_procedures/INITIATIVE__AUTHORING_AND_READYING_v0.1.0.md",
-        "relocation_entry_id": "AP-008"
-      }
-    ],
-    "roles": [
-      "administration_guides"
-    ],
+    "path": "lantern/administration_procedures/INITIATIVE__AUTHORING_AND_READYING.md",
     "projection_trace": {
       "derivation": "relocation_manifest_projection",
       "relocation_entry_id": "AP-008"
-    }
-  },
-  {
-    "resource_id": "resource.administration_guide.governance_onboarding_administration_guides_initiative_decomposition_and_ch_sizing_v0_1_0",
-    "kind": "administration_guide",
-    "workbench_id": "governance_onboarding",
-    "path": "lantern/administration_procedures/INITIATIVE__DECOMPOSITION_AND_CH_SIZING_v0.1.0.md",
-    "content_hash": "31eb462bf277a386293c2bb897186d497658fc78fb137a78f53ff7bc486fe7b4",
-    "review_status": "reviewed",
-    "provenance_type": "bridge_copy",
+    },
     "provenance_refs": [
       {
-        "path": "administration_procedures/INITIATIVE__DECOMPOSITION_AND_CH_SIZING_v0.1.0.md",
-        "relocation_entry_id": "AP-009"
+        "path": "administration_procedures/INITIATIVE__AUTHORING_AND_READYING.md",
+        "relocation_entry_id": "AP-008"
       }
     ],
+    "provenance_type": "bridge_copy",
+    "resource_id": "resource.administration_guide.governance_onboarding_administration_guides_initiative_authoring_and_readying",
+    "review_status": "reviewed",
     "roles": [
       "administration_guides"
     ],
+    "workbench_id": "governance_onboarding"
+  },
+  {
+    "content_hash": "9916c38b6b964b6d52ab5f7c57cfe268ae796115c8140f77cf2d40707307b005",
+    "kind": "administration_guide",
+    "path": "lantern/administration_procedures/INITIATIVE__DECOMPOSITION_AND_CH_SIZING.md",
     "projection_trace": {
       "derivation": "relocation_manifest_projection",
       "relocation_entry_id": "AP-009"
-    }
-  },
-  {
-    "resource_id": "resource.administration_guide.governance_onboarding_administration_guides_ssot_blob_ingestion_v0_2_0",
-    "kind": "administration_guide",
-    "workbench_id": "governance_onboarding",
-    "path": "lantern/administration_procedures/SSOT_BLOB_INGESTION_v0.2.0.md",
-    "content_hash": "14c2c604fcdb2d48f4d8b576239912a11397b5d0bfb67b71fffc594fe0dfa574",
-    "review_status": "reviewed",
-    "provenance_type": "bridge_copy",
+    },
     "provenance_refs": [
       {
-        "path": "administration_procedures/SSOT_BLOB_INGESTION_v0.2.0.md",
-        "relocation_entry_id": "AP-011"
-      }
-    ],
-    "roles": [
-      "administration_guides"
-    ],
-    "projection_trace": {
-      "derivation": "relocation_manifest_projection",
-      "relocation_entry_id": "AP-011"
-    }
-  },
-  {
-    "resource_id": "resource.authoritative_guide.governance_onboarding_authoritative_guides_governance_onboarding",
-    "kind": "authoritative_guide",
-    "workbench_id": "governance_onboarding",
-    "path": "lantern/resources/guides/governance_onboarding.md",
-    "content_hash": "c6aac15fb1af147cd82a81c9c9eb4587347fa2a167a06c9a18b490bbeb12fd6a",
-    "review_status": "lantern_authored",
-    "provenance_type": "lantern_authored_projection",
-    "provenance_refs": [
-      {
-        "path": "lantern/administration_procedures/SSOT_BLOB_INGESTION_v0.2.0.md",
-        "relocation_entry_id": "AP-011"
-      },
-      {
-        "path": "lantern/administration_procedures/INITIATIVE__DECOMPOSITION_AND_CH_SIZING_v0.1.0.md",
+        "path": "administration_procedures/INITIATIVE__DECOMPOSITION_AND_CH_SIZING.md",
         "relocation_entry_id": "AP-009"
       }
     ],
+    "provenance_type": "bridge_copy",
+    "resource_id": "resource.administration_guide.governance_onboarding_administration_guides_initiative_decomposition_and_ch_sizing",
+    "review_status": "reviewed",
     "roles": [
-      "authoritative_guides"
+      "administration_guides"
     ],
-    "projection_trace": {
-      "derivation": "lantern_authored_guide_surface",
-      "source": "guide_header"
-    }
+    "workbench_id": "governance_onboarding"
   },
   {
-    "resource_id": "resource.instruction.governance_onboarding_instruction_resource_governance_onboarding",
+    "content_hash": "7bfac8c892e29cbc74245e4b9a449335b5b87dd76d52fc6a2f70b059b7faa3a8",
     "kind": "instruction",
-    "workbench_id": "governance_onboarding",
     "path": "lantern/resources/instructions/governance_onboarding.md",
-    "content_hash": "ca6b99d04bf1f9c9dc57bc502787c52e20dede3009480ba0057d8eb9227de95b",
-    "review_status": "reviewed",
-    "provenance_type": "product_owned",
+    "projection_trace": {
+      "derivation": "relocation_manifest_projection",
+      "relocation_entry_id": "IR-010"
+    },
     "provenance_refs": [
       {
         "path": "instruction_snapshot/governance_onboarding.md",
         "relocation_entry_id": "IR-010"
       }
     ],
+    "provenance_type": "product_owned",
+    "resource_id": "resource.instruction.governance_onboarding_instruction_resource_governance_onboarding",
+    "review_status": "reviewed",
     "roles": [
       "instruction_resource"
     ],
-    "projection_trace": {
-      "derivation": "relocation_manifest_projection",
-      "relocation_entry_id": "IR-010"
-    }
+    "workbench_id": "governance_onboarding"
   },
   {
-    "resource_id": "resource.administration_guide.issue_operations_administration_guides_issue_intake_triage_resolution_v0_2_0",
+    "content_hash": "b15e497f972a0a993521d4b61b1c33f4a3ae1cacaac85f6db221aefad45310e9",
     "kind": "administration_guide",
-    "workbench_id": "issue_operations",
-    "path": "lantern/administration_procedures/ISSUE__INTAKE_TRIAGE_RESOLUTION_v0.2.0.md",
-    "content_hash": "32c6edda60342171ac42f5639e37a93737c703377cca18f62af93f6fb105633e",
-    "review_status": "reviewed",
-    "provenance_type": "bridge_copy",
-    "provenance_refs": [
-      {
-        "path": "administration_procedures/ISSUE__INTAKE_TRIAGE_RESOLUTION_v0.2.0.md",
-        "relocation_entry_id": "AP-010"
-      }
-    ],
-    "roles": [
-      "administration_guides"
-    ],
+    "path": "lantern/administration_procedures/ISSUE__INTAKE_TRIAGE_RESOLUTION.md",
     "projection_trace": {
       "derivation": "relocation_manifest_projection",
       "relocation_entry_id": "AP-010"
-    }
-  },
-  {
-    "resource_id": "resource.authoritative_guide.issue_operations_authoritative_guides_issue_operations",
-    "kind": "authoritative_guide",
-    "workbench_id": "issue_operations",
-    "path": "lantern/resources/guides/issue_operations.md",
-    "content_hash": "443b2afc72f84ddf6776770fc31c4f0ef62c9b3dce1fda9ddd56bb975328d022",
-    "review_status": "lantern_authored",
-    "provenance_type": "lantern_authored_projection",
+    },
     "provenance_refs": [
       {
-        "path": "lantern/administration_procedures/ISSUE__INTAKE_TRIAGE_RESOLUTION_v0.2.0.md",
+        "path": "administration_procedures/ISSUE__INTAKE_TRIAGE_RESOLUTION.md",
         "relocation_entry_id": "AP-010"
       }
     ],
+    "provenance_type": "bridge_copy",
+    "resource_id": "resource.administration_guide.issue_operations_administration_guides_issue_intake_triage_resolution",
+    "review_status": "reviewed",
     "roles": [
-      "authoritative_guides"
+      "administration_guides"
     ],
-    "projection_trace": {
-      "derivation": "lantern_authored_guide_surface",
-      "source": "guide_header"
-    }
+    "workbench_id": "issue_operations"
   },
   {
-    "resource_id": "resource.instruction.issue_operations_instruction_resource_issue_operations",
+    "content_hash": "45b8d2c644094fe4c9393ce279a98c1753d3f3cf77ac9ebc389b1e8c97e49957",
     "kind": "instruction",
-    "workbench_id": "issue_operations",
     "path": "lantern/resources/instructions/issue_operations.md",
-    "content_hash": "daba4b38f14738cab3df020515e2f5e3f6463777f8c49bbb019bcdb90374fb3b",
-    "review_status": "reviewed",
-    "provenance_type": "product_owned",
+    "projection_trace": {
+      "derivation": "relocation_manifest_projection",
+      "relocation_entry_id": "IR-009"
+    },
     "provenance_refs": [
       {
         "path": "instruction_snapshot/issue_operations.md",
         "relocation_entry_id": "IR-009"
       }
     ],
+    "provenance_type": "product_owned",
+    "resource_id": "resource.instruction.issue_operations_instruction_resource_issue_operations",
+    "review_status": "reviewed",
     "roles": [
       "instruction_resource"
     ],
-    "projection_trace": {
-      "derivation": "relocation_manifest_projection",
-      "relocation_entry_id": "IR-009"
-    }
+    "workbench_id": "issue_operations"
   },
   {
-    "resource_id": "resource.administration_guide.selected_ci_application_administration_guides_gt_120_ci_selection_administration_v0_2_1",
+    "content_hash": "65bd79d7f4ca5c14b64bd877726b1cf7ddbe5fd638427e3f2931de36ec973f9a",
     "kind": "administration_guide",
-    "workbench_id": "selected_ci_application",
-    "path": "lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION_v0.2.1.md",
-    "content_hash": "1da7e5a55e0ecd269003eb84d36a94c1ded070f7b81950a1dd25bc6b7caaf47a",
-    "review_status": "reviewed",
-    "provenance_type": "bridge_copy",
-    "provenance_refs": [
-      {
-        "path": "administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION_v0.2.1.md",
-        "relocation_entry_id": "AP-006"
-      }
-    ],
-    "roles": [
-      "administration_guides"
-    ],
+    "path": "lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION.md",
     "projection_trace": {
       "derivation": "relocation_manifest_projection",
       "relocation_entry_id": "AP-006"
-    }
+    },
+    "provenance_refs": [
+      {
+        "path": "administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION.md",
+        "relocation_entry_id": "AP-006"
+      }
+    ],
+    "provenance_type": "bridge_copy",
+    "resource_id": "resource.administration_guide.selected_ci_application_administration_guides_gt_120_ci_selection_administration",
+    "review_status": "reviewed",
+    "roles": [
+      "administration_guides"
+    ],
+    "workbench_id": "selected_ci_application"
   },
   {
-    "resource_id": "resource.administration_guide.selected_ci_application_administration_guides_gt_130_integration_verification_administration",
+    "content_hash": "b3681893f30027ae3786b1bd9a50a8304761cbf99e3036463ebc7847403e47d9",
     "kind": "administration_guide",
-    "workbench_id": "selected_ci_application",
     "path": "lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md",
-    "content_hash": "708e8cd9c6cbed1ccd9cbaafa188db7832c7e038b73793a77c0c179936435ad7",
-    "review_status": "reviewed",
-    "provenance_type": "bridge_copy",
+    "projection_trace": {
+      "derivation": "relocation_manifest_projection",
+      "relocation_entry_id": "AP-007"
+    },
     "provenance_refs": [
       {
         "path": "administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md",
         "relocation_entry_id": "AP-007"
       }
     ],
+    "provenance_type": "bridge_copy",
+    "resource_id": "resource.administration_guide.selected_ci_application_administration_guides_gt_130_integration_verification_administration",
+    "review_status": "reviewed",
     "roles": [
       "administration_guides"
     ],
+    "workbench_id": "selected_ci_application"
+  },
+  {
+    "content_hash": "8f1f80fc0ecc4fc78a4029122e487f50935750722191a5d6b177c165764a2f37",
+    "kind": "instruction",
+    "path": "lantern/resources/instructions/selected_ci_application.md",
     "projection_trace": {
       "derivation": "relocation_manifest_projection",
-      "relocation_entry_id": "AP-007"
-    }
-  },
-  {
-    "resource_id": "resource.authoritative_guide.selected_ci_application_authoritative_guides_selected_ci_application",
-    "kind": "authoritative_guide",
-    "workbench_id": "selected_ci_application",
-    "path": "lantern/resources/guides/selected_ci_application.md",
-    "content_hash": "f0b31359465ea61a5d71c4751ae204a9ea1cd93e335f9fa839fd2044fad4853d",
-    "review_status": "lantern_authored",
-    "provenance_type": "lantern_authored_projection",
-    "provenance_refs": [
-      {
-        "path": "lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md",
-        "relocation_entry_id": "AP-007"
-      }
-    ],
-    "roles": [
-      "authoritative_guides"
-    ],
-    "projection_trace": {
-      "derivation": "lantern_authored_guide_surface",
-      "source": "guide_header"
-    }
-  },
-  {
-    "resource_id": "resource.instruction.selected_ci_application_instruction_resource_selected_ci_application",
-    "kind": "instruction",
-    "workbench_id": "selected_ci_application",
-    "path": "lantern/resources/instructions/selected_ci_application.md",
-    "content_hash": "b847d612d5c5dcff6b763cf7d92225b96ae88d0a55cb844e4b05aa87e1eae326",
-    "review_status": "reviewed",
-    "provenance_type": "product_owned",
+      "relocation_entry_id": "IR-007"
+    },
     "provenance_refs": [
       {
         "path": "instruction_snapshot/selected_ci_application.md",
         "relocation_entry_id": "IR-007"
       }
     ],
+    "provenance_type": "product_owned",
+    "resource_id": "resource.instruction.selected_ci_application_instruction_resource_selected_ci_application",
+    "review_status": "reviewed",
     "roles": [
       "instruction_resource"
     ],
-    "projection_trace": {
-      "derivation": "relocation_manifest_projection",
-      "relocation_entry_id": "IR-007"
-    }
+    "workbench_id": "selected_ci_application"
   },
   {
-    "resource_id": "resource.administration_guide.upstream_intake_and_baselines_administration_guides_gt_030_dip_lock_administration_v0_1_0",
+    "content_hash": "13bf435888de70e500be3eb222e3630d4ec14ef1d9c75ede2807bb6f6b2d6823",
     "kind": "administration_guide",
-    "workbench_id": "upstream_intake_and_baselines",
-    "path": "lantern/administration_procedures/GT-030__DIP_LOCK_ADMINISTRATION_v0.1.0.md",
-    "content_hash": "3f44541de28ba8985691e42fee11aa78d6ffae853a9ade12fc64dbd8b81754eb",
-    "review_status": "reviewed",
-    "provenance_type": "bridge_copy",
-    "provenance_refs": [
-      {
-        "path": "administration_procedures/GT-030__DIP_LOCK_ADMINISTRATION_v0.1.0.md",
-        "relocation_entry_id": "AP-003"
-      }
-    ],
-    "roles": [
-      "administration_guides"
-    ],
+    "path": "lantern/administration_procedures/GT-030__DIP_LOCK_ADMINISTRATION.md",
     "projection_trace": {
       "derivation": "relocation_manifest_projection",
       "relocation_entry_id": "AP-003"
-    }
-  },
-  {
-    "resource_id": "resource.administration_guide.upstream_intake_and_baselines_administration_guides_gt_050_gt_060_baseline_readiness_administration_v0_1_0",
-    "kind": "administration_guide",
-    "workbench_id": "upstream_intake_and_baselines",
-    "path": "lantern/administration_procedures/GT-050_GT-060__BASELINE_READINESS_ADMINISTRATION_v0.1.0.md",
-    "content_hash": "91603296a65825dc0a015f0b6061665d6b6d8dd5957b2033f645b604fa3534c7",
-    "review_status": "reviewed",
-    "provenance_type": "bridge_copy",
+    },
     "provenance_refs": [
       {
-        "path": "administration_procedures/GT-050_GT-060__BASELINE_READINESS_ADMINISTRATION_v0.1.0.md",
-        "relocation_entry_id": "AP-004"
+        "path": "administration_procedures/GT-030__DIP_LOCK_ADMINISTRATION.md",
+        "relocation_entry_id": "AP-003"
       }
     ],
+    "provenance_type": "bridge_copy",
+    "resource_id": "resource.administration_guide.upstream_intake_and_baselines_administration_guides_gt_030_dip_lock_administration",
+    "review_status": "reviewed",
     "roles": [
       "administration_guides"
     ],
+    "workbench_id": "upstream_intake_and_baselines"
+  },
+  {
+    "content_hash": "3d92f9385a6c639fe59390ecb93bb7f1d5c40c5978477547cb3592b37fb35e3f",
+    "kind": "administration_guide",
+    "path": "lantern/administration_procedures/GT-050_GT-060__BASELINE_READINESS_ADMINISTRATION.md",
     "projection_trace": {
       "derivation": "relocation_manifest_projection",
       "relocation_entry_id": "AP-004"
-    }
-  },
-  {
-    "resource_id": "resource.administration_guide.upstream_intake_and_baselines_administration_guides_initiative_authoring_and_readying_v0_1_0",
-    "kind": "administration_guide",
-    "workbench_id": "upstream_intake_and_baselines",
-    "path": "lantern/administration_procedures/INITIATIVE__AUTHORING_AND_READYING_v0.1.0.md",
-    "content_hash": "8f69eaa7b3bea37542b7cf0b3f76be41d782f7ce44de3c55b6791b0c119cb447",
-    "review_status": "reviewed",
-    "provenance_type": "bridge_copy",
+    },
     "provenance_refs": [
       {
-        "path": "administration_procedures/INITIATIVE__AUTHORING_AND_READYING_v0.1.0.md",
-        "relocation_entry_id": "AP-008"
-      }
-    ],
-    "roles": [
-      "administration_guides"
-    ],
-    "projection_trace": {
-      "derivation": "relocation_manifest_projection",
-      "relocation_entry_id": "AP-008"
-    }
-  },
-  {
-    "resource_id": "resource.authoritative_guide.upstream_intake_and_baselines_authoritative_guides_upstream_intake_and_baselines",
-    "kind": "authoritative_guide",
-    "workbench_id": "upstream_intake_and_baselines",
-    "path": "lantern/resources/guides/upstream_intake_and_baselines.md",
-    "content_hash": "ded675ab4789855e2bb4db0a6de156231823458e8a92db63b5f9a4458b8a5d48",
-    "review_status": "lantern_authored",
-    "provenance_type": "lantern_authored_projection",
-    "provenance_refs": [
-      {
-        "path": "lantern/administration_procedures/INITIATIVE__AUTHORING_AND_READYING_v0.1.0.md",
-        "relocation_entry_id": "AP-008"
-      },
-      {
-        "path": "lantern/administration_procedures/GT-050_GT-060__BASELINE_READINESS_ADMINISTRATION_v0.1.0.md",
+        "path": "administration_procedures/GT-050_GT-060__BASELINE_READINESS_ADMINISTRATION.md",
         "relocation_entry_id": "AP-004"
       }
     ],
+    "provenance_type": "bridge_copy",
+    "resource_id": "resource.administration_guide.upstream_intake_and_baselines_administration_guides_gt_050_gt_060_baseline_readiness_administration",
+    "review_status": "reviewed",
     "roles": [
-      "authoritative_guides"
+      "administration_guides"
     ],
-    "projection_trace": {
-      "derivation": "lantern_authored_guide_surface",
-      "source": "guide_header"
-    }
+    "workbench_id": "upstream_intake_and_baselines"
   },
   {
-    "resource_id": "resource.instruction.upstream_intake_and_baselines_instruction_resource_upstream_intake_and_baselines",
-    "kind": "instruction",
-    "workbench_id": "upstream_intake_and_baselines",
-    "path": "lantern/resources/instructions/upstream_intake_and_baselines.md",
-    "content_hash": "d0b588efb0a5f7631f9d59c4d4036ec2b1d1080e884e7aa4f5e03895313c297c",
+    "content_hash": "a074681deac3a85b8035b802ac7815a60c57281f6a3794039ed2f9b521fc35c5",
+    "kind": "administration_guide",
+    "path": "lantern/administration_procedures/INITIATIVE__AUTHORING_AND_READYING.md",
+    "projection_trace": {
+      "derivation": "relocation_manifest_projection",
+      "relocation_entry_id": "AP-008"
+    },
+    "provenance_refs": [
+      {
+        "path": "administration_procedures/INITIATIVE__AUTHORING_AND_READYING.md",
+        "relocation_entry_id": "AP-008"
+      }
+    ],
+    "provenance_type": "bridge_copy",
+    "resource_id": "resource.administration_guide.upstream_intake_and_baselines_administration_guides_initiative_authoring_and_readying",
     "review_status": "reviewed",
-    "provenance_type": "product_owned",
+    "roles": [
+      "administration_guides"
+    ],
+    "workbench_id": "upstream_intake_and_baselines"
+  },
+  {
+    "content_hash": "46941ffd597c703c8649210e632293f0e7c3714616ff8e4ff9aa0f8af3bfe874",
+    "kind": "instruction",
+    "path": "lantern/resources/instructions/upstream_intake_and_baselines.md",
+    "projection_trace": {
+      "derivation": "relocation_manifest_projection",
+      "relocation_entry_id": "IR-001"
+    },
     "provenance_refs": [
       {
         "path": "instruction_snapshot/upstream_intake_and_baselines.md",
         "relocation_entry_id": "IR-001"
       }
     ],
+    "provenance_type": "product_owned",
+    "resource_id": "resource.instruction.upstream_intake_and_baselines_instruction_resource_upstream_intake_and_baselines",
+    "review_status": "reviewed",
     "roles": [
       "instruction_resource"
     ],
-    "projection_trace": {
-      "derivation": "relocation_manifest_projection",
-      "relocation_entry_id": "IR-001"
-    }
+    "workbench_id": "upstream_intake_and_baselines"
   },
   {
-    "resource_id": "resource.administration_guide.verification_and_closure_administration_guides_gt_130_integration_verification_administration",
+    "content_hash": "b3681893f30027ae3786b1bd9a50a8304761cbf99e3036463ebc7847403e47d9",
     "kind": "administration_guide",
-    "workbench_id": "verification_and_closure",
     "path": "lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md",
-    "content_hash": "708e8cd9c6cbed1ccd9cbaafa188db7832c7e038b73793a77c0c179936435ad7",
-    "review_status": "reviewed",
-    "provenance_type": "bridge_copy",
+    "projection_trace": {
+      "derivation": "relocation_manifest_projection",
+      "relocation_entry_id": "AP-007"
+    },
     "provenance_refs": [
       {
         "path": "administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md",
         "relocation_entry_id": "AP-007"
       }
     ],
+    "provenance_type": "bridge_copy",
+    "resource_id": "resource.administration_guide.verification_and_closure_administration_guides_gt_130_integration_verification_administration",
+    "review_status": "reviewed",
     "roles": [
       "administration_guides"
     ],
+    "workbench_id": "verification_and_closure"
+  },
+  {
+    "content_hash": "acdb15892896bb7fab036249cb3e52b2c3545aa3882f13ba61e6b15761513fc4",
+    "kind": "instruction",
+    "path": "lantern/resources/instructions/verification_and_closure.md",
     "projection_trace": {
       "derivation": "relocation_manifest_projection",
-      "relocation_entry_id": "AP-007"
-    }
-  },
-  {
-    "resource_id": "resource.authoritative_guide.verification_and_closure_authoritative_guides_verification_and_closure",
-    "kind": "authoritative_guide",
-    "workbench_id": "verification_and_closure",
-    "path": "lantern/resources/guides/verification_and_closure.md",
-    "content_hash": "a12976da8094f29124dee966206de739f7e08f9fd23678ec2003a5e73b2f2702",
-    "review_status": "lantern_authored",
-    "provenance_type": "lantern_authored_projection",
-    "provenance_refs": [
-      {
-        "path": "lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md",
-        "relocation_entry_id": "AP-007"
-      }
-    ],
-    "roles": [
-      "authoritative_guides"
-    ],
-    "projection_trace": {
-      "derivation": "lantern_authored_guide_surface",
-      "source": "guide_header"
-    }
-  },
-  {
-    "resource_id": "resource.instruction.verification_and_closure_instruction_resource_verification_and_closure",
-    "kind": "instruction",
-    "workbench_id": "verification_and_closure",
-    "path": "lantern/resources/instructions/verification_and_closure.md",
-    "content_hash": "69882f17eb9a89d71501494449f27ec81c84865627dcd98205fc48de05c44f6a",
-    "review_status": "reviewed",
-    "provenance_type": "product_owned",
+      "relocation_entry_id": "IR-008"
+    },
     "provenance_refs": [
       {
         "path": "instruction_snapshot/verification_and_closure.md",
         "relocation_entry_id": "IR-008"
       }
     ],
+    "provenance_type": "product_owned",
+    "resource_id": "resource.instruction.verification_and_closure_instruction_resource_verification_and_closure",
+    "review_status": "reviewed",
     "roles": [
       "instruction_resource"
     ],
-    "projection_trace": {
-      "derivation": "relocation_manifest_projection",
-      "relocation_entry_id": "IR-008"
-    }
+    "workbench_id": "verification_and_closure"
   }
 ]

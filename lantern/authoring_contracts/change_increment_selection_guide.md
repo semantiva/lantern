@@ -1,13 +1,12 @@
-# Change Increment Selection Guide (v0.2.1)
+# Change Increment Selection Guide
 
 
 Status: AUTHORITATIVE — Guide (selection analysis; must not conflict with SSOT specs or authoring contract)
 Date (UTC): 2026-03-15
-Supersedes: v0.2.0
 Gate: GT-120 (Change Increment Selection)
 
-Note: This guide assumes the multi-repo workspace posture defined in `lantern/preservation/WORKSPACE_TOPOLOGY.md`.
-Semantic identifiers (statuses, gate ids) are bound via `lantern/preservation/LANTERN_MODEL_BINDING.md`.
+Note: This guide assumes the multi-repo workspace posture defined in the workspace boundary posture in AGENTS.md.
+Semantic identifiers (statuses, gate ids) are bound via lantern-grammar.
 
 CH_ID: `CH-####`
 
@@ -33,7 +32,7 @@ The GT-120 EV is the one authoritative rich findings artifact. Record all materi
 Scope: selection only.
 
 After the selection report is produced and a human approves the chosen candidate, GT-120 status administration MUST be completed using:
-- `lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION_v0.2.1.md`
+- `lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION.md`
 
 Until that point, do not update CI statuses and do not create DEC/EV records.
 
@@ -43,15 +42,13 @@ Until that point, do not update CI statuses and do not create DEC/EV records.
 
 ## SSOT (must use; do not substitute)
 
-- `lantern/preservation/EPISTEMIC_FRAME.md` (objects, IDs, statuses, anchoring)
-- `lantern/preservation/GATES.md` (GT-110/120/130 decision logic and GT-120 output semantics)
 - `lantern/authoring_contracts/change_increment_authoring_guide.md` (normative CI/CH record shape; required CI sections)
 - The provided CH file for `CH_ID`: `ch/CH-####.md` (authoritative assessment criteria, constraints, validation target)
 - The provided DB file for `CH_ID`: `db/DB-####.md` (authoritative design commitments and implementation latitude)
 - The provided TD files for `CH_ID`: `td/TD-####.md` (authoritative test-definition coverage)
 
 This guide is intentionally paired with:
-- `change_intention_refinement_guide_v0.2.1.md` (how CH becomes `Ready` at GT-110 with approved TD coverage)
+- `change_intention_refinement_guide.md` (how CH becomes `Ready` at GT-110 with approved TD coverage)
 - `change_increment_authoring_guide.md` (what a CI must contain to be selection-eligible)
 
 ## Hard anti-drift rules (apply regardless of stage)
@@ -140,7 +137,7 @@ For each CI candidate:
 - CI header exists and parses as YAML.
 - `ch_id` equals `CH_ID`.
 - `ci_id` format matches `CI-<CH_NUM>-<UUID>`, where `CH_NUM` equals the numeric suffix of `CH_ID`.
-- `status` is a CI status defined by `lantern/preservation/EPISTEMIC_FRAME.md`.
+- `status` is a CI status defined by lantern-grammar.
 
 Hard rule:
 - A CI MUST NOT be compared/selected at GT-120 unless its status is `Candidate`.
@@ -214,6 +211,7 @@ PASS requires:
 - CI calls out key drift traps and how the integration step must avoid exceeding scope.
 
 ### 4) Selection logic
+- For authority-model replacement slices, prefer the CI that performs atomic replacement, removes superseded runtime authority, and explicitly retires or relabels old tests. A CI that defers superseded-code cleanup is weaker unless the DB requires compatibility retention.
 
 - If exactly one eligible candidate passes all classes A–E: recommend it as **Selected**.
 - If multiple eligible candidates pass all classes A–E: rank them by (highest priority first):

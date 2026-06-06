@@ -1,4 +1,4 @@
-# GT-130 Administration Guide — v0.1.0
+# GT-130 Administration Guide
 
 
 Status: **AUTHORITATIVE — Procedure**
@@ -11,9 +11,6 @@ GT-130 is the final change-lifecycle gate. A PASS at GT-130 transitions the CI t
 Normative anchors:
 - `change_increment_authoring_guide.md` (CI record shapes + verification plan contract)
 - `allowed_change_surface_flexibilization.md` (bounded GT-130 extension posture)
-- `lantern/preservation/EPISTEMIC_FRAME.md` (record invariants and status transitions)
-- `lantern/preservation/GATES.md` (GT-130 requirements)
-- `lantern/preservation/WORKSPACE_TOPOLOGY.md` (multi-repo posture)
 
 ---
 
@@ -125,6 +122,7 @@ Additionally, for each TD case in the Approved TD set:
 3. Record PASS or FAIL per TD case.
 
 Hard rules:
+- For authority-model replacement slices, GT-130 evidence must state whether superseded authority remains in the tree. If it remains, the EV must say whether it is runtime authority or compatibility-only projection, why it remains, and which tests cover it in that role. GT-130 must not claim clean closure when superseded code paths or tests remain without that explanation.
 - Aspirational or placeholder evidence is invalid. Real command output, test results, or artifact paths MUST appear in the EV record.
 - If the verification environment prevents a command from running, record this as a FAIL with the blocking reason; do not fabricate evidence.
 - The commit hash recorded in the EV and binding record MUST identify the committed product repository revision used for the delivered code; do not close GT-130 against an uncommitted dirty worktree.
@@ -295,10 +293,10 @@ Hard rules:
 
 ## Expectation-to-delivery review checklist (mandatory for MVP slices)
 Before a GT-130 PASS is approved, the verification packet MUST explicitly answer all of the following:
-- What initiative objective does this CH satisfy, and why does it exist in the roadmap now?
-- What role does this CH play in the current execution order?
-- Which approved SPEC / TD requirements are satisfied by the delivered result?
-- Does the delivered result remain aligned with the approved ARCH baseline?
+- Initiative objective: what initiative objective does this CH satisfy, and why does it exist in the roadmap now?
+- Roadmap role: what role does this CH play in the current roadmap and execution order?
+- Requirements satisfaction: which approved SPEC / TD requirements are satisfied by the delivered result?
+- Architectural fit: does the delivered result remain aligned with the approved ARCH baseline?
 - What clean-state, reproducibility, and local verification evidence proves the result is repeatable?
 
 Local test passage is necessary but not sufficient. A packet that omits this expectation-to-delivery review is incomplete for GT-130.

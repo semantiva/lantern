@@ -52,10 +52,9 @@ workflow_surface:
     - instruction_resource
     - authoritative_guides
 instruction_resource: lantern/resources/instructions/issue_operations.md
-authoritative_guides:
-- lantern/resources/guides/issue_operations.md
+authoritative_guides: []
 administration_guides:
-- lantern/administration_procedures/ISSUE__INTAKE_TRIAGE_RESOLUTION_v0.2.0.md
+- lantern/administration_procedures/ISSUE__INTAKE_TRIAGE_RESOLUTION.md
 entry_conditions:
 - issue exists
 exit_conditions:

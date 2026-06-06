@@ -1,4 +1,4 @@
-# GT-115 Administration Guide — v0.1.0
+# GT-115 Administration Guide
 
 
 Status: **AUTHORITATIVE — Procedure**
@@ -8,11 +8,8 @@ Revision note: expands the earlier skeletal GT-115 administration draft into a f
 Purpose: complete the required administration tasks for a GT-115 design baseline selection decision, in a way that is reproducible and mechanically checkable.
 
 Normative anchors:
-- `design_candidate_authoring_guide_v0.1.0.md` (DC record shapes + directory structure)
-- `design_baseline_authoring_guide_v0.1.0.md` (DB record shape + extraction discipline)
-- `lantern/preservation/EPISTEMIC_FRAME.md` (record invariants)
-- `lantern/preservation/GATES.md` (GT-115 requirements)
-- `lantern/preservation/WORKSPACE_TOPOLOGY.md` (multi-repo posture)
+- `design_candidate_authoring_guide.md` (DC record shapes + directory structure)
+- `design_baseline_authoring_guide.md` (DB record shape + extraction discipline)
 
 ---
 
@@ -34,7 +31,7 @@ These are administrative requirements, not evaluation criteria.
 - Each Candidate DC MUST appear in `INDEX.md` at the governance repo root with status `Candidate` before the selection report is approved.
 
 4) Selection report exists:
-- This procedure assumes the selection analysis report already exists (as chat output or a draft file), produced by running `lantern/authoring_contracts/design_candidate_selection_guide_v0.1.0.md`.
+- This procedure assumes the selection analysis report already exists (as chat output or a draft file), produced by running `lantern/authoring_contracts/design_candidate_selection_guide.md`.
 - A human has approved the chosen candidate (or explicitly overridden the assistant's recommendation).
 
 5) Stability:
@@ -45,7 +42,7 @@ These are administrative requirements, not evaluation criteria.
 ## Definitions (for this procedure)
 
 - "Candidate pool": the set of DC ids actively considered at GT-115 for a given `CH-####`.
-- "Selection report": the human-readable evaluation output produced by running `lantern/authoring_contracts/design_candidate_selection_guide_v0.1.0.md`.
+- "Selection report": the human-readable evaluation output produced by running `lantern/authoring_contracts/design_candidate_selection_guide.md`.
 
 ---
 
@@ -95,7 +92,7 @@ For each DC in the candidate pool:
 
 Do NOT change anything else in DC files at this step.
 
-Rationale: `Candidate` is the explicit "submitted for selection" status in `lantern/preservation/EPISTEMIC_FRAME.md`. It makes the GT-115 decision auditable even if selection is delayed.
+Rationale: `Candidate` is the explicit "submitted for selection" status in lantern-grammar. It makes the GT-115 decision auditable even if selection is delayed.
 
 ### Step 2 — Allocate new EV, DEC, and DB ids
 
@@ -122,7 +119,7 @@ Header requirements:
 - `artifacts` MUST include at least:
   - `kind: "path"` pointing to the CH file path
   - `kind: "path"` pointing to each DC file path (candidate pool)
-  - `kind: "path"` pointing to `lantern/authoring_contracts/design_candidate_selection_guide_v0.1.0.md`
+  - `kind: "path"` pointing to `lantern/authoring_contracts/design_candidate_selection_guide.md`
   - `kind: "path"` pointing to each Approved SPEC file used for the gate
   - `kind: "path"` pointing to each Approved ARCH file used for the gate
   - `kind: "path"` pointing to each Approved TD file used for the gate
@@ -191,7 +188,7 @@ Create: `db/DB-####.md`
 
 Use the DB id allocated in Step 2.
 
-Authoring rules (follow `design_baseline_authoring_guide_v0.1.0.md` in full):
+Authoring rules (follow `design_baseline_authoring_guide.md` in full):
 
 - `db_id` MUST equal the allocated DB id.
 - `source_dc_id` MUST reference the Selected DC id.
@@ -256,7 +253,7 @@ Use this when you want an assistant to generate the exact file edits (without re
 
 "Produce a GT-115 Administration Patch Pack:
 - the full contents for EV-#### and DEC-#### (allocate ids using `python tools/allocate_lantern_id.py`)
-- the full contents for DB-#### (allocate id using `python tools/allocate_lantern_id.py`; author using `design_baseline_authoring_guide_v0.1.0.md`)
+- the full contents for DB-#### (allocate id using `python tools/allocate_lantern_id.py`; author using `design_baseline_authoring_guide.md`)
 - unified diffs for DC header `status` updates (candidate → selected/rejected)
 - a unified diff patch for `INDEX.md` updates at the governance repo root
 

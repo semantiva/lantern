@@ -49,7 +49,7 @@ def test_no_lantern_path_semantics_note_in_ev_templates() -> None:
 
 def test_no_lantern_ci_selection_guide_pseudo_path_in_gt120_surface() -> None:
     """AC-2: Lantern/change_increment_selection_guide pseudo-path must not appear in GT-120 procedure or EV template."""
-    gt120_proc = (ADMIN_PROCEDURES / "GT-120__CI_SELECTION_ADMINISTRATION_v0.2.1.md").read_text(encoding="utf-8")
+    gt120_proc = (ADMIN_PROCEDURES / "GT-120__CI_SELECTION_ADMINISTRATION.md").read_text(encoding="utf-8")
     ev_gt120 = (TEMPLATES / "EV_TEMPLATE__GT120_SELECTION_REPORT.md").read_text(encoding="utf-8")
     pseudo_path = "Lantern/change_increment_selection_guide"
     assert (

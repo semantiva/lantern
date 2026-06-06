@@ -1,4 +1,4 @@
-# DIP authoring guide — v0.1.0
+# DIP authoring guide
 
 
 Status: AUTHORITATIVE — Normative
@@ -9,11 +9,7 @@ Applies to:
 - AI-assisted execution at and before GT-030
 
 Normative anchors:
-- `lantern/preservation/EPISTEMIC_FRAME.md`
-- `lantern/preservation/GATES.md`
-- `lantern/preservation/WORKSPACE_TOPOLOGY.md`
-- `lantern/preservation/LANTERN_MODEL_BINDING.md`
-- `lantern/preservation/ARTIFACT_ID_ALLOCATION.md`
+- lantern-grammar (gate, status, artifact-family, and ID semantics)
 
 ---
 
@@ -31,7 +27,7 @@ Allocation rule (normative): DIP ids MUST be generated using the Lantern allocat
 - `python tools/allocate_lantern_id.py --artifact DIP --repo <path-to-ssot-root>`
 
 ### 1.2 Initiative (INI)
-An Initiative is the planning container that owns one DIP and one or more derived SPEC/ARCH artifacts.
+An Initiative is a planning and roadmap artifact above CH. It may reference product technical baselines and candidate CH slices, but it does not own DIP, SPEC, or ARCH records.
 
 INI id format (required): `INI-####`
 
@@ -40,10 +36,14 @@ A SPEC is derived from an Approved DIP and is the authoritative requirements bas
 
 SPEC id format (required): `SPEC-####`
 
+Normative content, scope, granularity, and SPEC-to-CH relationship rules live in `lantern/authoring_contracts/spec_authoring_guide.md`.
+
 ### 1.4 Architecture Definition (ARCH)
-An ARCH is derived from an Approved DIP and is the authoritative architecture baseline.
+An ARCH is derived from an Approved DIP and compatible SPEC baseline and is the authoritative architecture baseline.
 
 ARCH id format (required): `ARCH-####`
+
+Normative content, scope, granularity, and ARCH-to-CH relationship rules live in `lantern/authoring_contracts/arch_authoring_guide.md`.
 
 ---
 

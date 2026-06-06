@@ -23,7 +23,7 @@ PRODUCT_ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_selection_guide_uses_live_ch_fields() -> None:
-    content = (PRODUCT_ROOT / "lantern/authoring_contracts/design_candidate_selection_guide_v0.1.0.md").read_text(
+    content = (PRODUCT_ROOT / "lantern/authoring_contracts/design_candidate_selection_guide.md").read_text(
         encoding="utf-8"
     )
     assert "constraints.must_not_change" not in content
@@ -34,9 +34,9 @@ def test_selection_guide_uses_live_ch_fields() -> None:
 
 
 def test_gt115_procedure_and_templates_use_live_conventions() -> None:
-    procedure = (
-        PRODUCT_ROOT / "lantern/administration_procedures/GT-115__DESIGN_BASELINE_SELECTION_v0.1.0.md"
-    ).read_text(encoding="utf-8")
+    procedure = (PRODUCT_ROOT / "lantern/administration_procedures/GT-115__DESIGN_BASELINE_SELECTION.md").read_text(
+        encoding="utf-8"
+    )
     ev_template = (PRODUCT_ROOT / "lantern/templates/EV_TEMPLATE__GT115_SELECTION_REPORT.md").read_text(
         encoding="utf-8"
     )

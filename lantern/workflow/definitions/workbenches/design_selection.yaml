@@ -58,11 +58,10 @@ workflow_surface:
     - instruction_resource
     - authoritative_guides
 instruction_resource: lantern/resources/instructions/design_selection.md
-authoritative_guides:
-- lantern/resources/guides/design_selection.md
+authoritative_guides: []
 administration_guides:
-- lantern/authoring_contracts/design_candidate_selection_guide_v0.1.0.md
-- lantern/administration_procedures/GT-115__DESIGN_BASELINE_SELECTION_v0.1.0.md
+- lantern/authoring_contracts/design_candidate_selection_guide.md
+- lantern/administration_procedures/GT-115__DESIGN_BASELINE_SELECTION.md
 entry_conditions:
 - GT-110 passed
 exit_conditions:

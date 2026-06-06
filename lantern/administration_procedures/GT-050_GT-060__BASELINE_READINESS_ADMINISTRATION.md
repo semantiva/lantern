@@ -1,4 +1,4 @@
-# GT-050/GT-060 Administration Guide — v0.1.0
+# GT-050/GT-060 Administration Guide
 
 
 Status: **AUTHORITATIVE — Procedure**
@@ -9,10 +9,7 @@ Purpose: approve a Requirements Specification (SPEC) at GT-050 and an Architectu
 These two gates share a procedure structure and are typically run in the same session after the SPEC and ARCH drafts are derived and the required derivation/coherence evidence has been assembled. They are documented together to avoid duplication but are independent gates: GT-050 PASS and GT-060 PASS are separate decisions recorded in separate DEC artifacts.
 
 Normative anchors:
-- `dip_authoring_guide_v0.1.0.md` (DIP record shape; ARCH and SPEC must derive from an Approved DIP)
-- `lantern/preservation/EPISTEMIC_FRAME.md` (record invariants)
-- `lantern/preservation/GATES.md` (GT-050 and GT-060 requirements)
-- `lantern/preservation/WORKSPACE_TOPOLOGY.md` (multi-repo posture)
+- `dip_authoring_guide.md` (DIP record shape; ARCH and SPEC must derive from an Approved DIP)
 
 ---
 
@@ -260,5 +257,5 @@ If any check fails, treat the affected gate as incomplete.
 
 Approved SPEC and ARCH are now available as reusable baselines for CH authoring.
 
-1. Derive one or more bounded CH slices from the approved baselines using `guides/INITIATIVE__DECOMPOSITION_AND_CH_SIZING_v0.1.0.md`.
-2. Author CH records and run GT-110 (CH + TD readiness) using `change_intention_refinement_guide_v0.2.1.md` and `test_definition_authoring_guide_v0.1.0.md`.
+1. Derive one or more bounded CH slices from the approved baselines.
+2. Author CH records and run GT-110 (CH + TD readiness) using `change_intention_refinement_guide.md` and `test_definition_authoring_guide.md`.

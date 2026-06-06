@@ -1,4 +1,4 @@
-# GT-030 Administration Guide — v0.1.0
+# GT-030 Administration Guide
 
 
 Status: **AUTHORITATIVE — Procedure**
@@ -9,10 +9,7 @@ Purpose: lock a Design Input Pack (DIP) at GT-030, producing the Approved baseli
 GT-030 is the entry gate for the upstream artifact family. A PASS at GT-030 transitions the DIP from `Draft` to `Approved` and unlocks SPEC/ARCH drafting plus the derivation/coherence evidence that will be carried into GT-050 and GT-060.
 
 Normative anchors:
-- `dip_authoring_guide_v0.1.0.md` (DIP record shape + authoring contract)
-- `lantern/preservation/EPISTEMIC_FRAME.md` (record invariants)
-- `lantern/preservation/GATES.md` (GT-030 requirements)
-- `lantern/preservation/WORKSPACE_TOPOLOGY.md` (multi-repo posture)
+- `dip_authoring_guide.md` (DIP record shape + authoring contract)
 
 ---
 
@@ -20,7 +17,7 @@ Normative anchors:
 
 1) DIP exists in `Draft`:
 - `dip/DIP-####.md` exists and has `Status: Draft`.
-- If no DIP exists yet, author one using `dip_authoring_guide_v0.1.0.md` before proceeding.
+- If no DIP exists yet, author one using `dip_authoring_guide.md` before proceeding.
 
 2) Source inventory is complete:
 - `## Source inventory` is non-empty and each source has a stable identifier, type, and locator.
@@ -232,5 +229,4 @@ If any check fails, treat GT-030 as incomplete.
 4. Run GT-050 (SPEC baseline readiness) and GT-060 (ARCH baseline readiness).
 
 These steps are covered by:
-- `guides/GT-050_GT-060__BASELINE_READINESS_ADMINISTRATION_v0.1.0.md`
-- Operator templates E and F plus template G in `guides/AI_OPERATOR_INVOCATION_TEMPLATES_v0.2.1.md`
+- `lantern/administration_procedures/GT-050_GT-060__BASELINE_READINESS_ADMINISTRATION.md`

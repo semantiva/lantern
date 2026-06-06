@@ -1,24 +1,18 @@
-# Change Increment authoring guide — v0.2.1
+# Change Increment authoring guide
 
 
 Status: AUTHORITATIVE — Normative
 Date (UTC): 2026-03-15
-Supersedes: v0.2.0
 
 Applies to:
 - Lantern workflow SSOT container repositories in a multi-repository workspace
 - AI-assisted execution under a locked `CH + DB + TD` downstream envelope
 
 Correction note:
-- This guide restores the rich authoring posture of `v0.2.0` while incorporating the active `TD / DB / GT-115` downstream contract that was introduced after `v0.2.0`.
+- This guide preserves execution-grade CI authoring while incorporating the active `TD / DB / GT-115` downstream contract.
 
 Normative anchors:
-- `lantern/preservation/EPISTEMIC_FRAME.md`
-- `lantern/preservation/GATES.md`
-- `lantern/preservation/WORKSPACE_TOPOLOGY.md`
-- `lantern/preservation/LANTERN_MODEL_BINDING.md`
-- `lantern/preservation/ARTIFACT_ID_ALLOCATION.md`
-- `lantern/preservation/UPSTREAM_INPUT_ARTIFACTS.md`
+- lantern-grammar (gate, status, artifact-family, and ID semantics)
 
 ---
 
@@ -291,7 +285,18 @@ If drop-in coverage is incomplete, the CI MUST include `## Blocking Items` with:
 
 ---
 
-## 9. Commit Message (normative)
+## 9. Authority-model replacement slices (normative)
+
+When a CI replaces an authority model, it must state whether the change is additive, replacement, compatibility-preserving, or migration-only.
+
+Hard rules:
+- Replacement slices must remove superseded runtime authority in the same CI unless the DB explicitly retains it as compatibility-only projection.
+- Do not append a new authority beside an old authority and leave reviewers to infer which one governs.
+- Identify duplicate top-level functions or classes, import aliases pointing to superseded modules, registry entries for removed paths, generated projections that are no longer authority, and tests tied only to superseded behavior.
+- Tests tied exclusively to superseded authority must be deleted, rewritten for the new authority, or relabeled as compatibility-projection tests with a comment stating that they cover output compatibility only, not runtime authority.
+- If compatibility output remains, the CI must state the owning source of truth and the reason the output remains packaged.
+
+## 10. Commit Message (normative)
 
 Every CI MUST include `## Commit Message (REQUIRED)`.
 
@@ -313,7 +318,7 @@ CI: CI-<CH_NUM>-<UUID>
 
 ---
 
-## 10. Verification requirements (normative)
+## 11. Verification requirements (normative)
 
 The `## Verification Plan` section MUST contain real, binary checks.
 
@@ -336,7 +341,7 @@ Examples of invalid signals:
 
 ---
 
-## 11. Gate-driven lifecycle implications
+## 12. Gate-driven lifecycle implications
 
 ### GT-110
 - CI authoring MUST NOT begin until the target CH is `Ready` and the required TD set is Approved.
@@ -352,7 +357,7 @@ Examples of invalid signals:
 
 ---
 
-## 12. Common failure modes (avoid)
+## 13. Common failure modes (avoid)
 
 - CI redefines design or test truth instead of consuming DB and TD.
 - CI widens the allowed change surface implicitly.

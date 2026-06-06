@@ -50,12 +50,10 @@ workflow_surface:
     - instruction_resource
     - authoritative_guides
 instruction_resource: lantern/resources/instructions/governance_onboarding.md
-authoritative_guides:
-- lantern/resources/guides/governance_onboarding.md
+authoritative_guides: []
 administration_guides:
-- lantern/administration_procedures/SSOT_BLOB_INGESTION_v0.2.0.md
-- lantern/administration_procedures/INITIATIVE__AUTHORING_AND_READYING_v0.1.0.md
-- lantern/administration_procedures/INITIATIVE__DECOMPOSITION_AND_CH_SIZING_v0.1.0.md
+- lantern/administration_procedures/INITIATIVE__AUTHORING_AND_READYING.md
+- lantern/administration_procedures/INITIATIVE__DECOMPOSITION_AND_CH_SIZING.md
 entry_conditions:
 - governance repo not yet prepared or needs inspection
 exit_conditions:

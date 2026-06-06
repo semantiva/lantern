@@ -9,12 +9,11 @@ Timestamp: [[TEMPLATE:TIMESTAMP]]  <!-- ISO 8601 recommended -->
 
 [[TEMPLATE:SUMMARY]]
 
-## Product refinement framing (required)
+## Decision motivation (optional)
 
-- Real bottleneck: [[TEMPLATE:REAL_BOTTLENECK]]
-- Delivered value in this slice: [[TEMPLATE:DELIVERED_VALUE]]
-- Complexity explicitly avoided or deferred: [[TEMPLATE:DEFERRED_COMPLEXITY]]
-- Required decomposition or sequencing consequence: [[TEMPLATE:DECOMPOSITION_OR_SEQUENCING]]
+<!-- At most one or two objective sentences naming the durable problem these architectural decisions address. Omit when the decisions are self-evident. No narrative, scenarios, analogies, transitional language, or slice-value framing. -->
+
+[[TEMPLATE:DECISION_MOTIVATION]]
 
 ## Architecture scope and intent
 

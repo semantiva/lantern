@@ -14,7 +14,7 @@ artifacts:
   - kind: "path"
     path: "ci/CI-####-<UUID>.md"
   - kind: "path"
-    path: "lantern/authoring_contracts/change_increment_selection_guide_v0.2.1.md"
+    path: "lantern/authoring_contracts/change_increment_selection_guide.md"
 ```
 
 ## Selection report (verbatim)

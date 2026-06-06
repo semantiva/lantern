@@ -1,0 +1,156 @@
+# Copyright 2025 Lantern Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""ARCH-0002 §5 static enforcement checks for the operator guidance corpus.
+
+CI-level corpus checks (not runtime logic) installed by CH-0030. Each check
+realizes one row of ARCH-0002 §5 and enforces the SPEC-0005 requirements.
+
+The membrane check honours DEC-0105 Option A: surviving authoring guides that
+are not yet wired into the delivery surface are an enumerated, deferred gap
+(delivery-topology realization is the next INI-0004 CH), not a CH-0030 failure.
+"""
+
+from __future__ import annotations
+
+import json
+import re
+from pathlib import Path
+
+PRODUCT_ROOT = Path(__file__).resolve().parents[1]
+DEFINITIONS = PRODUCT_ROOT / "lantern" / "workflow" / "definitions"
+MANIFEST = DEFINITIONS / "resource_manifest.json"
+
+# Guidance classes that are delivered as resource-manifest entries.
+GUIDANCE_DIRS = (
+    "lantern/authoring_contracts",
+    "lantern/administration_procedures",
+    "lantern/resources/instructions",
+)
+
+# DEC-0105 Option A — enumerated, deferred delivery-topology membrane gap.
+# These surviving authoring guides previously reached operators only through the
+# deleted projection layer; wiring them into the manifest is delivery-topology
+# realization deferred to the next INI-0004 CH. Recorded, not silently passed.
+DEFERRED_MEMBRANE_GAP = {
+    "lantern/authoring_contracts/dip_authoring_guide.md",
+    "lantern/authoring_contracts/spec_authoring_guide.md",
+    "lantern/authoring_contracts/arch_authoring_guide.md",
+    "lantern/authoring_contracts/design_baseline_authoring_guide.md",
+    "lantern/authoring_contracts/test_definition_authoring_guide.md",
+}
+
+ARCH0002_OPERATOR_KINDS = {"instruction", "authoring_contract", "administration_guide"}
+
+
+def _manifest() -> list[dict]:
+    return json.loads(MANIFEST.read_text(encoding="utf-8"))
+
+
+def _manifest_paths() -> set[str]:
+    return {entry["path"] for entry in _manifest()}
+
+
+def _guidance_files() -> set[str]:
+    files: set[str] = set()
+    for directory in GUIDANCE_DIRS:
+        for path in (PRODUCT_ROOT / directory).glob("*.md"):
+            files.add(f"lantern/{path.relative_to(PRODUCT_ROOT / 'lantern').as_posix()}")
+    return files
+
+
+# Row 1 — Membrane check (REQ-GS-01)
+def test_membrane_check_guidance_files_are_reachable_or_deferred() -> None:
+    manifest = _manifest_paths()
+    unreachable = _guidance_files() - manifest
+    non_enumerated = sorted(unreachable - DEFERRED_MEMBRANE_GAP)
+    assert non_enumerated == [], f"present-but-unreachable guidance files: {non_enumerated}"
+    # Keep the deferred allowlist honest.
+    for path in DEFERRED_MEMBRANE_GAP:
+        assert (PRODUCT_ROOT / path).exists(), f"stale deferred-gap entry (file gone): {path}"
+        assert path not in manifest, f"deferred-gap entry is now wired; remove from allowlist: {path}"
+
+
+# Row 2 — Single-authority check (REQ-GA-01, REQ-GA-03)
+def test_single_authority_no_projection_class_and_no_duplicate_documents() -> None:
+    import hashlib
+
+    kinds = {entry["kind"] for entry in _manifest()}
+    assert "authoritative_guide" not in kinds, "projection layer (authoritative_guide kind) must be removed"
+    # A document may serve multiple workbenches, but no two distinct governed
+    # documents may carry identical content (that would duplicate authority).
+    seen: dict[str, str] = {}
+    for path in _guidance_files():
+        digest = hashlib.sha256((PRODUCT_ROOT / path).read_bytes()).hexdigest()
+        assert digest not in seen, f"duplicate-authority documents: {path} == {seen[digest]}"
+        seen[digest] = path
+
+
+# Row 3 — Semantic-authority check (REQ-GA-02)
+def test_semantic_authority_no_shadow_corpus_or_semantic_definitions() -> None:
+    preservation = PRODUCT_ROOT / "lantern" / "preservation"
+    assert sorted(preservation.glob("*.md")) == [], "preservation shadow-corpus markdown must be removed"
+    forbidden_definition_headings = (
+        "## Gate definitions",
+        "## Status definitions",
+        "## Canonical statuses",
+        "## Artifact families (normative)",
+    )
+    for path in _guidance_files():
+        text = (PRODUCT_ROOT / path).read_text(encoding="utf-8")
+        for heading in forbidden_definition_headings:
+            assert heading not in text, f"{path} redefines grammar-owned semantics: {heading!r}"
+
+
+# Row 4 — Audience/class declaration check (REQ-GA-04, REQ-GA-05)
+def test_audience_class_each_resource_resolves_to_one_kind() -> None:
+    by_path: dict[str, set[str]] = {}
+    for entry in _manifest():
+        by_path.setdefault(entry["path"], set()).add(entry["kind"])
+    ambiguous = {path: kinds for path, kinds in by_path.items() if len(kinds) != 1}
+    assert ambiguous == {}, f"resources without a single declared class: {ambiguous}"
+    assert {entry["kind"] for entry in _manifest()} <= ARCH0002_OPERATOR_KINDS
+
+
+# Row 5 — Reference-resolution check (REQ-GS-04)
+def test_reference_resolution_no_dangling_corpus_references() -> None:
+    manifest = _manifest_paths()
+    ref_pattern = re.compile(r"lantern/[A-Za-z0-9_./-]+\.md")
+    # Bare guides/ references (deleted layer); catches backtick-quoted and plain forms.
+    bare_guides_pattern = re.compile(r"`?guides/[A-Za-z0-9_./-]+\.md`?")
+    dangling: dict[str, list[str]] = {}
+    bare_guides: dict[str, list[str]] = {}
+    for path in _guidance_files():
+        text = (PRODUCT_ROOT / path).read_text(encoding="utf-8")
+        for ref in set(ref_pattern.findall(text)):
+            if ref in manifest or ref in DEFERRED_MEMBRANE_GAP:
+                continue
+            if (PRODUCT_ROOT / ref).exists():
+                continue  # delivery-reachable peer (e.g., template / deferred guide present on disk)
+            dangling.setdefault(path, []).append(ref)
+        for match in set(bare_guides_pattern.findall(text)):
+            bare_guides.setdefault(path, []).append(match)
+    assert dangling == {}, f"references that resolve to no delivery-reachable target: {dangling}"
+    assert bare_guides == {}, f"bare guides/ references to deleted layer: {bare_guides}"
+
+
+# Row 6 — Non-governed-content check (REQ-GS-02, REQ-GS-03)
+def test_non_governed_content_absent_from_corpus() -> None:
+    for path in _manifest_paths():
+        name = path.rsplit("/", 1)[-1]
+        assert not name.startswith("MIGRATION__"), f"historical/migration document inside corpus: {path}"
+        assert "POC_VALUE_EXTRACTION" not in name, f"historical document inside corpus: {path}"
+    preservation = PRODUCT_ROOT / "lantern" / "preservation"
+    assert not (preservation / "MIGRATION__TD_DC_DB_GT115_v0.1.0.md").exists()
+    assert not (preservation / "POC_VALUE_EXTRACTION_MAP.md").exists()

@@ -3,23 +3,18 @@ Operator instruction resource for workbench design_candidate_authoring.
 ## Workbench
 Display name: Design Candidate Authoring
 Lifecycle kind: lifecycle_span
+Transaction posture: inspect, draft, validate
 
 ## Artifacts in scope
 DC
 
-## Key actions
-- Read and follow Lantern-local guidance in lantern/authoring_contracts/design_candidate_authoring_guide_v0.1.0.md.
-- Keep all emitted references inside the approved Lantern-local corpus.
+## Bound resource roles
+Consult, via MCP, the resources the workflow layer binds to this workbench. Route to them; do not restate their content. This workbench binds:
+- administration guides (authoring contracts and administration procedures bound to this workbench)
+- artifact templates for the families in scope
 
-## MCP usage
-- Inspect the ready change intent and approved inputs first.
-- Draft design candidates inside the bounded change surface.
-- Validate candidate structure before review.
-
-## Constraints
-- Respect posture constraints: requires_ready_ch.
-- Do not emit references outside Lantern-local paths.
-- Keep the workbench guidance inside the approved CH-0007 change surface.
-
-Referenced Lantern-local guides:
-- lantern/authoring_contracts/design_candidate_authoring_guide_v0.1.0.md
+## Hard stops
+- Each gate requires explicit human approval by default. Bounded multi-gate authorization applies only when the human names the authorized scope; it stops at any blocker, ambiguity, failed check, dirty worktree, or scope change.
+- Operate within the workspace boundary defined in AGENTS.md: write governed records only in the governance workspace.
+- Emit references only to resources delivered through this workbench's bound roles.
+- Respect posture constraint: requires_ready_ch.

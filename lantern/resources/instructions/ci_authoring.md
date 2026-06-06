@@ -3,25 +3,18 @@ Operator instruction resource for workbench ci_authoring.
 ## Workbench
 Display name: CI Authoring
 Lifecycle kind: lifecycle_span
+Transaction posture: inspect, draft, validate
 
 ## Artifacts in scope
 CI
 
-## Key actions
-- Read and follow Lantern-local guidance in lantern/authoring_contracts/change_increment_authoring_guide.md.
-- Apply the bounded surface rules in lantern/authoring_contracts/allowed_change_surface_flexibilization.md.
-- Keep all emitted references inside the approved Lantern-local corpus.
+## Bound resource roles
+Consult, via MCP, the resources the workflow layer binds to this workbench. Route to them; do not restate their content. This workbench binds:
+- administration guides (authoring contracts and administration procedures bound to this workbench)
+- artifact templates for the families in scope
 
-## MCP usage
-- Inspect the approved baseline and test definitions first.
-- Draft the change increment inside the selected change surface.
-- Keep verification commands concrete and executable.
-
-## Constraints
-- Respect posture constraints: requires_approved_db.
-- Do not emit references outside Lantern-local paths.
-- Keep the workbench guidance inside the approved CH-0007 change surface.
-
-Referenced Lantern-local guides:
-- lantern/authoring_contracts/change_increment_authoring_guide.md
-- lantern/authoring_contracts/allowed_change_surface_flexibilization.md
+## Hard stops
+- Each gate requires explicit human approval by default. Bounded multi-gate authorization applies only when the human names the authorized scope; it stops at any blocker, ambiguity, failed check, dirty worktree, or scope change.
+- Operate within the workspace boundary defined in AGENTS.md: write governed records only in the governance workspace.
+- Emit references only to resources delivered through this workbench's bound roles.
+- Respect posture constraint: requires_approved_db.

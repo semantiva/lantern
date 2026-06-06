@@ -1,4 +1,4 @@
-# ISSUE workflow (Intake → Triage → Resolution/Rejection) v0.2.0
+# ISSUE workflow (Intake → Triage → Resolution/Rejection)
 
 Scope
 - Define a low-overhead workflow for issues from intake through resolution or rejection.
@@ -20,7 +20,7 @@ Ordered notes are append-only timestamped issue comments captured inside the iss
 
 - Issue file: `is/IS-####.md`
 - Template: `lantern/templates/TEMPLATE__IS.md`
-- This guide: `lantern/administration_procedures/ISSUE__INTAKE_TRIAGE_RESOLUTION_v0.2.0.md`
+- This guide: `lantern/administration_procedures/ISSUE__INTAKE_TRIAGE_RESOLUTION.md`
 
 No additional registers are required.
 

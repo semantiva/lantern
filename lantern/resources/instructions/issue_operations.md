@@ -3,23 +3,18 @@ Operator instruction resource for workbench issue_operations.
 ## Workbench
 Display name: Issue Operations
 Lifecycle kind: lifecycle-independent
+Transaction posture: inspect, draft, commit, validate
 
 ## Artifacts in scope
 IS
 
-## Key actions
-- Read and follow Lantern-local guidance in lantern/administration_procedures/ISSUE__INTAKE_TRIAGE_RESOLUTION_v0.2.0.md.
-- Keep all emitted references inside the approved Lantern-local corpus.
+## Bound resource roles
+Consult, via MCP, the resources the workflow layer binds to this workbench. Route to them; do not restate their content. This workbench binds:
+- administration guides (authoring contracts and administration procedures bound to this workbench)
+- artifact templates for the families in scope
 
-## MCP usage
-- Inspect issue posture before proposing downstream changes.
-- Keep corrective guidance linked to the governed issue record.
-- Use Lantern-local issue templates and procedures only.
-
-## Constraints
-- Respect posture constraints: issue_first_for_regressions.
-- Do not emit references outside Lantern-local paths.
-- Keep the workbench guidance inside the approved CH-0007 change surface.
-
-Referenced Lantern-local guides:
-- lantern/administration_procedures/ISSUE__INTAKE_TRIAGE_RESOLUTION_v0.2.0.md
+## Hard stops
+- Each gate requires explicit human approval by default. Bounded multi-gate authorization applies only when the human names the authorized scope; it stops at any blocker, ambiguity, failed check, dirty worktree, or scope change.
+- Operate within the workspace boundary defined in AGENTS.md: write governed records only in the governance workspace.
+- Emit references only to resources delivered through this workbench's bound roles.
+- Respect posture constraint: issue_first_for_regressions.

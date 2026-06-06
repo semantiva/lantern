@@ -63,8 +63,7 @@ workflow_surface:
     - instruction_resource
     - authoritative_guides
 instruction_resource: lantern/resources/instructions/verification_and_closure.md
-authoritative_guides:
-- lantern/resources/guides/verification_and_closure.md
+authoritative_guides: []
 administration_guides:
 - lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md
 entry_conditions:

@@ -9,12 +9,11 @@ Timestamp: [[TEMPLATE:TIMESTAMP]]  <!-- ISO 8601 recommended -->
 
 [[TEMPLATE:SUMMARY]]
 
-## Product refinement framing (required)
+## Requirement motivation (optional)
 
-- Real bottleneck: [[TEMPLATE:REAL_BOTTLENECK]]
-- Delivered value in this slice: [[TEMPLATE:DELIVERED_VALUE]]
-- Complexity explicitly avoided or deferred: [[TEMPLATE:DEFERRED_COMPLEXITY]]
-- Required decomposition or sequencing consequence: [[TEMPLATE:DECOMPOSITION_OR_SEQUENCING]]
+<!-- At most one or two objective sentences naming the durable problem these requirements address. Omit when the requirements are self-evident. No narrative, scenarios, analogies, transitional language, or slice-value framing. -->
+
+[[TEMPLATE:REQUIREMENT_MOTIVATION]]
 
 ## Scope
 
@@ -24,11 +23,13 @@ In scope
 Out of scope
 - [[TEMPLATE:OUT_OF_SCOPE]]
 
-## Acceptance criteria (required)
+## Acceptance criteria
 
-Use explicit, checkable criteria.
+<!-- Each criterion traces to one or more requirements by REQ-ID in the heading. AC text states a mechanical, testable check — not requirement intent or rationale. This section is the single owning source for each AC text; requirements cite AC-### only, they do not duplicate text inline. -->
 
-- AC-001: [[TEMPLATE:AC_TEXT]]
+### AC-001 (REQ-[[TEMPLATE:REQ_ID]])
+
+[[TEMPLATE:AC_TEXT]]
 
 ## Validation target signal definition (recommended; gate-evaluated)
 

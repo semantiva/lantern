@@ -1,4 +1,4 @@
-# Design Candidate authoring guide — v0.1.0
+# Design Candidate authoring guide
 
 
 Status: AUTHORITATIVE — Normative
@@ -9,12 +9,7 @@ Applies to:
 - AI-assisted execution under a locked `CH + SPEC + ARCH + TD` upstream envelope before GT-115
 
 Normative anchors:
-- `lantern/preservation/EPISTEMIC_FRAME.md`
-- `lantern/preservation/GATES.md`
-- `lantern/preservation/WORKSPACE_TOPOLOGY.md`
-- `lantern/preservation/LANTERN_MODEL_BINDING.md`
-- `lantern/preservation/ARTIFACT_ID_ALLOCATION.md`
-- `lantern/preservation/UPSTREAM_INPUT_ARTIFACTS.md`
+- lantern-grammar (gate, status, artifact-family, and ID semantics)
 
 ---
 

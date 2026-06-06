@@ -1,4 +1,4 @@
-# Initiative decomposition and CH sizing — v0.1.0
+# Initiative decomposition and CH sizing
 
 Status: AUTHORITATIVE — Guidance  
 Date (UTC): 2026-03-07
@@ -9,10 +9,7 @@ Purpose:
 
 Normative anchors (must not contradict):
 - `change_increment_authoring_guide.md`
-- `change_intention_refinement_guide_v0.2.1.md`
-- `lantern/preservation/EPISTEMIC_FRAME.md`
-- `lantern/preservation/GATES.md`
-- `lantern/preservation/LANTERN_MODEL_BINDING.md`
+- `change_intention_refinement_guide.md`
 
 ## Initiative posture
 

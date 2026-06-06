@@ -245,6 +245,29 @@ When unsure, do not guess from names alone. Use the manifest entry workbench and
 - If the user is onboarding or setting up governance, check `bootstrap`.
 - If the user is in the middle of design, CI, application, or closure work, use the corresponding mode from the manifest rather than inferring from repository layout.
 
+## Operator invocation requirements (default full governed workflow only)
+
+**Scope note:** The guidance in this section applies to the default `full_governed_surface` workflow. If the MCP server is loaded with a custom workflow or custom workbenches, the task boundaries, authorization postures, and required inputs for those workbenches are defined by their own workflow surface — not by this document. Consult the live MCP resources for that workflow's task-specific guidance.
+
+Before calling `orient(...)`, confirm that the operator has provided all of the following for the intended task. If any item is missing, ask before proceeding.
+
+**Required for every governed task invocation:**
+- Target artifact ID(s) and scope anchor (`INI`, `DIP`, `SPEC`, `ARCH`, `CH`, `TD`, `DC`, `DB`, `CI` as applicable)
+- Target gate ID, if the task executes a gate (e.g., `GT-110`, `GT-115`, `GT-120`, `GT-130`)
+- Scope boundary: what is in scope and what is explicitly out of scope for this invocation
+- Authorization posture: one of:
+  - **Analysis only** — `inspect` and `draft` transactions are permitted; `commit` is NOT authorized
+  - **Administration authorized** — `inspect`, `draft`, and `commit` are permitted for the named scope
+- Stop condition: when the task ends (do not proceed past it without re-authorization)
+- Expected deliverables: which artifact files must exist at completion
+
+**Recommended (state when available):**
+- `governance_root`: path to the SSOT container repository root
+- Binding posture: committed product SHA or release ID, when the task involves product verification
+- Governing authoring contract: when the task creates `DC` or `CI` artifacts, state the locked contract ref explicitly
+
+**Authorization posture matters most at selection gates.** When working `design_selection` (GT-115) or `ci_selection` (GT-120): if the operator has not explicitly stated "administration authorized," treat the task as analysis-only and do not execute `commit` transactions. The workbench allows both postures; the operator's stated scope determines which applies.
+
 ## Immutable safety rules
 
 - Treat this skill and manifest as routing only; live MCP resources remain authoritative.

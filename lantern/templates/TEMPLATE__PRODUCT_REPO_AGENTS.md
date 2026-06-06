@@ -24,6 +24,13 @@ You may add repo-specific notes below the managed block.
 - Do not ask the user to choose gates, artifact IDs, or skills by name unless the runtime genuinely lacks the required skill.
 - Prefer the stage packet's recommended Lantern runtime tool over manual low-level gate choreography when the workflow release surface provides it.
 
+## Gate approval posture
+
+- Each gate requires explicit human approval before the agent proceeds.
+- The operator may grant bounded multi-gate authorization only by naming the intended progression scope, such as proceed through GT-115 unless a blocker is found.
+- Bounded authorization stops at any blocker, ambiguity, failed check, dirty worktree, or scope change.
+- Governance autopilot may synthesize and administer; it may not silently pass human approval checkpoints.
+
 ## Bootstrap and intake
 
 - If `bootstrap_required` is true, use the Lantern bootstrap/intake posture before any other governed write.

@@ -520,14 +520,6 @@ def test_tc012_gt060_maps_to_arch_readiness() -> None:
     assert "lg:artifacts/spec" not in inputs, f"GT-060 must not require SPEC input, got: {inputs}"
 
 
-def test_tc012_gates_md_uses_correct_semantics() -> None:
-    gates_content = (PRODUCT_ROOT / "lantern" / "preservation" / "GATES.md").read_text(encoding="utf-8")
-    assert "GT-050 — Requirements Specification Readiness" in gates_content
-    assert "GT-060 — Architecture Definition Readiness" in gates_content
-    assert "GT-050 — Architecture" not in gates_content
-    assert "GT-060 — Requirements" not in gates_content
-
-
 # ── TC-013: Generated projections pass enforced-artifact validation ────────────
 
 

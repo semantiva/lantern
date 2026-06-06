@@ -23,7 +23,7 @@ artifacts:
   - kind: "path"
     path: "dc/DC-<CH_NUM>-<UUID>.md"
   - kind: "path"
-    path: "lantern/authoring_contracts/design_candidate_selection_guide_v0.1.0.md"
+    path: "lantern/authoring_contracts/design_candidate_selection_guide.md"
   - kind: "path"
     path: "spec/SPEC-####.md"
   - kind: "path"

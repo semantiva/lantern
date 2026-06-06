@@ -47,8 +47,7 @@ workflow_surface:
     - instruction_resource
     - authoritative_guides
 instruction_resource: lantern/resources/instructions/ci_authoring.md
-authoritative_guides:
-- lantern/resources/guides/ci_authoring.md
+authoritative_guides: []
 administration_guides:
 - lantern/authoring_contracts/change_increment_authoring_guide.md
 - lantern/authoring_contracts/allowed_change_surface_flexibilization.md
