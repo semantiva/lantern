@@ -22,6 +22,28 @@
     "workbench_id": "ch_and_td_readiness"
   },
   {
+    "content_hash": "6f332c6d005289ae2ba68921ab0033b709f7002444cae89e2b69dffad1ff77cb",
+    "kind": "authoring_contract",
+    "path": "lantern/authoring_contracts/test_definition_authoring_guide.md",
+    "projection_trace": {
+      "derivation": "relocation_manifest_projection",
+      "relocation_entry_id": "AC-008"
+    },
+    "provenance_refs": [
+      {
+        "path": "authoring_contracts/test_definition_authoring_guide.md",
+        "relocation_entry_id": "AC-008"
+      }
+    ],
+    "provenance_type": "bridge_copy",
+    "resource_id": "resource.authoring_contract.ch_and_td_readiness_administration_guides_test_definition_authoring_guide",
+    "review_status": "reviewed",
+    "roles": [
+      "administration_guides"
+    ],
+    "workbench_id": "ch_and_td_readiness"
+  },
+  {
     "content_hash": "87ac43f523fb37929c396fbaa1aa454a2df9619917bcd123f994af0a5fa291ca",
     "kind": "instruction",
     "path": "lantern/resources/instructions/ch_and_td_readiness.md",
@@ -235,6 +257,28 @@
     ],
     "provenance_type": "bridge_copy",
     "resource_id": "resource.administration_guide.design_selection_administration_guides_gt_115_design_baseline_selection",
+    "review_status": "reviewed",
+    "roles": [
+      "administration_guides"
+    ],
+    "workbench_id": "design_selection"
+  },
+  {
+    "content_hash": "776f1a4259ae39b9bbdbce55a301f0b272d65c7e6b9c6c193651869fccdf5122",
+    "kind": "authoring_contract",
+    "path": "lantern/authoring_contracts/design_baseline_authoring_guide.md",
+    "projection_trace": {
+      "derivation": "relocation_manifest_projection",
+      "relocation_entry_id": "AC-004"
+    },
+    "provenance_refs": [
+      {
+        "path": "authoring_contracts/design_baseline_authoring_guide.md",
+        "relocation_entry_id": "AC-004"
+      }
+    ],
+    "provenance_type": "bridge_copy",
+    "resource_id": "resource.authoring_contract.design_selection_administration_guides_design_baseline_authoring_guide",
     "review_status": "reviewed",
     "roles": [
       "administration_guides"
@@ -521,6 +565,72 @@
     ],
     "provenance_type": "bridge_copy",
     "resource_id": "resource.administration_guide.upstream_intake_and_baselines_administration_guides_initiative_authoring_and_readying",
+    "review_status": "reviewed",
+    "roles": [
+      "administration_guides"
+    ],
+    "workbench_id": "upstream_intake_and_baselines"
+  },
+  {
+    "content_hash": "f677b3f27043b02c0c692ccf840e3d9d1bc26a29d33db90c3ddce20775dcc9b8",
+    "kind": "authoring_contract",
+    "path": "lantern/authoring_contracts/arch_authoring_guide.md",
+    "projection_trace": {
+      "derivation": "relocation_manifest_projection",
+      "relocation_entry_id": "AC-011"
+    },
+    "provenance_refs": [
+      {
+        "path": "authoring_contracts/arch_authoring_guide.md",
+        "relocation_entry_id": "AC-011"
+      }
+    ],
+    "provenance_type": "product_owned",
+    "resource_id": "resource.authoring_contract.upstream_intake_and_baselines_administration_guides_arch_authoring_guide",
+    "review_status": "reviewed",
+    "roles": [
+      "administration_guides"
+    ],
+    "workbench_id": "upstream_intake_and_baselines"
+  },
+  {
+    "content_hash": "3c50dfd018c87456c7776ae134654d1c9fe372cde214a9d1ac7ef4f84343292e",
+    "kind": "authoring_contract",
+    "path": "lantern/authoring_contracts/dip_authoring_guide.md",
+    "projection_trace": {
+      "derivation": "relocation_manifest_projection",
+      "relocation_entry_id": "AC-007"
+    },
+    "provenance_refs": [
+      {
+        "path": "authoring_contracts/dip_authoring_guide.md",
+        "relocation_entry_id": "AC-007"
+      }
+    ],
+    "provenance_type": "bridge_copy",
+    "resource_id": "resource.authoring_contract.upstream_intake_and_baselines_administration_guides_dip_authoring_guide",
+    "review_status": "reviewed",
+    "roles": [
+      "administration_guides"
+    ],
+    "workbench_id": "upstream_intake_and_baselines"
+  },
+  {
+    "content_hash": "1460c8ea6a91c6796a325f73d35c74a520a2becd245df9465001160c89a35bc8",
+    "kind": "authoring_contract",
+    "path": "lantern/authoring_contracts/spec_authoring_guide.md",
+    "projection_trace": {
+      "derivation": "relocation_manifest_projection",
+      "relocation_entry_id": "AC-010"
+    },
+    "provenance_refs": [
+      {
+        "path": "authoring_contracts/spec_authoring_guide.md",
+        "relocation_entry_id": "AC-010"
+      }
+    ],
+    "provenance_type": "product_owned",
+    "resource_id": "resource.authoring_contract.upstream_intake_and_baselines_administration_guides_spec_authoring_guide",
     "review_status": "reviewed",
     "roles": [
       "administration_guides"

@@ -70,6 +70,7 @@ instruction_resource: lantern/resources/instructions/ch_and_td_readiness.md
 authoritative_guides: []
 administration_guides:
 - lantern/authoring_contracts/change_intention_refinement_guide.md
+- lantern/authoring_contracts/test_definition_authoring_guide.md
 entry_conditions:
 - upstream baselines approved
 exit_conditions:

@@ -62,6 +62,7 @@ authoritative_guides: []
 administration_guides:
 - lantern/authoring_contracts/design_candidate_selection_guide.md
 - lantern/administration_procedures/GT-115__DESIGN_BASELINE_SELECTION.md
+- lantern/authoring_contracts/design_baseline_authoring_guide.md
 entry_conditions:
 - GT-110 passed
 exit_conditions:

@@ -47,7 +47,8 @@
     ],
     "guide_refs": [
       "lantern/resources/instructions/ch_and_td_readiness.md",
-      "lantern/authoring_contracts/change_intention_refinement_guide.md"
+      "lantern/authoring_contracts/change_intention_refinement_guide.md",
+      "lantern/authoring_contracts/test_definition_authoring_guide.md"
     ],
     "provenance": {
       "catalog_source": "built_in",
@@ -548,7 +549,8 @@
     "guide_refs": [
       "lantern/resources/instructions/design_selection.md",
       "lantern/authoring_contracts/design_candidate_selection_guide.md",
-      "lantern/administration_procedures/GT-115__DESIGN_BASELINE_SELECTION.md"
+      "lantern/administration_procedures/GT-115__DESIGN_BASELINE_SELECTION.md",
+      "lantern/authoring_contracts/design_baseline_authoring_guide.md"
     ],
     "provenance": {
       "catalog_source": "built_in",
@@ -978,7 +980,10 @@
       "lantern/resources/instructions/upstream_intake_and_baselines.md",
       "lantern/administration_procedures/GT-030__DIP_LOCK_ADMINISTRATION.md",
       "lantern/administration_procedures/GT-050_GT-060__BASELINE_READINESS_ADMINISTRATION.md",
-      "lantern/administration_procedures/INITIATIVE__AUTHORING_AND_READYING.md"
+      "lantern/administration_procedures/INITIATIVE__AUTHORING_AND_READYING.md",
+      "lantern/authoring_contracts/dip_authoring_guide.md",
+      "lantern/authoring_contracts/spec_authoring_guide.md",
+      "lantern/authoring_contracts/arch_authoring_guide.md"
     ],
     "provenance": {
       "catalog_source": "built_in",

@@ -16,10 +16,6 @@
 
 CI-level corpus checks (not runtime logic) installed by CH-0030. Each check
 realizes one row of ARCH-0002 §5 and enforces the SPEC-0005 requirements.
-
-The membrane check honours DEC-0105 Option A: surviving authoring guides that
-are not yet wired into the delivery surface are an enumerated, deferred gap
-(delivery-topology realization is the next INI-0004 CH), not a CH-0030 failure.
 """
 
 from __future__ import annotations
@@ -38,18 +34,6 @@ GUIDANCE_DIRS = (
     "lantern/administration_procedures",
     "lantern/resources/instructions",
 )
-
-# DEC-0105 Option A — enumerated, deferred delivery-topology membrane gap.
-# These surviving authoring guides previously reached operators only through the
-# deleted projection layer; wiring them into the manifest is delivery-topology
-# realization deferred to the next INI-0004 CH. Recorded, not silently passed.
-DEFERRED_MEMBRANE_GAP = {
-    "lantern/authoring_contracts/dip_authoring_guide.md",
-    "lantern/authoring_contracts/spec_authoring_guide.md",
-    "lantern/authoring_contracts/arch_authoring_guide.md",
-    "lantern/authoring_contracts/design_baseline_authoring_guide.md",
-    "lantern/authoring_contracts/test_definition_authoring_guide.md",
-}
 
 ARCH0002_OPERATOR_KINDS = {"instruction", "authoring_contract", "administration_guide"}
 
@@ -71,15 +55,10 @@ def _guidance_files() -> set[str]:
 
 
 # Row 1 — Membrane check (REQ-GS-01)
-def test_membrane_check_guidance_files_are_reachable_or_deferred() -> None:
+def test_membrane_check_all_guidance_files_are_reachable() -> None:
     manifest = _manifest_paths()
-    unreachable = _guidance_files() - manifest
-    non_enumerated = sorted(unreachable - DEFERRED_MEMBRANE_GAP)
-    assert non_enumerated == [], f"present-but-unreachable guidance files: {non_enumerated}"
-    # Keep the deferred allowlist honest.
-    for path in DEFERRED_MEMBRANE_GAP:
-        assert (PRODUCT_ROOT / path).exists(), f"stale deferred-gap entry (file gone): {path}"
-        assert path not in manifest, f"deferred-gap entry is now wired; remove from allowlist: {path}"
+    unreachable = sorted(_guidance_files() - manifest)
+    assert unreachable == [], f"present-but-unreachable guidance files: {unreachable}"
 
 
 # Row 2 — Single-authority check (REQ-GA-01, REQ-GA-03)
@@ -134,10 +113,10 @@ def test_reference_resolution_no_dangling_corpus_references() -> None:
     for path in _guidance_files():
         text = (PRODUCT_ROOT / path).read_text(encoding="utf-8")
         for ref in set(ref_pattern.findall(text)):
-            if ref in manifest or ref in DEFERRED_MEMBRANE_GAP:
+            if ref in manifest:
                 continue
             if (PRODUCT_ROOT / ref).exists():
-                continue  # delivery-reachable peer (e.g., template / deferred guide present on disk)
+                continue  # delivery-reachable peer (e.g., a template present on disk)
             dangling.setdefault(path, []).append(ref)
         for match in set(bare_guides_pattern.findall(text)):
             bare_guides.setdefault(path, []).append(match)

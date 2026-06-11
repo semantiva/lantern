@@ -75,6 +75,9 @@ administration_guides:
 - lantern/administration_procedures/GT-030__DIP_LOCK_ADMINISTRATION.md
 - lantern/administration_procedures/GT-050_GT-060__BASELINE_READINESS_ADMINISTRATION.md
 - lantern/administration_procedures/INITIATIVE__AUTHORING_AND_READYING.md
+- lantern/authoring_contracts/dip_authoring_guide.md
+- lantern/authoring_contracts/spec_authoring_guide.md
+- lantern/authoring_contracts/arch_authoring_guide.md
 entry_conditions:
 - governance workspace bootstrapped
 exit_conditions:
