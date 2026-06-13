@@ -54,3 +54,4 @@ entry_conditions:
 - GT-110 passed
 exit_conditions:
 - at least one design candidate exists
+charter_ref: lantern/workbench_charters/design_candidate_authoring.md

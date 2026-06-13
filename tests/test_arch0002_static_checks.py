@@ -14,8 +14,10 @@
 
 """ARCH-0002 §5 static enforcement checks for the operator guidance corpus.
 
-CI-level corpus checks (not runtime logic) installed by CH-0030. Each check
-realizes one row of ARCH-0002 §5 and enforces the SPEC-0005 requirements.
+CI-level corpus checks (not runtime logic) installed by CH-0030 (rows 1–6)
+and CH-0033 (rows 7–9: Charter-header, Charter-binding, task-card-derivation).
+Each check realizes one row of ARCH-0002 §5 and enforces the SPEC-0005
+requirements.
 """
 
 from __future__ import annotations
@@ -24,9 +26,13 @@ import json
 import re
 from pathlib import Path
 
+import yaml
+
 PRODUCT_ROOT = Path(__file__).resolve().parents[1]
 DEFINITIONS = PRODUCT_ROOT / "lantern" / "workflow" / "definitions"
 MANIFEST = DEFINITIONS / "resource_manifest.json"
+WORKBENCHES_DIR = DEFINITIONS / "workbenches"
+CHARTERS_DIR = PRODUCT_ROOT / "lantern" / "workbench_charters"
 
 # Guidance classes that are delivered as resource-manifest entries.
 GUIDANCE_DIRS = (
@@ -133,3 +139,87 @@ def test_non_governed_content_absent_from_corpus() -> None:
     preservation = PRODUCT_ROOT / "lantern" / "preservation"
     assert not (preservation / "MIGRATION__TD_DC_DB_GT115_v0.1.0.md").exists()
     assert not (preservation / "POC_VALUE_EXTRACTION_MAP.md").exists()
+
+
+# ── CH-0033 rows 7–9: Workbench Charter static checks ──────────────────────
+
+
+def _load_workbench_yaml(path: Path) -> dict:
+    return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+
+
+def _workbench_definitions() -> list[dict]:
+    return [_load_workbench_yaml(p) for p in sorted(WORKBENCHES_DIR.glob("*.yaml"))]
+
+
+# Row 7 — Charter-header check (REQ-CH-01)
+def test_charter_header_every_workbench_has_valid_charter() -> None:
+    from lantern.workflow.charter import CHARTER_SCHEMA_ID, load_charter
+
+    missing: list[str] = []
+    invalid: dict[str, str] = {}
+    for defn in _workbench_definitions():
+        wid = defn.get("workbench_id", "<unknown>")
+        charter_ref = defn.get("charter_ref", "")
+        if not charter_ref:
+            missing.append(wid)
+            continue
+        charter_path = PRODUCT_ROOT / charter_ref
+        if not charter_path.exists():
+            invalid[wid] = f"charter_ref {charter_ref!r} does not exist"
+            continue
+        try:
+            charter = load_charter(charter_path)
+        except Exception as exc:
+            invalid[wid] = f"load error: {exc}"
+            continue
+        if charter.schema_id != CHARTER_SCHEMA_ID:
+            invalid[wid] = f"schema_id {charter.schema_id!r} != {CHARTER_SCHEMA_ID!r}"
+    assert missing == [], f"workbenches without charter_ref: {missing}"
+    assert invalid == {}, f"workbenches with invalid charter: {invalid}"
+
+
+# Row 8 — Charter-binding check (REQ-CH-02)
+def test_charter_binding_workbench_ref_matches_workbench_id() -> None:
+    from lantern.workflow.charter import load_charter
+
+    mismatches: dict[str, str] = {}
+    for defn in _workbench_definitions():
+        wid = defn.get("workbench_id", "<unknown>")
+        charter_ref = defn.get("charter_ref", "")
+        if not charter_ref:
+            continue
+        charter_path = PRODUCT_ROOT / charter_ref
+        if not charter_path.exists():
+            continue
+        try:
+            charter = load_charter(charter_path)
+        except Exception:
+            continue
+        if charter.workbench_ref != wid:
+            mismatches[wid] = f"Charter.workbench_ref={charter.workbench_ref!r}"
+    assert mismatches == {}, f"Charter workbench_ref binding mismatches: {mismatches}"
+
+
+# Row 9 — Task-card-derivation check (REQ-CH-03)
+def test_task_card_derivation_all_layers_are_valid() -> None:
+    from lantern.workflow.charter import load_charter, validate_charter_header
+
+    failures: dict[str, list[str]] = {}
+    for defn in _workbench_definitions():
+        wid = defn.get("workbench_id", "<unknown>")
+        charter_ref = defn.get("charter_ref", "")
+        if not charter_ref:
+            continue
+        charter_path = PRODUCT_ROOT / charter_ref
+        if not charter_path.exists():
+            continue
+        try:
+            charter = load_charter(charter_path)
+        except Exception as exc:
+            failures[wid] = [str(exc)]
+            continue
+        errs = validate_charter_header(charter, wid)
+        if errs:
+            failures[wid] = errs
+    assert failures == {}, f"Charter header validation failures: {failures}"

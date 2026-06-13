@@ -55,3 +55,4 @@ entry_conditions:
 - GT-115 passed
 exit_conditions:
 - at least one CI candidate exists
+charter_ref: lantern/workbench_charters/ci_authoring.md

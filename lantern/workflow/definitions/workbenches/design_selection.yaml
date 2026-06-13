@@ -67,3 +67,4 @@ entry_conditions:
 - GT-110 passed
 exit_conditions:
 - DB approved
+charter_ref: lantern/workbench_charters/design_selection.md

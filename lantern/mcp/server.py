@@ -239,6 +239,7 @@ def validate(
     draft_id: str = "",
     artifact_path: str = "",
     transaction_id: str = "",
+    workbench_id: str = "",
 ) -> dict[str, Any]:
     result = handle_validate(
         workflow_layer=_get_workflow_layer(),
@@ -248,6 +249,7 @@ def validate(
         transaction_id=transaction_id or None,
         product_root=_require_product_root(),
         governance_root=_governance_root,
+        workbench_id=workbench_id or None,
     )
     return _to_dict(result)
 

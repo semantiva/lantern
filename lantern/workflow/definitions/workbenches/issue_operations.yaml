@@ -59,3 +59,4 @@ entry_conditions:
 - issue exists
 exit_conditions:
 - issue posture updated
+charter_ref: lantern/workbench_charters/issue_operations.md

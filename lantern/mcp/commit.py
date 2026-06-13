@@ -20,7 +20,10 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from lantern.mcp.transactions import TransactionEngine
+from lantern.workflow.charter import CharterLoadError, get_layer_bodies, load_charter
 from lantern.workflow.loader import WorkflowLayer
+
+_REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 def handle_commit(
@@ -39,17 +42,34 @@ def handle_commit(
         governance_root=governance_root,
     )
     if workbench_id == "selected_ci_application":
-        return engine.commit_selected_ci_application(
+        result = engine.commit_selected_ci_application(
             workbench_id=workbench_id,
             payload=payload,
             actor=actor,
         )
-    hold_lock_seconds = 0.0
-    if isinstance(payload, Mapping):
-        hold_lock_seconds = float(payload.get("hold_lock_seconds", 0.0))
-    return engine.commit_governance(
-        workbench_id=workbench_id,
-        draft_id=draft_id,
-        actor=actor,
-        hold_lock_seconds=hold_lock_seconds,
-    )
+    else:
+        hold_lock_seconds = 0.0
+        if isinstance(payload, Mapping):
+            hold_lock_seconds = float(payload.get("hold_lock_seconds", 0.0))
+        result = engine.commit_governance(
+            workbench_id=workbench_id,
+            draft_id=draft_id,
+            actor=actor,
+            hold_lock_seconds=hold_lock_seconds,
+        )
+    workbench = workflow_layer.get_workbench(workbench_id)
+    bodies = _load_charter_layer_bodies(workbench.charter_ref, "commit")
+    if bodies:
+        result["charter_layer_bodies"] = bodies
+    return result
+
+
+def _load_charter_layer_bodies(charter_ref: str, moment: str) -> list[dict[str, str]]:
+    if not charter_ref:
+        return []
+    charter_path = _REPO_ROOT / charter_ref
+    try:
+        charter = load_charter(charter_path)
+        return get_layer_bodies(charter, moment)
+    except (CharterLoadError, OSError):
+        return []

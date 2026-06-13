@@ -51,3 +51,4 @@ entry_conditions:
 - GT-120 passed
 exit_conditions:
 - selected CI applied
+charter_ref: lantern/workbench_charters/selected_ci_application.md

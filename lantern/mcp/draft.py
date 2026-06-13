@@ -20,7 +20,10 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from lantern.mcp.transactions import TransactionEngine
+from lantern.workflow.charter import CharterLoadError, get_layer_bodies, load_charter
 from lantern.workflow.loader import WorkflowLayer
+
+_REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 def handle_draft(
@@ -41,10 +44,25 @@ def handle_draft(
         product_root=product_root,
         governance_root=governance_root,
     )
-    return engine.create_draft(
+    result = engine.create_draft(
         workbench_id=workbench_id,
         artifact_family=artifact_family,
         payload=payload,
         contract_ref=resolved_contract_ref,
         actor=actor,
     )
+    bodies = _load_charter_layer_bodies(workbench.charter_ref, "draft")
+    if bodies:
+        result["charter_layer_bodies"] = bodies
+    return result
+
+
+def _load_charter_layer_bodies(charter_ref: str, moment: str) -> list[dict[str, str]]:
+    if not charter_ref:
+        return []
+    charter_path = _REPO_ROOT / charter_ref
+    try:
+        charter = load_charter(charter_path)
+        return get_layer_bodies(charter, moment)
+    except (CharterLoadError, OSError):
+        return []

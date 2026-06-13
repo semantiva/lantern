@@ -58,3 +58,4 @@ entry_conditions:
 - governance repo not yet prepared or needs inspection
 exit_conditions:
 - governance onboarding complete
+charter_ref: lantern/workbench_charters/governance_onboarding.md

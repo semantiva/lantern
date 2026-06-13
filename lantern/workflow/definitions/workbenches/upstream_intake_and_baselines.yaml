@@ -82,3 +82,4 @@ entry_conditions:
 - governance workspace bootstrapped
 exit_conditions:
 - upstream baselines approved
+charter_ref: lantern/workbench_charters/upstream_intake_and_baselines.md

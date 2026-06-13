@@ -19,7 +19,10 @@ from __future__ import annotations
 from pathlib import Path
 
 from lantern.mcp.transactions import TransactionEngine
+from lantern.workflow.charter import CharterLoadError, get_layer_bodies, load_charter
 from lantern.workflow.loader import WorkflowLayer
+
+_REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 def handle_validate(
@@ -31,15 +34,33 @@ def handle_validate(
     draft_id: str | None = None,
     artifact_path: str | None = None,
     transaction_id: str | None = None,
+    workbench_id: str | None = None,
 ) -> dict[str, object]:
     engine = TransactionEngine(
         workflow_layer=workflow_layer,
         product_root=product_root,
         governance_root=governance_root,
     )
-    return engine.validate(
+    result = engine.validate(
         scope=scope,
         draft_id=draft_id,
         artifact_path=artifact_path,
         transaction_id=transaction_id,
     )
+    if workbench_id:
+        workbench = workflow_layer.get_workbench(workbench_id)
+        bodies = _load_charter_layer_bodies(workbench.charter_ref, "validate")
+        if bodies:
+            result["charter_layer_bodies"] = bodies
+    return result
+
+
+def _load_charter_layer_bodies(charter_ref: str, moment: str) -> list[dict[str, str]]:
+    if not charter_ref:
+        return []
+    charter_path = _REPO_ROOT / charter_ref
+    try:
+        charter = load_charter(charter_path)
+        return get_layer_bodies(charter, moment)
+    except (CharterLoadError, OSError):
+        return []

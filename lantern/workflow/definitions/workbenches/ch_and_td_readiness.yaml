@@ -75,3 +75,4 @@ entry_conditions:
 - upstream baselines approved
 exit_conditions:
 - GT-110 passed
+charter_ref: lantern/workbench_charters/ch_and_td_readiness.md

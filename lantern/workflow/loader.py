@@ -666,6 +666,7 @@ class WorkflowWorkbench:
     source_path: str
     catalog_source: str
     content_hash: str
+    charter_ref: str = ""
 
 
 @dataclass(frozen=True)
@@ -1230,6 +1231,7 @@ def _parse_workbench_definition(
         source_path=_path_label(path, anchor_root),
         catalog_source=catalog_source,
         content_hash=_sha256_text(canonical_payload),
+        charter_ref=str(payload.get("charter_ref", "")),
     )
 
 

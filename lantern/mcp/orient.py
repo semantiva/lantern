@@ -25,6 +25,7 @@ from lantern.mcp.catalog import (
     filter_resources_for_workbench,
     get_allowed_roles_for_transaction,
 )
+from lantern.workflow.charter import CharterLoadError, build_task_card, load_charter
 from lantern.workflow.loader import WorkflowLayer
 from lantern.workflow.merger import PostureResult, build_runtime_posture_label
 from lantern.workflow.resolver import (
@@ -35,6 +36,7 @@ from lantern.workflow.resolver import (
 
 _ORIENT_TRANSACTION_KIND = "orient"
 _ORIENT_DISCOVERY_SAFE_ROLES = frozenset({"instruction_resource", "authoritative_guides", "artifact_templates"})
+_REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 @dataclass(frozen=True)
@@ -148,6 +150,7 @@ def _build_runtime_exposure(
             workbench_id=workbench_id,
             allowed_roles=allowed_roles,
         )
+        task_card, charter_routing = _load_charter_deliverables(workbench.charter_ref)
         exposure["workbenches"].append(
             {
                 "workbench_id": workbench_id,
@@ -156,9 +159,25 @@ def _build_runtime_exposure(
                 "resource_packets": resource_packets,
                 "contract_refs": list(workbench.contract_refs),
                 "inspect_views": list(workbench.inspect_views),
+                "task_card": task_card,
+                "charter_routing": charter_routing,
             }
         )
     return exposure
+
+
+def _load_charter_deliverables(
+    charter_ref: str,
+) -> tuple[Optional[dict[str, Any]], Optional[str]]:
+    """Return (task_card, routing_section_body) from the Charter file; None on missing/error."""
+    if not charter_ref:
+        return None, None
+    charter_path = _REPO_ROOT / charter_ref
+    try:
+        charter = load_charter(charter_path)
+        return build_task_card(charter), charter.routing_section_body or None
+    except (CharterLoadError, OSError):
+        return None, None
 
 
 def _orient_runtime_posture_label(

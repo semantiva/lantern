@@ -64,3 +64,4 @@ entry_conditions:
 - GT-115 passed
 exit_conditions:
 - selected CI recorded
+charter_ref: lantern/workbench_charters/ci_selection.md

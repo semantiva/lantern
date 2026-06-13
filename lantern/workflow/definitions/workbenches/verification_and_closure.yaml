@@ -70,3 +70,4 @@ entry_conditions:
 - selected CI applied
 exit_conditions:
 - GT-130 passed
+charter_ref: lantern/workbench_charters/verification_and_closure.md

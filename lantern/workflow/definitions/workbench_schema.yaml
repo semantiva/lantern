@@ -48,6 +48,8 @@ built_in_workbench_ids:
 - verification_and_closure
 - issue_operations
 - governance_onboarding
+optional_workbench_fields:
+- charter_ref
 removed_authority_fields:
 - source
 - enabled
