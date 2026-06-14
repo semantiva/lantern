@@ -17,9 +17,7 @@ workbenches:
   intent_classes:
   - baseline_intake
   - baseline_approval
-  posture_constraints:
-  - requires_governance_workspace
-  - startup_validated
+  charter_ref: lantern/workbench_charters/upstream_intake_and_baselines.md
   workflow_surface:
     allowed_transaction_kinds:
     - inspect
@@ -41,46 +39,30 @@ workbenches:
     - transaction_kind: inspect
       response_envelope: catalog
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
       - artifact_templates
+      - operating_references
     - transaction_kind: inspect
       response_envelope: baselines
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
       - artifact_templates
+      - operating_references
     - transaction_kind: inspect
       response_envelope: lineage
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
       - artifact_templates
+      - operating_references
     - transaction_kind: draft
       response_envelope: default
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
-      - administration_guides
+      - artifact_templates
     - transaction_kind: commit
       response_envelope: default
       allowed_resource_roles:
-      - instruction_resource
-      - administration_guides
+      - artifact_templates
     - transaction_kind: validate
       response_envelope: default
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
-  instruction_resource: lantern/resources/instructions/upstream_intake_and_baselines.md
-  authoritative_guides: []
-  administration_guides:
-  - lantern/administration_procedures/GT-030__DIP_LOCK_ADMINISTRATION.md
-  - lantern/administration_procedures/GT-050_GT-060__BASELINE_READINESS_ADMINISTRATION.md
-  - lantern/administration_procedures/INITIATIVE__AUTHORING_AND_READYING.md
-  - lantern/authoring_contracts/dip_authoring_guide.md
-  - lantern/authoring_contracts/spec_authoring_guide.md
-  - lantern/authoring_contracts/arch_authoring_guide.md
+      - artifact_templates
   entry_conditions:
   - governance workspace bootstrapped
   exit_conditions:
@@ -99,8 +81,7 @@ workbenches:
   intent_classes:
   - change_readiness
   - test_definition_authoring
-  posture_constraints:
-  - requires_upstream_baselines
+  charter_ref: lantern/workbench_charters/ch_and_td_readiness.md
   workflow_surface:
     allowed_transaction_kinds:
     - inspect
@@ -122,42 +103,30 @@ workbenches:
     - transaction_kind: inspect
       response_envelope: catalog
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
       - artifact_templates
+      - operating_references
     - transaction_kind: inspect
       response_envelope: readiness
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
       - artifact_templates
+      - operating_references
     - transaction_kind: inspect
       response_envelope: lineage
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
       - artifact_templates
+      - operating_references
     - transaction_kind: draft
       response_envelope: default
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
-      - administration_guides
+      - artifact_templates
     - transaction_kind: commit
       response_envelope: default
       allowed_resource_roles:
-      - instruction_resource
-      - administration_guides
+      - artifact_templates
     - transaction_kind: validate
       response_envelope: default
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
-  instruction_resource: lantern/resources/instructions/ch_and_td_readiness.md
-  authoritative_guides: []
-  administration_guides:
-  - lantern/authoring_contracts/change_intention_refinement_guide.md
-  - lantern/authoring_contracts/test_definition_authoring_guide.md
+      - artifact_templates
   entry_conditions:
   - upstream baselines approved
   exit_conditions:
@@ -172,8 +141,7 @@ workbenches:
   - DC
   intent_classes:
   - design_candidate_authoring
-  posture_constraints:
-  - requires_ready_ch
+  charter_ref: lantern/workbench_charters/design_candidate_authoring.md
   workflow_surface:
     allowed_transaction_kinds:
     - inspect
@@ -190,30 +158,21 @@ workbenches:
     - transaction_kind: inspect
       response_envelope: catalog
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
       - artifact_templates
+      - operating_references
     - transaction_kind: inspect
       response_envelope: design_candidates
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
       - artifact_templates
+      - operating_references
     - transaction_kind: draft
       response_envelope: default
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
-      - administration_guides
+      - artifact_templates
     - transaction_kind: validate
       response_envelope: default
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
-  instruction_resource: lantern/resources/instructions/design_candidate_authoring.md
-  authoritative_guides: []
-  administration_guides:
-  - lantern/authoring_contracts/design_candidate_authoring_guide.md
+      - artifact_templates
   entry_conditions:
   - GT-110 passed
   exit_conditions:
@@ -231,8 +190,7 @@ workbenches:
   - DEC
   intent_classes:
   - design_selection
-  posture_constraints:
-  - requires_candidate_comparison
+  charter_ref: lantern/workbench_charters/design_selection.md
   workflow_surface:
     allowed_transaction_kinds:
     - inspect
@@ -252,37 +210,25 @@ workbenches:
     - transaction_kind: inspect
       response_envelope: catalog
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
       - artifact_templates
+      - operating_references
     - transaction_kind: inspect
       response_envelope: design_selection
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
       - artifact_templates
+      - operating_references
     - transaction_kind: draft
       response_envelope: default
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
-      - administration_guides
+      - artifact_templates
     - transaction_kind: commit
       response_envelope: default
       allowed_resource_roles:
-      - instruction_resource
-      - administration_guides
+      - artifact_templates
     - transaction_kind: validate
       response_envelope: default
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
-  instruction_resource: lantern/resources/instructions/design_selection.md
-  authoritative_guides: []
-  administration_guides:
-  - lantern/authoring_contracts/design_candidate_selection_guide.md
-  - lantern/administration_procedures/GT-115__DESIGN_BASELINE_SELECTION.md
-  - lantern/authoring_contracts/design_baseline_authoring_guide.md
+      - artifact_templates
   entry_conditions:
   - GT-110 passed
   exit_conditions:
@@ -297,8 +243,7 @@ workbenches:
   - CI
   intent_classes:
   - ci_authoring
-  posture_constraints:
-  - requires_approved_db
+  charter_ref: lantern/workbench_charters/ci_authoring.md
   workflow_surface:
     allowed_transaction_kinds:
     - inspect
@@ -315,31 +260,21 @@ workbenches:
     - transaction_kind: inspect
       response_envelope: catalog
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
       - artifact_templates
+      - operating_references
     - transaction_kind: inspect
       response_envelope: implementation_scope
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
       - artifact_templates
+      - operating_references
     - transaction_kind: draft
       response_envelope: default
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
-      - administration_guides
+      - artifact_templates
     - transaction_kind: validate
       response_envelope: default
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
-  instruction_resource: lantern/resources/instructions/ci_authoring.md
-  authoritative_guides: []
-  administration_guides:
-  - lantern/authoring_contracts/change_increment_authoring_guide.md
-  - lantern/authoring_contracts/allowed_change_surface_flexibilization.md
+      - artifact_templates
   entry_conditions:
   - GT-115 passed
   exit_conditions:
@@ -356,8 +291,7 @@ workbenches:
   - DEC
   intent_classes:
   - ci_selection
-  posture_constraints:
-  - requires_execution_grade_candidate
+  charter_ref: lantern/workbench_charters/ci_selection.md
   workflow_surface:
     allowed_transaction_kinds:
     - inspect
@@ -376,36 +310,25 @@ workbenches:
     - transaction_kind: inspect
       response_envelope: catalog
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
       - artifact_templates
+      - operating_references
     - transaction_kind: inspect
       response_envelope: ci_selection
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
       - artifact_templates
+      - operating_references
     - transaction_kind: draft
       response_envelope: default
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
-      - administration_guides
+      - artifact_templates
     - transaction_kind: commit
       response_envelope: default
       allowed_resource_roles:
-      - instruction_resource
-      - administration_guides
+      - artifact_templates
     - transaction_kind: validate
       response_envelope: default
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
-  instruction_resource: lantern/resources/instructions/ci_selection.md
-  authoritative_guides: []
-  administration_guides:
-  - lantern/authoring_contracts/change_increment_selection_guide.md
-  - lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION.md
+      - artifact_templates
   entry_conditions:
   - GT-115 passed
   exit_conditions:
@@ -420,8 +343,7 @@ workbenches:
   - CI
   intent_classes:
   - selected_ci_application
-  posture_constraints:
-  - product_writes_permitted
+  charter_ref: lantern/workbench_charters/selected_ci_application.md
   workflow_surface:
     allowed_transaction_kinds:
     - inspect
@@ -437,28 +359,21 @@ workbenches:
     - transaction_kind: inspect
       response_envelope: catalog
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
+      - artifact_templates
+      - operating_references
     - transaction_kind: inspect
       response_envelope: change_surface
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
+      - artifact_templates
+      - operating_references
     - transaction_kind: commit
       response_envelope: default
       allowed_resource_roles:
-      - instruction_resource
-      - administration_guides
+      - artifact_templates
     - transaction_kind: validate
       response_envelope: default
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
-  instruction_resource: lantern/resources/instructions/selected_ci_application.md
-  authoritative_guides: []
-  administration_guides:
-  - lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION.md
-  - lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md
+      - artifact_templates
   entry_conditions:
   - GT-120 passed
   exit_conditions:
@@ -475,8 +390,7 @@ workbenches:
   - DEC
   intent_classes:
   - verification_and_closure
-  posture_constraints:
-  - requires_selected_ci
+  charter_ref: lantern/workbench_charters/verification_and_closure.md
   workflow_surface:
     allowed_transaction_kinds:
     - inspect
@@ -496,41 +410,30 @@ workbenches:
     - transaction_kind: inspect
       response_envelope: catalog
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
       - artifact_templates
+      - operating_references
     - transaction_kind: inspect
       response_envelope: verification
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
       - artifact_templates
+      - operating_references
     - transaction_kind: inspect
       response_envelope: closure
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
       - artifact_templates
+      - operating_references
     - transaction_kind: draft
       response_envelope: default
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
-      - administration_guides
+      - artifact_templates
     - transaction_kind: commit
       response_envelope: default
       allowed_resource_roles:
-      - instruction_resource
-      - administration_guides
+      - artifact_templates
     - transaction_kind: validate
       response_envelope: default
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
-  instruction_resource: lantern/resources/instructions/verification_and_closure.md
-  authoritative_guides: []
-  administration_guides:
-  - lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md
+      - artifact_templates
   entry_conditions:
   - selected CI applied
   exit_conditions:
@@ -544,8 +447,7 @@ workbenches:
   intent_classes:
   - issue_intake
   - issue_resolution
-  posture_constraints:
-  - issue_first_for_regressions
+  charter_ref: lantern/workbench_charters/issue_operations.md
   workflow_surface:
     allowed_transaction_kinds:
     - inspect
@@ -563,35 +465,25 @@ workbenches:
     - transaction_kind: inspect
       response_envelope: catalog
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
       - artifact_templates
+      - operating_references
     - transaction_kind: inspect
       response_envelope: issues
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
       - artifact_templates
+      - operating_references
     - transaction_kind: draft
       response_envelope: default
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
-      - administration_guides
+      - artifact_templates
     - transaction_kind: commit
       response_envelope: default
       allowed_resource_roles:
-      - instruction_resource
-      - administration_guides
+      - artifact_templates
     - transaction_kind: validate
       response_envelope: default
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
-  instruction_resource: lantern/resources/instructions/issue_operations.md
-  authoritative_guides: []
-  administration_guides:
-  - lantern/administration_procedures/ISSUE__INTAKE_TRIAGE_RESOLUTION.md
+      - artifact_templates
   entry_conditions:
   - issue exists
   exit_conditions:
@@ -607,8 +499,7 @@ workbenches:
   intent_classes:
   - bootstrap
   - onboarding
-  posture_constraints:
-  - supports_bootstrap_without_product_writes
+  charter_ref: lantern/workbench_charters/governance_onboarding.md
   workflow_surface:
     allowed_transaction_kinds:
     - inspect
@@ -627,31 +518,21 @@ workbenches:
     - transaction_kind: inspect
       response_envelope: catalog
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
       - artifact_templates
+      - operating_references
     - transaction_kind: inspect
       response_envelope: onboarding
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
       - artifact_templates
+      - operating_references
     - transaction_kind: draft
       response_envelope: default
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
-      - administration_guides
+      - artifact_templates
     - transaction_kind: validate
       response_envelope: default
       allowed_resource_roles:
-      - instruction_resource
-      - authoritative_guides
-  instruction_resource: lantern/resources/instructions/governance_onboarding.md
-  authoritative_guides: []
-  administration_guides:
-  - lantern/administration_procedures/INITIATIVE__AUTHORING_AND_READYING.md
-  - lantern/administration_procedures/INITIATIVE__DECOMPOSITION_AND_CH_SIZING.md
+      - artifact_templates
   entry_conditions:
   - governance repo not yet prepared or needs inspection
   exit_conditions:

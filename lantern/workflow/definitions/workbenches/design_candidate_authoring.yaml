@@ -4,12 +4,8 @@ lifecycle_placement:
   kind: lifecycle_span
   start_gate: GT-110
   end_gate: GT-115
-artifacts_in_scope:
-- DC
 intent_classes:
 - design_candidate_authoring
-posture_constraints:
-- requires_ready_ch
 workflow_surface:
   allowed_transaction_kinds:
   - inspect
@@ -26,30 +22,21 @@ workflow_surface:
   - transaction_kind: inspect
     response_envelope: catalog
     allowed_resource_roles:
-    - instruction_resource
-    - authoritative_guides
     - artifact_templates
+    - operating_references
   - transaction_kind: inspect
     response_envelope: design_candidates
     allowed_resource_roles:
-    - instruction_resource
-    - authoritative_guides
     - artifact_templates
+    - operating_references
   - transaction_kind: draft
     response_envelope: default
     allowed_resource_roles:
-    - instruction_resource
-    - authoritative_guides
-    - administration_guides
+    - artifact_templates
   - transaction_kind: validate
     response_envelope: default
     allowed_resource_roles:
-    - instruction_resource
-    - authoritative_guides
-instruction_resource: lantern/resources/instructions/design_candidate_authoring.md
-authoritative_guides: []
-administration_guides:
-- lantern/authoring_contracts/design_candidate_authoring_guide.md
+    - artifact_templates
 entry_conditions:
 - GT-110 passed
 exit_conditions:

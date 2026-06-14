@@ -2,18 +2,9 @@ workbench_id: ch_and_td_readiness
 display_name: CH and TD Readiness
 lifecycle_placement:
   kind: covered_gates
-  covered_gates:
-  - GT-110
-artifacts_in_scope:
-- CH
-- TD
-- EV
-- DEC
 intent_classes:
 - change_readiness
 - test_definition_authoring
-posture_constraints:
-- requires_upstream_baselines
 workflow_surface:
   allowed_transaction_kinds:
   - inspect
@@ -35,42 +26,30 @@ workflow_surface:
   - transaction_kind: inspect
     response_envelope: catalog
     allowed_resource_roles:
-    - instruction_resource
-    - authoritative_guides
     - artifact_templates
+    - operating_references
   - transaction_kind: inspect
     response_envelope: readiness
     allowed_resource_roles:
-    - instruction_resource
-    - authoritative_guides
     - artifact_templates
+    - operating_references
   - transaction_kind: inspect
     response_envelope: lineage
     allowed_resource_roles:
-    - instruction_resource
-    - authoritative_guides
     - artifact_templates
+    - operating_references
   - transaction_kind: draft
     response_envelope: default
     allowed_resource_roles:
-    - instruction_resource
-    - authoritative_guides
-    - administration_guides
+    - artifact_templates
   - transaction_kind: commit
     response_envelope: default
     allowed_resource_roles:
-    - instruction_resource
-    - administration_guides
+    - artifact_templates
   - transaction_kind: validate
     response_envelope: default
     allowed_resource_roles:
-    - instruction_resource
-    - authoritative_guides
-instruction_resource: lantern/resources/instructions/ch_and_td_readiness.md
-authoritative_guides: []
-administration_guides:
-- lantern/authoring_contracts/change_intention_refinement_guide.md
-- lantern/authoring_contracts/test_definition_authoring_guide.md
+    - artifact_templates
 entry_conditions:
 - upstream baselines approved
 exit_conditions:

@@ -20,7 +20,7 @@ Covers:
   C03 - orient delivers task card + charter routing per active workbench.
   C04 - IS-0041 disposition table coverage across all Charters.
   C05 - Custom workbench Charter produces same task card structure as shipped.
-  C06 - Additive posture: legacy guidance docs and roles still present.
+  C06 - [Closed by CH-0034] Transitional-duplicate allowance removed.
   C07 - draft delivers Charter authoring-layer body for a Charter-bound workbench.
   C08 - commit delivers Charter administrative-layer body for a Charter-bound workbench.
   C09 - validate delivers Charter validation-layer body for a Charter-bound workbench.
@@ -348,54 +348,6 @@ def test_c05_custom_charter_source_pointer_fields_are_correct(tmp_path: Path) ->
     assert sp["schema_id"] == CHARTER_SCHEMA_ID
     assert sp["workbench_ref"] == "custom_test_workbench"
 
-
-# ── C06: Additive posture — legacy guidance docs still present ───────────────
-
-
-def test_c06_legacy_instruction_resources_still_present() -> None:
-    for defn in _all_workbench_defs():
-        wid = defn["workbench_id"]
-        instr = defn.get("instruction_resource", "")
-        if not instr:
-            continue
-        instr_path = PRODUCT_ROOT / instr
-        assert instr_path.exists(), f"{wid}: instruction_resource {instr!r} is missing"
-
-
-def test_c06_legacy_administration_guides_still_present() -> None:
-    for defn in _all_workbench_defs():
-        wid = defn["workbench_id"]
-        for guide_path in defn.get("administration_guides", []) or []:
-            path = PRODUCT_ROOT / guide_path
-            assert path.exists(), f"{wid}: administration_guide {guide_path!r} is missing"
-
-
-def test_c06_workbench_surface_still_exposes_administration_guides_role() -> None:
-    for defn in _all_workbench_defs():
-        wid = defn["workbench_id"]
-        bindings = (defn.get("workflow_surface") or {}).get("response_surface_bindings") or []
-        roles_present = {role for binding in bindings for role in (binding.get("allowed_resource_roles") or [])}
-        if defn.get("administration_guides"):
-            assert (
-                "administration_guides" in roles_present
-            ), f"{wid}: has administration_guides but surface bindings do not include the role"
-
-
-def test_c06_commit_is_still_an_allowed_transaction_kind_for_administrative_workbenches() -> None:
-    administrative_workbenches = [
-        "design_selection",
-        "ci_selection",
-        "selected_ci_application",
-        "verification_and_closure",
-    ]
-    for defn in _all_workbench_defs():
-        wid = defn["workbench_id"]
-        if wid not in administrative_workbenches:
-            continue
-        tx_kinds = (defn.get("workflow_surface") or {}).get("allowed_transaction_kinds") or []
-        assert (
-            "commit" in tx_kinds
-        ), f"{wid}: commit must remain an allowed_transaction_kind (additive posture; no posture enforcement in CH-0033)"
 
 
 # ── C07: draft delivers Charter authoring-layer body ─────────────────────────

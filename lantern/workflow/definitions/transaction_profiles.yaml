@@ -1,7 +1,6 @@
 transaction_profiles:
 - transaction_kind: inspect
-  required_refs:
-  - instruction_resource
+  required_refs: []
   bounded_families: []
   allowed_contract_refs:
   - contract.upstream_intake.v1
@@ -16,8 +15,7 @@ transaction_profiles:
   - contract.governance_onboarding.v1
   side_effect_class: read_only
 - transaction_kind: orient
-  required_refs:
-  - instruction_resource
+  required_refs: []
   bounded_families: []
   allowed_contract_refs:
   - contract.upstream_intake.v1
@@ -32,9 +30,7 @@ transaction_profiles:
   - contract.governance_onboarding.v1
   side_effect_class: read_only
 - transaction_kind: draft
-  required_refs:
-  - instruction_resource
-  - authoritative_guides
+  required_refs: []
   bounded_families:
   - ARCH
   - CH
@@ -60,9 +56,7 @@ transaction_profiles:
   - contract.governance_onboarding.v1
   side_effect_class: draft_buffer_only
 - transaction_kind: commit
-  required_refs:
-  - instruction_resource
-  - administration_guides
+  required_refs: []
   bounded_families:
   - ARCH
   - CH
@@ -86,8 +80,7 @@ transaction_profiles:
   - contract.issue_operations.v1
   side_effect_class: governed_write
 - transaction_kind: validate
-  required_refs:
-  - instruction_resource
+  required_refs: []
   bounded_families:
   - ARCH
   - CH

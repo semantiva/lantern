@@ -3,13 +3,9 @@ required_workbench_fields:
 - workbench_id
 - display_name
 - lifecycle_placement
-- artifacts_in_scope
 - intent_classes
-- posture_constraints
 - workflow_surface
-- instruction_resource
-- authoritative_guides
-- administration_guides
+- charter_ref
 - entry_conditions
 - exit_conditions
 required_workflow_surface_fields:
@@ -25,10 +21,8 @@ allowed_transaction_kinds:
 - commit
 - validate
 allowed_resource_roles:
-- instruction_resource
-- authoritative_guides
-- administration_guides
 - artifact_templates
+- operating_references
 required_full_governed_gates:
 - GT-030
 - GT-050
@@ -48,17 +42,20 @@ built_in_workbench_ids:
 - verification_and_closure
 - issue_operations
 - governance_onboarding
-optional_workbench_fields:
-- charter_ref
+optional_workbench_fields: []
 removed_authority_fields:
 - source
 - enabled
 - governance_mode
+- artifacts_in_scope
+- posture_constraints
+- instruction_resource
+- authoritative_guides
+- administration_guides
 catalog_shape: one_file_per_workbench
 lifecycle_placement_variants:
   covered_gates:
-    requires:
-    - covered_gates
+    requires: []
   lifecycle_span:
     requires:
     - start_gate

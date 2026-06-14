@@ -26,7 +26,6 @@ import json
 from pathlib import Path
 from typing import Any
 
-from lantern.mcp.catalog import filter_resources_for_workbench
 from lantern.workflow.loader import WorkflowLayer, load_workflow_layer
 
 PACKAGED_DEFAULT_ROOT = Path(__file__).resolve().parent / "packaged_default"
@@ -90,66 +89,11 @@ def _resource_manifest_hash(workflow_layer: WorkflowLayer) -> str:
     return _sha256_text(_canonical_json(payload))
 
 
-def _mode_id_for_workbench(workbench: Any) -> str:
-    if workbench.intent_classes:
-        return workbench.intent_classes[0]
-    return workbench.workbench_id
-
-
-def _build_mode_entries(workflow_layer: WorkflowLayer) -> list[dict[str, Any]]:
-    seen_mode_ids: set[str] = set()
-    modes: list[dict[str, Any]] = []
-    for workbench in workflow_layer.workbenches:
-        mode_id = _mode_id_for_workbench(workbench)
-        if mode_id in seen_mode_ids:
-            raise AssertionError(
-                f"Duplicate packaged mode_id {mode_id!r}; CH-0006 packaged routing must stay unambiguous"
-            )
-        seen_mode_ids.add(mode_id)
-        inspect_roles = tuple(
-            role
-            for role in next(
-                (
-                    binding.allowed_resource_roles
-                    for binding in workbench.response_surface_bindings
-                    if binding.transaction_kind == "inspect"
-                ),
-                (),
-            )
-            if role
-            in {
-                "instruction_resource",
-                "authoritative_guides",
-                "administration_guides",
-                "artifact_templates",
-            }
-        )
-        resource_refs = [
-            item["resource_id"]
-            for item in filter_resources_for_workbench(
-                workflow_layer=workflow_layer,
-                workbench_id=workbench.workbench_id,
-                allowed_roles=inspect_roles,
-            )
-        ]
-        modes.append(
-            {
-                "mode_id": mode_id,
-                "entry_workbench_id": workbench.workbench_id,
-                "entry_contract_refs": list(workbench.contract_refs),
-                "resource_refs": resource_refs,
-            }
-        )
-    return modes
-
-
-def _workflow_mode_ids(workflow_layer: WorkflowLayer) -> list[str]:
-    return [entry["mode_id"] for entry in _build_mode_entries(workflow_layer)]
-
 
 def build_packaged_skill_md(workflow_layer: WorkflowLayer) -> str:
-    workflow_modes = "\n".join(f"- `{mode_id}`" for mode_id in _workflow_mode_ids(workflow_layer))
-    return f"""---
+    del workflow_layer
+    return """\
+---
 name: lantern
 description: Use this skill when the task involves Lantern-governed workflow work. This includes authoring or assessing change handlers (CH, TD, DB, CI), upstream baseline intake (DIP, SPEC, ARCH), design candidate or design selection steps, CI authoring or selection, applying a selected CI, verification or closure, issue intake, governance onboarding, or bootstrap. Triggers on any mention of Lantern gates (GT-030, GT-050, GT-060, GT-110, GT-115, GT-120, GT-130), Lantern MCP tools (inspect, orient, draft, commit, validate), Lantern artifact families, or requests to operate through Lantern workflow procedures rather than direct repository editing.
 ---
@@ -174,13 +118,13 @@ Use Lantern when the request is about any of the following:
 
 Typical examples:
 
-- “Prepare or assess a CH/TD for readiness”
-- “Work a design candidate or design selection step”
-- “Author or select a CI”
-- “Apply a selected CI and move toward verification/closure”
-- “Handle an issue through the governed workflow”
-- “Bootstrap or onboard a governed product into Lantern”
-- “Explain which Lantern workflow mode or workbench applies”
+- "Prepare or assess a CH/TD for readiness"
+- "Work a design candidate or design selection step"
+- "Author or select a CI"
+- "Apply a selected CI and move toward verification/closure"
+- "Handle an issue through the governed workflow"
+- "Bootstrap or onboard a governed product into Lantern"
+- "Explain which Lantern workflow mode or workbench applies"
 
 ## Do not use Lantern as
 
@@ -203,7 +147,7 @@ It helps you:
 - determine whether a governed workflow applies
 - identify the right workflow mode and entry workbench
 - inspect the authoritative contract for that workbench
-- consume live guides, instructions, and templates through MCP before any write
+- consume live Charter task cards, layer bodies, and templates through MCP before any write
 - stay on the fixed public tool surface
 
 ## First MCP move
@@ -222,28 +166,16 @@ These two calls establish the governed vocabulary and the active runtime/workspa
 
 1. `inspect(kind="catalog")`
 2. `inspect(kind="workspace")`
-3. read `skill-manifest.json`
-4. choose the most relevant workflow mode and entry workbench
-5. `orient(...)`
-6. `inspect(kind="contract", contract_ref="...")`
-7. consume the returned live `resource_packets`
-8. only then consider `draft`, `commit`, or `validate`
+3. `orient(...)` — use the active workbench from catalog to get the task card and charter routing
+4. `inspect(kind="contract", contract_ref="...")`
+5. consume the returned live `resource_packets` and `charter_layer_bodies`
+6. only then consider `draft`, `commit`, or `validate`
 
-## Workflow modes currently exposed
+## Routing
 
-Use the manifest to choose among these mode families:
+Workflow mode and workbench selection is driven by live MCP discovery. Call `inspect(kind="catalog")` to enumerate available workbenches and their contract refs, then use `orient(...)` to confirm the active workbench for the current lifecycle position.
 
-{workflow_modes}
-
-When unsure, do not guess from names alone. Use the manifest entry workbench and contract refs, then confirm through `orient(...)` and `inspect(kind="contract", ...)`.
-
-## Minimal routing hints
-
-- If the user is preparing or assessing governed change work, start by checking `change_readiness`.
-- If the user is working from upstream baseline artifacts, check `baseline_intake`.
-- If the user is handling a reported problem or issue, check `issue_intake`.
-- If the user is onboarding or setting up governance, check `bootstrap`.
-- If the user is in the middle of design, CI, application, or closure work, use the corresponding mode from the manifest rather than inferring from repository layout.
+Do not enumerate modes from filenames or repository paths. Use `inspect(kind="catalog")` as the authoritative source.
 
 ## Operator invocation requirements (default full governed workflow only)
 
@@ -270,7 +202,7 @@ Before calling `orient(...)`, confirm that the operator has provided all of the 
 
 ## Immutable safety rules
 
-- Treat this skill and manifest as routing only; live MCP resources remain authoritative.
+- Treat this skill as routing only; live MCP resources remain authoritative.
 - Stay on the fixed public tool surface: `inspect`, `orient`, `draft`, `commit`, `validate`.
 - Do not rely on raw repository paths as the operator contract.
 - Do not require local skill regeneration or generated guide/template folders before source-tree discovery.
@@ -282,8 +214,8 @@ Before calling `orient(...)`, confirm that the operator has provided all of the 
 This skill is meant to create the right initial mindset:
 
 - first identify whether the request is governed by Lantern
-- then route to the correct mode/workbench
-- then read authoritative live packets
+- then route to the correct mode/workbench via `inspect(kind="catalog")` and `orient(...)`
+- then read authoritative live packets and Charter layer bodies
 - then act
 
 Lantern is strongest when used as governed routing and inspection, not as opportunistic repo search.
@@ -300,7 +232,6 @@ def build_packaged_skill_manifest(workflow_layer: WorkflowLayer) -> dict[str, An
             "contract_catalog_hash": _contract_catalog_hash(workflow_layer),
             "resource_manifest_hash": _resource_manifest_hash(workflow_layer),
         },
-        "workflow_modes": _build_mode_entries(workflow_layer),
     }
 
 

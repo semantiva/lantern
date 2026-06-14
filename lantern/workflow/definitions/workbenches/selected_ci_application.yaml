@@ -4,12 +4,8 @@ lifecycle_placement:
   kind: lifecycle_span
   start_gate: GT-120
   end_gate: GT-130
-artifacts_in_scope:
-- CI
 intent_classes:
 - selected_ci_application
-posture_constraints:
-- product_writes_permitted
 workflow_surface:
   allowed_transaction_kinds:
   - inspect
@@ -25,28 +21,21 @@ workflow_surface:
   - transaction_kind: inspect
     response_envelope: catalog
     allowed_resource_roles:
-    - instruction_resource
-    - authoritative_guides
+    - artifact_templates
+    - operating_references
   - transaction_kind: inspect
     response_envelope: change_surface
     allowed_resource_roles:
-    - instruction_resource
-    - authoritative_guides
+    - artifact_templates
+    - operating_references
   - transaction_kind: commit
     response_envelope: default
     allowed_resource_roles:
-    - instruction_resource
-    - administration_guides
+    - artifact_templates
   - transaction_kind: validate
     response_envelope: default
     allowed_resource_roles:
-    - instruction_resource
-    - authoritative_guides
-instruction_resource: lantern/resources/instructions/selected_ci_application.md
-authoritative_guides: []
-administration_guides:
-- lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION.md
-- lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md
+    - artifact_templates
 entry_conditions:
 - GT-120 passed
 exit_conditions:

@@ -2,17 +2,8 @@ workbench_id: design_selection
 display_name: Design Selection
 lifecycle_placement:
   kind: covered_gates
-  covered_gates:
-  - GT-115
-artifacts_in_scope:
-- DC
-- DB
-- EV
-- DEC
 intent_classes:
 - design_selection
-posture_constraints:
-- requires_candidate_comparison
 workflow_surface:
   allowed_transaction_kinds:
   - inspect
@@ -32,37 +23,25 @@ workflow_surface:
   - transaction_kind: inspect
     response_envelope: catalog
     allowed_resource_roles:
-    - instruction_resource
-    - authoritative_guides
     - artifact_templates
+    - operating_references
   - transaction_kind: inspect
     response_envelope: design_selection
     allowed_resource_roles:
-    - instruction_resource
-    - authoritative_guides
     - artifact_templates
+    - operating_references
   - transaction_kind: draft
     response_envelope: default
     allowed_resource_roles:
-    - instruction_resource
-    - authoritative_guides
-    - administration_guides
+    - artifact_templates
   - transaction_kind: commit
     response_envelope: default
     allowed_resource_roles:
-    - instruction_resource
-    - administration_guides
+    - artifact_templates
   - transaction_kind: validate
     response_envelope: default
     allowed_resource_roles:
-    - instruction_resource
-    - authoritative_guides
-instruction_resource: lantern/resources/instructions/design_selection.md
-authoritative_guides: []
-administration_guides:
-- lantern/authoring_contracts/design_candidate_selection_guide.md
-- lantern/administration_procedures/GT-115__DESIGN_BASELINE_SELECTION.md
-- lantern/authoring_contracts/design_baseline_authoring_guide.md
+    - artifact_templates
 entry_conditions:
 - GT-110 passed
 exit_conditions:

@@ -2,13 +2,9 @@ workbench_id: issue_operations
 display_name: Issue Operations
 lifecycle_placement:
   kind: lifecycle-independent
-artifacts_in_scope:
-- IS
 intent_classes:
 - issue_intake
 - issue_resolution
-posture_constraints:
-- issue_first_for_regressions
 workflow_surface:
   allowed_transaction_kinds:
   - inspect
@@ -26,35 +22,25 @@ workflow_surface:
   - transaction_kind: inspect
     response_envelope: catalog
     allowed_resource_roles:
-    - instruction_resource
-    - authoritative_guides
     - artifact_templates
+    - operating_references
   - transaction_kind: inspect
     response_envelope: issues
     allowed_resource_roles:
-    - instruction_resource
-    - authoritative_guides
     - artifact_templates
+    - operating_references
   - transaction_kind: draft
     response_envelope: default
     allowed_resource_roles:
-    - instruction_resource
-    - authoritative_guides
-    - administration_guides
+    - artifact_templates
   - transaction_kind: commit
     response_envelope: default
     allowed_resource_roles:
-    - instruction_resource
-    - administration_guides
+    - artifact_templates
   - transaction_kind: validate
     response_envelope: default
     allowed_resource_roles:
-    - instruction_resource
-    - authoritative_guides
-instruction_resource: lantern/resources/instructions/issue_operations.md
-authoritative_guides: []
-administration_guides:
-- lantern/administration_procedures/ISSUE__INTAKE_TRIAGE_RESOLUTION.md
+    - artifact_templates
 entry_conditions:
 - issue exists
 exit_conditions:

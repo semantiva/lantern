@@ -35,7 +35,7 @@ from lantern.workflow.resolver import (
 )
 
 _ORIENT_TRANSACTION_KIND = "orient"
-_ORIENT_DISCOVERY_SAFE_ROLES = frozenset({"instruction_resource", "authoritative_guides", "artifact_templates"})
+_ORIENT_DISCOVERY_SAFE_ROLES = frozenset({"artifact_templates", "operating_references"})
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 
 

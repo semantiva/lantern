@@ -45,11 +45,7 @@
     "gate_binding": [
       "GT-110"
     ],
-    "guide_refs": [
-      "lantern/resources/instructions/ch_and_td_readiness.md",
-      "lantern/authoring_contracts/change_intention_refinement_guide.md",
-      "lantern/authoring_contracts/test_definition_authoring_guide.md"
-    ],
+    "guide_refs": [],
     "provenance": {
       "catalog_source": "built_in",
       "generated_from": [
@@ -63,52 +59,45 @@
     "response_surface_bindings": [
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides",
-          "artifact_templates"
+          "artifact_templates",
+          "operating_references"
         ],
         "response_envelope": "catalog",
         "transaction_kind": "inspect"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides",
-          "artifact_templates"
+          "artifact_templates",
+          "operating_references"
         ],
         "response_envelope": "readiness",
         "transaction_kind": "inspect"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides",
-          "artifact_templates"
+          "artifact_templates",
+          "operating_references"
         ],
         "response_envelope": "lineage",
         "transaction_kind": "inspect"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides",
-          "administration_guides"
+          "artifact_templates"
         ],
         "response_envelope": "default",
         "transaction_kind": "draft"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "administration_guides"
+          "artifact_templates"
         ],
         "response_envelope": "default",
         "transaction_kind": "commit"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides"
+          "artifact_templates"
         ],
         "response_envelope": "default",
         "transaction_kind": "validate"
@@ -196,11 +185,7 @@
       "GT-115",
       "GT-120"
     ],
-    "guide_refs": [
-      "lantern/resources/instructions/ci_authoring.md",
-      "lantern/authoring_contracts/change_increment_authoring_guide.md",
-      "lantern/authoring_contracts/allowed_change_surface_flexibilization.md"
-    ],
+    "guide_refs": [],
     "provenance": {
       "catalog_source": "built_in",
       "generated_from": [
@@ -214,35 +199,30 @@
     "response_surface_bindings": [
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides",
-          "artifact_templates"
+          "artifact_templates",
+          "operating_references"
         ],
         "response_envelope": "catalog",
         "transaction_kind": "inspect"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides",
-          "artifact_templates"
+          "artifact_templates",
+          "operating_references"
         ],
         "response_envelope": "implementation_scope",
         "transaction_kind": "inspect"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides",
-          "administration_guides"
+          "artifact_templates"
         ],
         "response_envelope": "default",
         "transaction_kind": "draft"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides"
+          "artifact_templates"
         ],
         "response_envelope": "default",
         "transaction_kind": "validate"
@@ -300,11 +280,7 @@
     "gate_binding": [
       "GT-120"
     ],
-    "guide_refs": [
-      "lantern/resources/instructions/ci_selection.md",
-      "lantern/authoring_contracts/change_increment_selection_guide.md",
-      "lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION.md"
-    ],
+    "guide_refs": [],
     "provenance": {
       "catalog_source": "built_in",
       "generated_from": [
@@ -318,43 +294,37 @@
     "response_surface_bindings": [
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides",
-          "artifact_templates"
+          "artifact_templates",
+          "operating_references"
         ],
         "response_envelope": "catalog",
         "transaction_kind": "inspect"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides",
-          "artifact_templates"
+          "artifact_templates",
+          "operating_references"
         ],
         "response_envelope": "ci_selection",
         "transaction_kind": "inspect"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides",
-          "administration_guides"
+          "artifact_templates"
         ],
         "response_envelope": "default",
         "transaction_kind": "draft"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "administration_guides"
+          "artifact_templates"
         ],
         "response_envelope": "default",
         "transaction_kind": "commit"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides"
+          "artifact_templates"
         ],
         "response_envelope": "default",
         "transaction_kind": "validate"
@@ -440,10 +410,7 @@
       "GT-110",
       "GT-115"
     ],
-    "guide_refs": [
-      "lantern/resources/instructions/design_candidate_authoring.md",
-      "lantern/authoring_contracts/design_candidate_authoring_guide.md"
-    ],
+    "guide_refs": [],
     "provenance": {
       "catalog_source": "built_in",
       "generated_from": [
@@ -457,35 +424,30 @@
     "response_surface_bindings": [
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides",
-          "artifact_templates"
+          "artifact_templates",
+          "operating_references"
         ],
         "response_envelope": "catalog",
         "transaction_kind": "inspect"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides",
-          "artifact_templates"
+          "artifact_templates",
+          "operating_references"
         ],
         "response_envelope": "design_candidates",
         "transaction_kind": "inspect"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides",
-          "administration_guides"
+          "artifact_templates"
         ],
         "response_envelope": "default",
         "transaction_kind": "draft"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides"
+          "artifact_templates"
         ],
         "response_envelope": "default",
         "transaction_kind": "validate"
@@ -546,12 +508,7 @@
     "gate_binding": [
       "GT-115"
     ],
-    "guide_refs": [
-      "lantern/resources/instructions/design_selection.md",
-      "lantern/authoring_contracts/design_candidate_selection_guide.md",
-      "lantern/administration_procedures/GT-115__DESIGN_BASELINE_SELECTION.md",
-      "lantern/authoring_contracts/design_baseline_authoring_guide.md"
-    ],
+    "guide_refs": [],
     "provenance": {
       "catalog_source": "built_in",
       "generated_from": [
@@ -565,43 +522,37 @@
     "response_surface_bindings": [
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides",
-          "artifact_templates"
+          "artifact_templates",
+          "operating_references"
         ],
         "response_envelope": "catalog",
         "transaction_kind": "inspect"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides",
-          "artifact_templates"
+          "artifact_templates",
+          "operating_references"
         ],
         "response_envelope": "design_selection",
         "transaction_kind": "inspect"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides",
-          "administration_guides"
+          "artifact_templates"
         ],
         "response_envelope": "default",
         "transaction_kind": "draft"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "administration_guides"
+          "artifact_templates"
         ],
         "response_envelope": "default",
         "transaction_kind": "commit"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides"
+          "artifact_templates"
         ],
         "response_envelope": "default",
         "transaction_kind": "validate"
@@ -627,11 +578,7 @@
       "TD"
     ],
     "gate_binding": [],
-    "guide_refs": [
-      "lantern/resources/instructions/governance_onboarding.md",
-      "lantern/administration_procedures/INITIATIVE__AUTHORING_AND_READYING.md",
-      "lantern/administration_procedures/INITIATIVE__DECOMPOSITION_AND_CH_SIZING.md"
-    ],
+    "guide_refs": [],
     "provenance": {
       "catalog_source": "built_in",
       "generated_from": [
@@ -645,35 +592,30 @@
     "response_surface_bindings": [
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides",
-          "artifact_templates"
+          "artifact_templates",
+          "operating_references"
         ],
         "response_envelope": "catalog",
         "transaction_kind": "inspect"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides",
-          "artifact_templates"
+          "artifact_templates",
+          "operating_references"
         ],
         "response_envelope": "onboarding",
         "transaction_kind": "inspect"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides",
-          "administration_guides"
+          "artifact_templates"
         ],
         "response_envelope": "default",
         "transaction_kind": "draft"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides"
+          "artifact_templates"
         ],
         "response_envelope": "default",
         "transaction_kind": "validate"
@@ -697,10 +639,7 @@
       "IS"
     ],
     "gate_binding": [],
-    "guide_refs": [
-      "lantern/resources/instructions/issue_operations.md",
-      "lantern/administration_procedures/ISSUE__INTAKE_TRIAGE_RESOLUTION.md"
-    ],
+    "guide_refs": [],
     "provenance": {
       "catalog_source": "built_in",
       "generated_from": [
@@ -714,43 +653,37 @@
     "response_surface_bindings": [
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides",
-          "artifact_templates"
+          "artifact_templates",
+          "operating_references"
         ],
         "response_envelope": "catalog",
         "transaction_kind": "inspect"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides",
-          "artifact_templates"
+          "artifact_templates",
+          "operating_references"
         ],
         "response_envelope": "issues",
         "transaction_kind": "inspect"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides",
-          "administration_guides"
+          "artifact_templates"
         ],
         "response_envelope": "default",
         "transaction_kind": "draft"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "administration_guides"
+          "artifact_templates"
         ],
         "response_envelope": "default",
         "transaction_kind": "commit"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides"
+          "artifact_templates"
         ],
         "response_envelope": "default",
         "transaction_kind": "validate"
@@ -836,11 +769,7 @@
       "GT-120",
       "GT-130"
     ],
-    "guide_refs": [
-      "lantern/resources/instructions/selected_ci_application.md",
-      "lantern/administration_procedures/GT-120__CI_SELECTION_ADMINISTRATION.md",
-      "lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md"
-    ],
+    "guide_refs": [],
     "provenance": {
       "catalog_source": "built_in",
       "generated_from": [
@@ -854,32 +783,30 @@
     "response_surface_bindings": [
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides"
+          "artifact_templates",
+          "operating_references"
         ],
         "response_envelope": "catalog",
         "transaction_kind": "inspect"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides"
+          "artifact_templates",
+          "operating_references"
         ],
         "response_envelope": "change_surface",
         "transaction_kind": "inspect"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "administration_guides"
+          "artifact_templates"
         ],
         "response_envelope": "default",
         "transaction_kind": "commit"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides"
+          "artifact_templates"
         ],
         "response_envelope": "default",
         "transaction_kind": "validate"
@@ -976,15 +903,7 @@
       "GT-050",
       "GT-060"
     ],
-    "guide_refs": [
-      "lantern/resources/instructions/upstream_intake_and_baselines.md",
-      "lantern/administration_procedures/GT-030__DIP_LOCK_ADMINISTRATION.md",
-      "lantern/administration_procedures/GT-050_GT-060__BASELINE_READINESS_ADMINISTRATION.md",
-      "lantern/administration_procedures/INITIATIVE__AUTHORING_AND_READYING.md",
-      "lantern/authoring_contracts/dip_authoring_guide.md",
-      "lantern/authoring_contracts/spec_authoring_guide.md",
-      "lantern/authoring_contracts/arch_authoring_guide.md"
-    ],
+    "guide_refs": [],
     "provenance": {
       "catalog_source": "built_in",
       "generated_from": [
@@ -998,52 +917,45 @@
     "response_surface_bindings": [
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides",
-          "artifact_templates"
+          "artifact_templates",
+          "operating_references"
         ],
         "response_envelope": "catalog",
         "transaction_kind": "inspect"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides",
-          "artifact_templates"
+          "artifact_templates",
+          "operating_references"
         ],
         "response_envelope": "baselines",
         "transaction_kind": "inspect"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides",
-          "artifact_templates"
+          "artifact_templates",
+          "operating_references"
         ],
         "response_envelope": "lineage",
         "transaction_kind": "inspect"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides",
-          "administration_guides"
+          "artifact_templates"
         ],
         "response_envelope": "default",
         "transaction_kind": "draft"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "administration_guides"
+          "artifact_templates"
         ],
         "response_envelope": "default",
         "transaction_kind": "commit"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides"
+          "artifact_templates"
         ],
         "response_envelope": "default",
         "transaction_kind": "validate"
@@ -1101,10 +1013,7 @@
     "gate_binding": [
       "GT-130"
     ],
-    "guide_refs": [
-      "lantern/resources/instructions/verification_and_closure.md",
-      "lantern/administration_procedures/GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md"
-    ],
+    "guide_refs": [],
     "provenance": {
       "catalog_source": "built_in",
       "generated_from": [
@@ -1118,52 +1027,45 @@
     "response_surface_bindings": [
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides",
-          "artifact_templates"
+          "artifact_templates",
+          "operating_references"
         ],
         "response_envelope": "catalog",
         "transaction_kind": "inspect"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides",
-          "artifact_templates"
+          "artifact_templates",
+          "operating_references"
         ],
         "response_envelope": "verification",
         "transaction_kind": "inspect"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides",
-          "artifact_templates"
+          "artifact_templates",
+          "operating_references"
         ],
         "response_envelope": "closure",
         "transaction_kind": "inspect"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides",
-          "administration_guides"
+          "artifact_templates"
         ],
         "response_envelope": "default",
         "transaction_kind": "draft"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "administration_guides"
+          "artifact_templates"
         ],
         "response_envelope": "default",
         "transaction_kind": "commit"
       },
       {
         "allowed_resource_roles": [
-          "instruction_resource",
-          "authoritative_guides"
+          "artifact_templates"
         ],
         "response_envelope": "default",
         "transaction_kind": "validate"

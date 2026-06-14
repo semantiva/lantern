@@ -60,10 +60,8 @@ DEFAULT_WORKBENCH_BINDINGS_PATH = DEFAULT_DEFINITIONS_ROOT / "workbench_resource
 DEFAULT_RELOCATION_MANIFEST_PATH = Path(__file__).resolve().parents[1] / "preservation" / "relocation_manifest.yaml"
 
 _ALLOWED_RESOURCE_ROLES = {
-    "instruction_resource",
-    "authoritative_guides",
-    "administration_guides",
     "artifact_templates",
+    "operating_references",
 }
 _REQUIRED_ARTIFACT_FAMILIES = {"DIP", "SPEC", "ARCH", "INI", "CH", "TD", "DC", "DB", "CI", "EV", "DEC", "IS"}
 _PRIMARY_TRANSACTION_KIND = {
@@ -406,84 +404,8 @@ def _derive_resource_manifest(
     workbenches: tuple[WorkflowWorkbench, ...],
     product_root: Path,
 ) -> tuple[ResourceManifestEntry, ...]:
-    relocation_targets = {entry["target"]: entry for entry in relocation_manifest.get("entries", [])}
-    entries: list[ResourceManifestEntry] = []
-    for workbench in workbenches:
-        refs = [
-            ("instruction_resource", workbench.instruction_resource),
-            *[("administration_guides", path) for path in workbench.administration_guides],
-            *[("authoritative_guides", path) for path in workbench.authoritative_guides],
-        ]
-        for role, rel_path in refs:
-            path = product_root / rel_path
-            kind = _resource_kind_for_path(rel_path)
-            resource_id = _resource_id(kind, workbench.workbench_id, role, rel_path)
-            if not path.exists():
-                affected_bindings = [
-                    f"{binding.transaction_kind}:{binding.response_envelope}"
-                    for binding in workbench.response_surface_bindings
-                    if role in binding.allowed_resource_roles
-                ]
-                raise WorkflowLayerError(
-                    f"{workbench.workbench_id} has unresolved resource role {role!r} at path {rel_path!r} "
-                    f"(resource_id={resource_id}, affected_response_surface_bindings={affected_bindings})"
-                )
-            payload = path.read_text(encoding="utf-8")
-            if rel_path.startswith("lantern/resources/guides/"):
-                guide_meta = _extract_markdown_yaml_header(payload, rel_path)
-                provenance_type = str(guide_meta.get("provenance_type", ""))
-                if not provenance_type:
-                    raise WorkflowLayerError(
-                        f"{workbench.workbench_id} authoritative guide {rel_path!r} is missing provenance_type"
-                    )
-                provenance_refs = tuple(dict(item) for item in guide_meta.get("provenance_refs", []))
-                if not provenance_refs:
-                    raise WorkflowLayerError(
-                        f"{workbench.workbench_id} authoritative guide {rel_path!r} is missing provenance_refs"
-                    )
-                review_status = "lantern_authored"
-                projection_trace = {
-                    "derivation": "lantern_authored_guide_surface",
-                    "source": "guide_header",
-                }
-            else:
-                if rel_path not in relocation_targets:
-                    raise WorkflowLayerError(
-                        f"{workbench.workbench_id} references {rel_path!r} for role {role!r}, but it is not traceable to lantern/preservation/relocation_manifest.yaml"
-                    )
-                relocation_entry = relocation_targets[rel_path]
-                provenance_type = str(relocation_entry.get("entry_class", "bridge_copy"))
-                if provenance_type not in {"bridge_copy", "product_owned"}:
-                    raise WorkflowLayerError(
-                        f"{workbench.workbench_id} references {rel_path!r} with unsupported provenance_type {provenance_type!r}; workflow resources must remain reviewed bridge_copy or product_owned surfaces"
-                    )
-                provenance_refs = (
-                    {
-                        "path": relocation_entry.get("source", ""),
-                        "relocation_entry_id": relocation_entry.get("entry_id", ""),
-                    },
-                )
-                review_status = "reviewed"
-                projection_trace = {
-                    "derivation": "relocation_manifest_projection",
-                    "relocation_entry_id": relocation_entry.get("entry_id", ""),
-                }
-            resource_id = _resource_id(kind, workbench.workbench_id, role, rel_path)
-            entries.append(
-                ResourceManifestEntry(
-                    resource_id=resource_id,
-                    kind=kind,
-                    workbench_id=workbench.workbench_id,
-                    path=rel_path,
-                    content_hash=_sha256_text(payload),
-                    review_status=review_status,
-                    provenance_type=provenance_type,
-                    provenance_refs=provenance_refs,
-                    roles=(role,),
-                    projection_trace=projection_trace,
-                )
-            )
-    return tuple(sorted(entries, key=lambda item: (item.workbench_id, item.path, item.roles[0])))
+    del relocation_manifest, workbenches, product_root
+    return ()
 
 
 def _assert_committed_json_matches(path: Path, expected_payload: Any, label: str) -> None:
@@ -652,21 +574,22 @@ class WorkflowWorkbench:
     lifecycle_placement: LifecyclePlacement
     artifacts_in_scope: tuple[str, ...]
     intent_classes: tuple[str, ...]
-    posture_constraints: tuple[str, ...]
     allowed_transaction_kinds: tuple[str, ...]
     draftable_artifact_families: tuple[str, ...]
     contract_refs: tuple[str, ...]
     inspect_views: tuple[str, ...]
     response_surface_bindings: tuple[ResponseSurfaceBinding, ...]
-    instruction_resource: str
-    authoritative_guides: tuple[str, ...]
-    administration_guides: tuple[str, ...]
     entry_conditions: tuple[str, ...]
     exit_conditions: tuple[str, ...]
     source_path: str
     catalog_source: str
     content_hash: str
-    charter_ref: str = ""
+    charter_ref: str
+    # Legacy authority fields — retired in CH-0034; kept optional for caller compatibility.
+    posture_constraints: tuple[str, ...] = ()
+    instruction_resource: str = ""
+    authoritative_guides: tuple[str, ...] = ()
+    administration_guides: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -968,19 +891,17 @@ def render_generated_artifacts(
         "",
         f"Workflow ID: `{workflow_id}`",
         "",
-        "| Workbench | Instruction resource | Administration guides | Authoritative guides | Manifest resource ids |",
-        "|---|---|---|---|---|",
+        "| Workbench | Charter ref | Manifest resource ids |",
+        "|---|---|---|",
     ]
     for workbench in workbenches:
         manifest_ids: list[str] = []
-        for role in ("instruction_resource", "administration_guides", "authoritative_guides"):
+        for role in ("artifact_templates", "operating_references"):
             manifest_ids.extend(resource_lookup.get((workbench.workbench_id, role), []))
         bindings_lines.append(
-            "| {wb} | {instruction} | {admin} | {authoritative} | {manifest_ids} |".format(
+            "| {wb} | {charter} | {manifest_ids} |".format(
                 wb=workbench.workbench_id,
-                instruction=workbench.instruction_resource,
-                admin="<br>".join(workbench.administration_guides),
-                authoritative="<br>".join(workbench.authoritative_guides),
+                charter=workbench.charter_ref,
                 manifest_ids="<br>".join(sorted(manifest_ids)),
             )
         )
@@ -1208,14 +1129,39 @@ def _parse_workbench_definition(
             )
         )
 
+    charter_ref = str(payload.get("charter_ref", "")).strip()
+    if not charter_ref:
+        raise WorkflowLayerError(f"{workbench_id} missing required field: charter_ref")
+    if anchor_root is None:
+        raise WorkflowLayerError(
+            f"{workbench_id} cannot resolve charter_ref: anchor_root is required"
+        )
+    charter_path = anchor_root / charter_ref
+    try:
+        from lantern.workflow.charter import CharterLoadError, load_charter as _load_charter
+        charter = _load_charter(charter_path)
+    except Exception as exc:
+        raise WorkflowLayerError(
+            f"{workbench_id} charter_ref {charter_ref!r} failed to load: {exc}"
+        ) from exc
+
+    artifacts_in_scope = tuple(charter.artifact_families)
+    if lifecycle_placement.kind == "covered_gates":
+        if not charter.gate_refs:
+            raise WorkflowLayerError(
+                f"{workbench_id} has lifecycle_placement.kind=covered_gates but Charter.gate_refs is empty"
+            )
+        lifecycle_placement = LifecyclePlacement(
+            kind="covered_gates", covered_gates=tuple(charter.gate_refs)
+        )
+
     canonical_payload = json.dumps(_to_plain_data(payload), sort_keys=True, separators=(",", ":"))
     return WorkflowWorkbench(
         workbench_id=workbench_id,
         display_name=str(payload["display_name"]),
         lifecycle_placement=lifecycle_placement,
-        artifacts_in_scope=tuple(str(item) for item in payload.get("artifacts_in_scope", ())),
+        artifacts_in_scope=artifacts_in_scope,
         intent_classes=tuple(str(item) for item in payload.get("intent_classes", ())),
-        posture_constraints=tuple(str(item) for item in payload.get("posture_constraints", ())),
         allowed_transaction_kinds=declared_transactions,
         draftable_artifact_families=tuple(
             str(item) for item in workflow_surface.get("draftable_artifact_families", ())
@@ -1223,15 +1169,12 @@ def _parse_workbench_definition(
         contract_refs=tuple(str(item) for item in workflow_surface.get("contract_refs", ())),
         inspect_views=inspect_views,
         response_surface_bindings=tuple(response_surface_bindings),
-        instruction_resource=str(payload.get("instruction_resource", "")),
-        authoritative_guides=tuple(str(item) for item in payload.get("authoritative_guides", ())),
-        administration_guides=tuple(str(item) for item in payload.get("administration_guides", ())),
         entry_conditions=tuple(str(item) for item in payload.get("entry_conditions", ())),
         exit_conditions=tuple(str(item) for item in payload.get("exit_conditions", ())),
         source_path=_path_label(path, anchor_root),
         catalog_source=catalog_source,
         content_hash=_sha256_text(canonical_payload),
-        charter_ref=str(payload.get("charter_ref", "")),
+        charter_ref=charter_ref,
     )
 
 
@@ -1296,10 +1239,8 @@ def _parse_lifecycle_placement(
         if field not in payload:
             raise WorkflowLayerError(f"{workbench_id}.lifecycle_placement missing required field: {field}")
     if kind == "covered_gates":
-        covered_gates = tuple(str(item) for item in payload.get("covered_gates", ()))
-        if not covered_gates:
-            raise WorkflowLayerError(f"{workbench_id}.lifecycle_placement.covered_gates must not be empty")
-        return LifecyclePlacement(kind=kind, covered_gates=covered_gates)
+        # covered_gates list is derived from Charter.gate_refs in _parse_workbench_definition.
+        return LifecyclePlacement(kind=kind, covered_gates=())
     if kind == "lifecycle_span":
         return LifecyclePlacement(
             kind=kind,
@@ -1420,10 +1361,14 @@ def _build_contract_catalog(
                 family_binding=workbench.artifacts_in_scope,
                 gate_binding=tuple(gate_binding),
                 workbench_refs=(workbench.workbench_id,),
-                guide_refs=(
-                    workbench.instruction_resource,
-                    *workbench.administration_guides,
-                    *workbench.authoritative_guides,
+                guide_refs=tuple(
+                    ref
+                    for ref in (
+                        workbench.instruction_resource,
+                        *workbench.administration_guides,
+                        *workbench.authoritative_guides,
+                    )
+                    if ref
                 ),
                 response_surface_bindings=workbench.response_surface_bindings,
                 compatibility=compatibility,
@@ -1455,7 +1400,7 @@ def _workbench_to_projection_dict(workbench: WorkflowWorkbench) -> dict[str, Any
         "lifecycle_placement": _lifecycle_to_dict(workbench.lifecycle_placement),
         "artifacts_in_scope": list(workbench.artifacts_in_scope),
         "intent_classes": list(workbench.intent_classes),
-        "posture_constraints": list(workbench.posture_constraints),
+        "charter_ref": workbench.charter_ref,
         "workflow_surface": {
             "allowed_transaction_kinds": list(workbench.allowed_transaction_kinds),
             "draftable_artifact_families": list(workbench.draftable_artifact_families),
@@ -1470,9 +1415,6 @@ def _workbench_to_projection_dict(workbench: WorkflowWorkbench) -> dict[str, Any
                 for binding in workbench.response_surface_bindings
             ],
         },
-        "instruction_resource": workbench.instruction_resource,
-        "authoritative_guides": list(workbench.authoritative_guides),
-        "administration_guides": list(workbench.administration_guides),
         "entry_conditions": list(workbench.entry_conditions),
         "exit_conditions": list(workbench.exit_conditions),
     }

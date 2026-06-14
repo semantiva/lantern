@@ -19,7 +19,6 @@ import shutil
 from pathlib import Path
 
 import pytest
-import yaml
 
 from lantern.workflow.loader import (
     DEFAULT_RESOURCE_MANIFEST_PATH,
@@ -112,23 +111,16 @@ def test_contract_catalog_and_resource_manifest_cover_selected_workflow() -> Non
     assert {entry.workbench_refs[0] for entry in layer.contract_catalog} == workbench_ids
     for entry in layer.contract_catalog:
         assert entry.request_schema_ref == f"schema.request.{entry.workbench_refs[0]}.v1"
-        assert entry.guide_refs
         assert entry.response_surface_bindings
         assert entry.compatibility["runtime_surface_classification"] == layer.runtime_surface_classification
         assert entry.compatibility["selected_workflow_id"] == layer.selected_workflow_id
 
 
-def test_resource_manifest_entries_are_traceable_and_match_selected_workflow_resources() -> None:
+def test_resource_manifest_is_empty_after_authority_field_retirement() -> None:
     layer = load_workflow_layer()
-    expected_pairs: set[tuple[str, str]] = set()
-    for workbench in layer.workbenches:
-        expected_pairs.add((workbench.workbench_id, workbench.instruction_resource))
-        expected_pairs.update((workbench.workbench_id, path) for path in workbench.authoritative_guides)
-        expected_pairs.update((workbench.workbench_id, path) for path in workbench.administration_guides)
-
-    actual_pairs = {(entry.workbench_id, entry.path) for entry in layer.resource_manifest}
-    assert actual_pairs == expected_pairs
-    assert all(entry.provenance_refs for entry in layer.resource_manifest)
+    assert layer.resource_manifest == (), (
+        "resource_manifest must be empty: all legacy authority role fields retired in CH-0034"
+    )
 
 
 def test_recomputed_resource_manifest_matches_committed_projection() -> None:
@@ -172,20 +164,14 @@ def test_projection_enforcement_is_explicit_for_fixture_copies(tmp_path: Path) -
         _load_fixture_layer(fixture_root, enforce_generated_artifacts=True)
 
 
-def test_td0024_c10_legacy_copy_without_review_is_rejected(tmp_path: Path) -> None:
-    fixture_root = _copy_product_fixture(tmp_path)
-    relocation_manifest_path = fixture_root / "lantern" / "preservation" / "relocation_manifest.yaml"
-    payload = yaml.safe_load(relocation_manifest_path.read_text(encoding="utf-8"))
-    target_path = "lantern/authoring_contracts/change_intention_refinement_guide.md"
-
-    for entry in payload["entries"]:
-        if entry["target"] == target_path:
-            entry["entry_class"] = "legacy_copy"
-            break
-    else:  # pragma: no cover - defensive fixture guard
-        raise AssertionError(f"Expected relocation manifest entry for {target_path}")
-
-    relocation_manifest_path.write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
-
-    with pytest.raises(WorkflowLayerError, match="legacy_copy"):
-        _load_fixture_layer(fixture_root)
+def test_relocation_manifest_no_longer_consulted_by_derive_resource_manifest() -> None:
+    layer = load_workflow_layer()
+    relocation_manifest = _load_yaml(
+        PRODUCT_ROOT / "lantern" / "preservation" / "relocation_manifest.yaml", "relocation manifest"
+    )
+    recomputed = _derive_resource_manifest(
+        relocation_manifest=relocation_manifest,
+        workbenches=layer.workbenches,
+        product_root=PRODUCT_ROOT,
+    )
+    assert recomputed == (), "resource manifest must be empty: legacy role entries retired in CH-0034"
