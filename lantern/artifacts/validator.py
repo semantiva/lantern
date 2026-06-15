@@ -16,12 +16,13 @@
 
 from __future__ import annotations
 
-import json
 import re
 from collections.abc import Mapping
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
+
+import yaml
 
 from lantern.artifacts.renderers import parse_header_block
 from lantern.workflow.loader import (
@@ -47,9 +48,22 @@ _HEADER_ID_KEYS = {
     "spec": "spec_id",
     "td": "td_id",
 }
-DEFAULT_STATUS_CONTRACT_PATH = (
-    Path(__file__).resolve().parents[1] / "workflow" / "definitions" / "artifact_status_contract.json"
-)
+_DEFAULT_LIFECYCLE_POLICY_DIR = Path(__file__).resolve().parents[1] / "workflow" / "definitions" / "lifecycle-policy"
+_DEFAULT_LIFECYCLE_MANIFEST = _DEFAULT_LIFECYCLE_POLICY_DIR / "manifest.yaml"
+_DEFAULT_LIFECYCLE_SUPPLEMENT = _DEFAULT_LIFECYCLE_POLICY_DIR / "supplement.yaml"
+
+_LIFECYCLE_ID_TO_FAMILY: dict[str, str] = {
+    "lg:artifacts/initiative": "INI",
+    "lg:artifacts/dip": "DIP",
+    "lg:artifacts/spec": "SPEC",
+    "lg:artifacts/arch": "ARCH",
+    "lg:artifacts/td": "TD",
+    "lg:artifacts/ch": "CH",
+    "lg:artifacts/dc": "DC",
+    "lg:artifacts/db": "DB",
+    "lg:artifacts/ci": "CI",
+    "lg:artifacts/issue": "IS",
+}
 _ISSUE_STATUS_RE = re.compile(r"^Status:\s*(?P<status>[A-Za-z_][A-Za-z_ ]*)\s*$", re.MULTILINE)
 _ACTIVE_CI_STATUSES = {"Draft", "Candidate", "Selected"}
 
@@ -412,7 +426,7 @@ def validate_artifact_file(path: Path) -> list[ValidationFinding]:
     family = path.parent.name
     if family == "ch":
         governance_root = path.parent.parent if path.parent.parent.is_dir() else None
-        contract = load_status_contract()
+        contract = derive_status_contract()
         findings.extend(_validate_family_status("CH", header.get("status"), artifact_id=path.stem, contract=contract))
         findings.extend(
             _validate_ch_lifecycle_state_constraints(
@@ -422,22 +436,57 @@ def validate_artifact_file(path: Path) -> list[ValidationFinding]:
     return findings
 
 
-@lru_cache(maxsize=8)
-def load_status_contract(path: str | Path | None = None) -> dict[str, Any]:
-    target = Path(path or DEFAULT_STATUS_CONTRACT_PATH)
-    if not target.exists():
-        raise FileNotFoundError(f"Missing generated artifact artifact_status_contract.json: {target}")
-    payload = json.loads(target.read_text(encoding="utf-8"))
-    if payload.get("projection_kind") != "artifact_status_contract":
-        raise ValueError(f"invalid status-contract projection: {target}")
-    families = payload.get("families")
-    if not isinstance(families, dict) or not families:
-        raise ValueError(f"status-contract projection has no family map: {target}")
-    return payload
+@lru_cache(maxsize=1)
+def derive_status_contract() -> dict[str, Any]:
+    """Derive the status contract in memory from the lifecycle-policy bundle and supplement."""
+    manifest = yaml.safe_load(_DEFAULT_LIFECYCLE_MANIFEST.read_text(encoding="utf-8")) or {}
+    supplement = yaml.safe_load(_DEFAULT_LIFECYCLE_SUPPLEMENT.read_text(encoding="utf-8")) or {}
+    family_supplements: dict[str, Any] = supplement.get("family_supplements", {})
+    bundle_dir = _DEFAULT_LIFECYCLE_POLICY_DIR
+
+    families: dict[str, Any] = {}
+
+    for family_file in manifest.get("families", []):
+        fpath = bundle_dir / family_file
+        fdata = yaml.safe_load(fpath.read_text(encoding="utf-8")) or {}
+        family_id = str(fdata.get("id", ""))
+        short = _LIFECYCLE_ID_TO_FAMILY.get(family_id)
+        if short is None:
+            continue
+        statuses = [s for s in fdata.get("statuses", []) if isinstance(s, dict)]
+        id_to_label = {s["id"]: s["label"] for s in statuses if "id" in s and "label" in s}
+        grammar_mapping = {s["label"]: s["id"] for s in statuses if "id" in s and "label" in s}
+        canonical_statuses = [s["label"] for s in statuses if "label" in s]
+        transitions = [
+            {"from": id_to_label[t["from"]], "to": id_to_label[t["to"]]}
+            for t in fdata.get("transitions", [])
+            if isinstance(t, dict) and t.get("from") in id_to_label and t.get("to") in id_to_label
+        ]
+        sup = family_supplements.get(short, {})
+        families[short] = {
+            "ownership": "grammar_semantic",
+            "canonical_statuses": canonical_statuses,
+            "transitions": transitions,
+            "grammar_mapping": grammar_mapping,
+            "aliases": sup.get("aliases", {}),
+            "normal_path_policy": sup.get("normal_path_policy", "reject_unknown"),
+        }
+
+    for exempt_short, data in supplement.get("exempt_families", {}).items():
+        families[exempt_short] = {
+            "ownership": "lifecycle_exempt",
+            "canonical_statuses": list(data.get("canonical_statuses", [])),
+            "transitions": [],
+            "grammar_mapping": {},
+            "aliases": data.get("aliases", {}),
+            "normal_path_policy": data.get("normal_path_policy", "statusless"),
+        }
+
+    return {"families": families}
 
 
 def validate_status_transition(family: str, from_status: str, to_status: str) -> list[ValidationFinding]:
-    contract = load_status_contract()
+    contract = derive_status_contract()
     rule = _family_contract(family, contract)
     from_findings = _validate_family_status(family, from_status, artifact_id=family, contract=contract)
     to_findings = _validate_family_status(family, to_status, artifact_id=family, contract=contract)
@@ -465,7 +514,7 @@ def validate_status_transition(family: str, from_status: str, to_status: str) ->
 
 def audit_legacy_status_values(governance_root: Path) -> list[dict[str, str]]:
     governance_root = Path(governance_root).resolve()
-    contract = load_status_contract()
+    contract = derive_status_contract()
     results: list[dict[str, str]] = []
     for family_dir in _GOVERNED_FAMILY_DIRS:
         family = family_dir.upper()
@@ -589,7 +638,6 @@ def validate_workspace_readiness(
     *,
     product_root: Path,
     governance_root: Path | None = None,
-    status_contract_path: Path | None = None,
 ) -> list[ValidationFinding]:
     """Validate only product-owned runtime readiness.
 
@@ -604,18 +652,6 @@ def validate_workspace_readiness(
     product_root = Path(product_root).resolve()
     if not product_root.is_dir():
         return [_finding("workspace.product_root", f"product root not found: {product_root}", anchor="workspace")]
-
-    try:
-        load_status_contract(status_contract_path)
-    except (FileNotFoundError, ValueError) as exc:
-        target = Path(status_contract_path or DEFAULT_STATUS_CONTRACT_PATH)
-        findings.append(
-            _finding(
-                _runtime_relative_path(str(target)),
-                str(exc),
-                anchor="workspace.status_contract",
-            )
-        )
 
     try:
         load_workflow_layer(
@@ -640,7 +676,7 @@ def validate_workspace_readiness(
 
 def validate_governance_corpus(governance_root: Path) -> list[ValidationFinding]:
     governance_root = Path(governance_root).resolve()
-    contract = load_status_contract()
+    contract = derive_status_contract()
     findings: list[ValidationFinding] = []
     for family_dir in _GOVERNED_FAMILY_DIRS:
         base = governance_root / family_dir
@@ -800,7 +836,7 @@ def _validate_ch_lifecycle_state_constraints(
         return findings
 
     if contract is None:
-        contract = load_status_contract()
+        contract = derive_status_contract()
 
     ch_num = _ch_numeric_id(artifact_id)
     full_enforcement = (governance_root is not None) and (ch_num >= _CH_CUTOVER_ID)

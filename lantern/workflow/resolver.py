@@ -28,7 +28,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 from typing import Any, Optional
 
-from lantern.artifacts.validator import load_status_contract
+from lantern.artifacts.validator import derive_status_contract
 
 
 class ResolverAmbiguityError(RuntimeError):
@@ -47,7 +47,7 @@ class ResolvedWorkbenchSet:
 
 @lru_cache(maxsize=1)
 def _non_terminal_ch_statuses() -> frozenset[str]:
-    ch_rule = load_status_contract()["families"]["CH"]
+    ch_rule = derive_status_contract()["families"]["CH"]
     return frozenset(item["from"] for item in ch_rule["transitions"])
 
 

@@ -112,7 +112,7 @@ def _run_startup_sequence(
     workflow_layer: WorkflowLayer,
 ) -> tuple[EffectiveLayer, PostureResult]:
     """Execute the ordered startup validation sequence before any MCP tool responds."""
-    from lantern.artifacts.validator import load_status_contract
+    from lantern.artifacts.validator import derive_status_contract
 
     effective_layer = load_effective_layer(
         workflow_layer=workflow_layer,
@@ -122,7 +122,7 @@ def _run_startup_sequence(
         workbench_folder=_workbench_folder,
     )
 
-    status_contract = load_status_contract()
+    status_contract = derive_status_contract()
     validator = PostureValidator()
     posture_result = validator.validate(
         effective_layer=effective_layer,

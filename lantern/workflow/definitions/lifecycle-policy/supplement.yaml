@@ -1,0 +1,51 @@
+# Authored supplement to the lifecycle-policy bundle.
+# Provides per-family aliases and normal_path_policy for grammar-semantic families,
+# and full definitions for lifecycle-exempt families (not tracked by the lifecycle bundle).
+# This file is the authoritative source for these values; they must never be hardcoded
+# in product Python code.
+
+family_supplements:
+  INI:
+    normal_path_policy: reject_alias
+    aliases:
+      InProgress: "In Progress"
+  DIP:
+    normal_path_policy: reject_unknown
+  SPEC:
+    normal_path_policy: reject_unknown
+  ARCH:
+    normal_path_policy: reject_unknown
+  TD:
+    normal_path_policy: reject_alias
+  CH:
+    normal_path_policy: reject_alias
+    aliases:
+      Draft: null
+      Selected: null
+  DC:
+    normal_path_policy: reject_unknown
+  DB:
+    normal_path_policy: reject_alias
+    aliases:
+      Superseded: null
+  CI:
+    normal_path_policy: reject_unknown
+  IS:
+    normal_path_policy: reject_alias
+    aliases:
+      Open: null
+      Closed: null
+      Resolved: "RESOLVED"
+
+exempt_families:
+  DEC:
+    canonical_statuses:
+      - Active
+      - Superseded
+    normal_path_policy: allow_record_local_status
+  EV:
+    normal_path_policy: statusless
+    aliases:
+      Recorded: null
+  Q:
+    normal_path_policy: statusless

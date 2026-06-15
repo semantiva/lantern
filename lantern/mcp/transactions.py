@@ -32,8 +32,8 @@ from lantern.artifacts.renderers import canonical_render_markdown, parse_header_
 from lantern.artifacts.validator import (
     _validate_ch_lifecycle_state_constraints,
     _validate_family_status,
+    derive_status_contract,
     extract_allowed_change_surface,
-    load_status_contract,
     resolve_gt130_extension_surface,
     validate_artifact_file,
     validate_commit_request,
@@ -186,7 +186,7 @@ class TransactionEngine:
         # CH pre-checks: status admissibility + lifecycle target-state constraints.
         if artifact_family.lower() == "ch":
             proposed_artifact_id = str(header.get("ch_id", "")).strip() or "CH-DRAFT"
-            _contract = load_status_contract()
+            _contract = derive_status_contract()
             status_findings = _validate_family_status(
                 "CH",
                 header.get("status"),
@@ -278,7 +278,7 @@ class TransactionEngine:
         if str(draft.get("artifact_family", "")).lower() == "ch":
             ch_header = draft.get("header", {})
             ch_artifact_id = str(draft.get("artifact_id", ""))
-            _contract = load_status_contract()
+            _contract = derive_status_contract()
             status_findings = _validate_family_status(
                 "CH",
                 ch_header.get("status"),
@@ -596,7 +596,7 @@ class TransactionEngine:
             if not draft.get("preview"):
                 findings.append({"path": "preview", "message": "draft preview missing", "anchor": "draft.preview"})
             if str(draft.get("artifact_family", "")).lower() == "ch":
-                _contract = load_status_contract()
+                _contract = derive_status_contract()
                 findings.extend(
                     _validate_family_status(
                         "CH",

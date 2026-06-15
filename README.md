@@ -113,7 +113,7 @@ pip install -e ".[dev]"
 pip install lantern-grammar
 ```
 
-Use the workflow-layer README for the authored-vs-generated boundary and runtime surface details:
+Use the workflow-layer README for authored authority and runtime surface details:
 
 - `lantern/workflow/README.md`
 

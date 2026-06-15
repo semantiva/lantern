@@ -55,7 +55,6 @@ where = ["."]
 	"artifacts/schemas/*.json",
 	"skills/packaged_default/*.md",
 	"templates/*.md",
-	"workflow/definitions/*.json",
 	"workflow/definitions/*.md",
 	"workflow/definitions/*.yaml",
 	"workflow/definitions/lifecycle-policy/*.yaml",

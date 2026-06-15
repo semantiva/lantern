@@ -101,11 +101,11 @@ def handle_orient(
                 from lantern.artifacts.renderers import parse_header_block
                 from lantern.artifacts.validator import (
                     _validate_ch_lifecycle_state_constraints,
-                    load_status_contract,
+                    derive_status_contract,
                 )
 
                 header = parse_header_block(ch_path.read_text(encoding="utf-8"))
-                contract = load_status_contract()
+                contract = derive_status_contract()
                 lc_findings = _validate_ch_lifecycle_state_constraints(
                     header, ch_id, governance_root=governance_root, contract=contract
                 )

@@ -16,14 +16,12 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 import yaml
 
 PRODUCT_ROOT = Path(__file__).resolve().parents[1]
 LIFECYCLE_POLICY_MANIFEST = PRODUCT_ROOT / "lantern" / "workflow" / "definitions" / "lifecycle-policy" / "manifest.yaml"
-STATUS_CONTRACT_PATH = PRODUCT_ROOT / "lantern" / "workflow" / "definitions" / "artifact_status_contract.json"
 
 
 def _grammar():
@@ -67,7 +65,9 @@ def test_tc003_removed_initiative_ids_absent_from_lifecycle_bundle() -> None:
 
 
 def test_tc003_removed_initiative_ids_absent_from_status_contract() -> None:
-    contract = json.loads(STATUS_CONTRACT_PATH.read_text(encoding="utf-8"))
+    from lantern.artifacts.validator import derive_status_contract
+
+    contract = derive_status_contract()
     for family_id, family_data in contract["families"].items():
         mapping = family_data.get("grammar_mapping", {})
         for status_id in mapping.values():
@@ -80,8 +80,10 @@ def test_tc003_removed_initiative_ids_absent_from_status_contract() -> None:
 
 
 def test_tc004_live_grammar_ids_resolve() -> None:
+    from lantern.artifacts.validator import derive_status_contract
+
     grammar = _grammar()
-    contract = json.loads(STATUS_CONTRACT_PATH.read_text(encoding="utf-8"))
+    contract = derive_status_contract()
     for family_id, family_data in contract["families"].items():
         mapping = family_data.get("grammar_mapping", {})
         for display_name, grammar_id in mapping.items():
@@ -444,7 +446,7 @@ def test_tc011_inspect_lifecycle_policy_returns_ch_state_constraints() -> None:
     assert "test_definition_refs" in ready_constraint["slots"]
 
 
-# ── TC-014 addendum: lifecycle projection freshness is mechanically enforced ───
+# ── TC-014 addendum: lifecycle bundle mutation is rejected by bundle validator ──
 
 
 def test_tc014_lifecycle_projection_divergence_is_rejected(tmp_path: Path) -> None:
@@ -468,7 +470,7 @@ def test_tc014_lifecycle_projection_divergence_is_rejected(tmp_path: Path) -> No
 
     try:
         load_workflow_layer(lifecycle_policy_manifest_path=dst / "manifest.yaml")
-        assert False, "Expected WorkflowLayerError for lifecycle projection divergence"
+        assert False, "Expected WorkflowLayerError for lifecycle bundle divergence"
     except Exception as exc:
         assert "divergence" in str(exc).lower() or "CH" in str(exc), f"Expected divergence error; got: {exc}"
 
@@ -726,197 +728,6 @@ def test_b5_orient_reports_lifecycle_blockers_for_ch_with_violations(tmp_path: P
     ), f"Expected lifecycle_constraint blockers in orient result; got blockers={result.blockers}"
 
 
-# ── B2: Projection parity omission-gap enforcement ───────────────────────────
-
-
-def test_b2_missing_projection_family_raises(tmp_path: Path) -> None:
-    """Lifecycle bundle declares CH (a known family) absent from projection → WorkflowLayerError."""
-    import json
-
-    from lantern.workflow.loader import WorkflowLayerError, _verify_lifecycle_projection_consistency
-
-    real_contract = json.loads(STATUS_CONTRACT_PATH.read_text(encoding="utf-8"))
-    contract_without_ch = {
-        **real_contract,
-        "families": {k: v for k, v in real_contract["families"].items() if k != "CH"},
-    }
-    contract_path = tmp_path / "status_contract.json"
-    contract_path.write_text(json.dumps(contract_without_ch), encoding="utf-8")
-
-    try:
-        _verify_lifecycle_projection_consistency(LIFECYCLE_POLICY_MANIFEST, status_contract_path=contract_path)
-        assert False, "Expected WorkflowLayerError when CH absent from projection"
-    except WorkflowLayerError as exc:
-        assert "CH" in str(exc) or "absent" in str(exc).lower(), f"Expected CH-related error; got: {exc}"
-
-
-def test_b2_missing_ini_projection_family_raises(tmp_path: Path) -> None:
-    """Lifecycle bundle declares lg:artifacts/initiative mapped to 'INI' — absent INI must raise, not silently skip."""
-    import json
-
-    from lantern.workflow.loader import WorkflowLayerError, _verify_lifecycle_projection_consistency
-
-    real_contract = json.loads(STATUS_CONTRACT_PATH.read_text(encoding="utf-8"))
-    contract_without_ini = {
-        **real_contract,
-        "families": {k: v for k, v in real_contract["families"].items() if k != "INI"},
-    }
-    contract_path = tmp_path / "status_contract.json"
-    contract_path.write_text(json.dumps(contract_without_ini), encoding="utf-8")
-
-    try:
-        _verify_lifecycle_projection_consistency(LIFECYCLE_POLICY_MANIFEST, status_contract_path=contract_path)
-        assert False, "Expected WorkflowLayerError when INI absent from projection"
-    except WorkflowLayerError as exc:
-        assert (
-            "INI" in str(exc) or "absent" in str(exc).lower() or "initiative" in str(exc).lower()
-        ), f"Expected INI-related error; got: {exc}"
-
-
-def test_b2_empty_grammar_mapping_raises(tmp_path: Path) -> None:
-    """Lifecycle projection with empty grammar_mapping for CH → WorkflowLayerError."""
-    import json
-
-    from lantern.workflow.loader import WorkflowLayerError, _verify_lifecycle_projection_consistency
-
-    real_contract = json.loads(STATUS_CONTRACT_PATH.read_text(encoding="utf-8"))
-    modified_families = dict(real_contract["families"])
-    modified_families["CH"] = {**real_contract["families"]["CH"], "grammar_mapping": {}}
-    modified_contract = {**real_contract, "families": modified_families}
-    contract_path = tmp_path / "status_contract.json"
-    contract_path.write_text(json.dumps(modified_contract), encoding="utf-8")
-
-    try:
-        _verify_lifecycle_projection_consistency(LIFECYCLE_POLICY_MANIFEST, status_contract_path=contract_path)
-        assert False, "Expected WorkflowLayerError for empty grammar_mapping"
-    except WorkflowLayerError as exc:
-        assert "grammar_mapping" in str(exc).lower() or "CH" in str(exc), f"Expected grammar_mapping error; got: {exc}"
-
-
-def test_b2_bundle_transitions_without_projection_transitions_raises(tmp_path: Path) -> None:
-    """CH bundle has transitions but projection transitions list is empty → WorkflowLayerError."""
-    import json
-
-    from lantern.workflow.loader import WorkflowLayerError, _verify_lifecycle_projection_consistency
-
-    real_contract = json.loads(STATUS_CONTRACT_PATH.read_text(encoding="utf-8"))
-    modified_families = dict(real_contract["families"])
-    modified_families["CH"] = {**real_contract["families"]["CH"], "transitions": []}
-    modified_contract = {**real_contract, "families": modified_families}
-    contract_path = tmp_path / "status_contract.json"
-    contract_path.write_text(json.dumps(modified_contract), encoding="utf-8")
-
-    try:
-        _verify_lifecycle_projection_consistency(LIFECYCLE_POLICY_MANIFEST, status_contract_path=contract_path)
-        assert False, "Expected WorkflowLayerError for CH transitions absent from projection"
-    except WorkflowLayerError as exc:
-        assert "transition" in str(exc).lower() or "CH" in str(exc), f"Expected transition divergence error; got: {exc}"
-
-
-# ── B3: validate(scope='draft') lifecycle constraint enforcement ──────────────
-
-
-# ── B1: Projection parity — canonical_statuses and policy enforcement ─────────
-
-
-def test_b1_extra_canonical_status_raises(tmp_path: Path) -> None:
-    """CH projection with an extra canonical_statuses entry not in lifecycle bundle → WorkflowLayerError."""
-    import json
-
-    from lantern.workflow.loader import WorkflowLayerError, _verify_lifecycle_projection_consistency
-
-    real_contract = json.loads(STATUS_CONTRACT_PATH.read_text(encoding="utf-8"))
-    modified_families = dict(real_contract["families"])
-    modified_families["CH"] = {
-        **real_contract["families"]["CH"],
-        "canonical_statuses": real_contract["families"]["CH"]["canonical_statuses"] + ["Bogus"],
-    }
-    modified_contract = {**real_contract, "families": modified_families}
-    contract_path = tmp_path / "status_contract.json"
-    contract_path.write_text(json.dumps(modified_contract), encoding="utf-8")
-
-    try:
-        _verify_lifecycle_projection_consistency(LIFECYCLE_POLICY_MANIFEST, status_contract_path=contract_path)
-        assert False, "Expected WorkflowLayerError for extra 'Bogus' canonical_statuses entry"
-    except WorkflowLayerError as exc:
-        assert (
-            "canonical" in str(exc).lower() or "CH" in str(exc) or "Bogus" in str(exc)
-        ), f"Expected canonical_statuses divergence error; got: {exc}"
-
-
-def test_b1_missing_canonical_status_raises(tmp_path: Path) -> None:
-    """CH projection missing 'In Progress' from canonical_statuses → WorkflowLayerError."""
-    import json
-
-    from lantern.workflow.loader import WorkflowLayerError, _verify_lifecycle_projection_consistency
-
-    real_contract = json.loads(STATUS_CONTRACT_PATH.read_text(encoding="utf-8"))
-    modified_families = dict(real_contract["families"])
-    modified_families["CH"] = {
-        **real_contract["families"]["CH"],
-        "canonical_statuses": [s for s in real_contract["families"]["CH"]["canonical_statuses"] if s != "In Progress"],
-    }
-    modified_contract = {**real_contract, "families": modified_families}
-    contract_path = tmp_path / "status_contract.json"
-    contract_path.write_text(json.dumps(modified_contract), encoding="utf-8")
-
-    try:
-        _verify_lifecycle_projection_consistency(LIFECYCLE_POLICY_MANIFEST, status_contract_path=contract_path)
-        assert False, "Expected WorkflowLayerError for missing 'In Progress' in canonical_statuses"
-    except WorkflowLayerError as exc:
-        assert (
-            "canonical" in str(exc).lower() or "In Progress" in str(exc) or "CH" in str(exc)
-        ), f"Expected canonical_statuses divergence error; got: {exc}"
-
-
-def test_b1_permissive_normal_path_policy_raises(tmp_path: Path) -> None:
-    """CH projection with allow_record_local_status (permissive) normal_path_policy → WorkflowLayerError."""
-    import json
-
-    from lantern.workflow.loader import WorkflowLayerError, _verify_lifecycle_projection_consistency
-
-    real_contract = json.loads(STATUS_CONTRACT_PATH.read_text(encoding="utf-8"))
-    modified_families = dict(real_contract["families"])
-    modified_families["CH"] = {
-        **real_contract["families"]["CH"],
-        "normal_path_policy": "allow_record_local_status",
-    }
-    modified_contract = {**real_contract, "families": modified_families}
-    contract_path = tmp_path / "status_contract.json"
-    contract_path.write_text(json.dumps(modified_contract), encoding="utf-8")
-
-    try:
-        _verify_lifecycle_projection_consistency(LIFECYCLE_POLICY_MANIFEST, status_contract_path=contract_path)
-        assert False, "Expected WorkflowLayerError for permissive normal_path_policy"
-    except WorkflowLayerError as exc:
-        assert "policy" in str(exc).lower() or "CH" in str(exc), f"Expected policy broadening error; got: {exc}"
-
-
-def test_b1_non_ch_canonical_status_drift_raises(tmp_path: Path) -> None:
-    """SPEC projection with an extra canonical_statuses entry → WorkflowLayerError (non-CH family coverage)."""
-    import json
-
-    from lantern.workflow.loader import WorkflowLayerError, _verify_lifecycle_projection_consistency
-
-    real_contract = json.loads(STATUS_CONTRACT_PATH.read_text(encoding="utf-8"))
-    modified_families = dict(real_contract["families"])
-    modified_families["SPEC"] = {
-        **real_contract["families"]["SPEC"],
-        "canonical_statuses": real_contract["families"]["SPEC"]["canonical_statuses"] + ["Phantom"],
-    }
-    modified_contract = {**real_contract, "families": modified_families}
-    contract_path = tmp_path / "status_contract.json"
-    contract_path.write_text(json.dumps(modified_contract), encoding="utf-8")
-
-    try:
-        _verify_lifecycle_projection_consistency(LIFECYCLE_POLICY_MANIFEST, status_contract_path=contract_path)
-        assert False, "Expected WorkflowLayerError for SPEC extra canonical_statuses entry"
-    except WorkflowLayerError as exc:
-        assert (
-            "canonical" in str(exc).lower() or "SPEC" in str(exc) or "Phantom" in str(exc)
-        ), f"Expected canonical_statuses divergence error for SPEC; got: {exc}"
-
-
 # ── B3: validate(scope='draft') lifecycle constraint enforcement ──────────────
 
 
@@ -971,179 +782,3 @@ def test_b3_validate_draft_runs_lifecycle_constraints_for_ch_ready(tmp_path: Pat
     assert any(
         "lifecycle_policy" in a for a in anchors
     ), f"Expected lifecycle_policy anchor in validate(scope='draft') findings; anchors={anchors}"
-
-
-# ── B1 (round 6): Projection parity — exact label→grammar-ID association ──────
-
-
-def test_b1_swapped_spec_grammar_mapping_raises(tmp_path: Path) -> None:
-    """SPEC Draft/Approved grammar_mapping swapped with transitions adjusted consistently → WorkflowLayerError."""
-    import json
-
-    from lantern.workflow.loader import WorkflowLayerError, _verify_lifecycle_projection_consistency
-
-    real_contract = json.loads(STATUS_CONTRACT_PATH.read_text(encoding="utf-8"))
-    modified_families = dict(real_contract["families"])
-    modified_families["SPEC"] = {
-        **real_contract["families"]["SPEC"],
-        "grammar_mapping": {
-            "Draft": "lg:statuses/approved",  # swapped
-            "Approved": "lg:statuses/draft",  # swapped
-            "Superseded": "lg:statuses/superseded",
-        },
-        # Transitions adjusted so the swapped display-label pairs are self-consistent
-        "transitions": [
-            {"from": "Approved", "to": "Draft"},
-            {"from": "Draft", "to": "Superseded"},
-        ],
-    }
-    modified_contract = {**real_contract, "families": modified_families}
-    contract_path = tmp_path / "status_contract.json"
-    contract_path.write_text(json.dumps(modified_contract), encoding="utf-8")
-
-    try:
-        _verify_lifecycle_projection_consistency(LIFECYCLE_POLICY_MANIFEST, status_contract_path=contract_path)
-        assert False, "Expected WorkflowLayerError for swapped SPEC grammar_mapping with adjusted transitions"
-    except WorkflowLayerError as exc:
-        assert (
-            "SPEC" in str(exc) or "association" in str(exc).lower() or "mapping" in str(exc).lower()
-        ), f"Expected SPEC association error; got: {exc}"
-
-
-def test_b1_swapped_ch_grammar_mapping_raises(tmp_path: Path) -> None:
-    """CH Ready/In-Progress grammar_mapping swapped with transitions adjusted consistently → WorkflowLayerError."""
-    import json
-
-    from lantern.workflow.loader import WorkflowLayerError, _verify_lifecycle_projection_consistency
-
-    real_contract = json.loads(STATUS_CONTRACT_PATH.read_text(encoding="utf-8"))
-    modified_families = dict(real_contract["families"])
-    modified_families["CH"] = {
-        **real_contract["families"]["CH"],
-        "grammar_mapping": {
-            "Proposed": "lg:statuses/proposed",
-            "Ready": "lg:statuses/in_progress",  # swapped
-            "In Progress": "lg:statuses/ready",  # swapped
-            "Addressed": "lg:statuses/addressed",
-        },
-        # Transitions adjusted so the swapped display-label pairs are self-consistent
-        "transitions": [
-            {"from": "Proposed", "to": "In Progress"},
-            {"from": "In Progress", "to": "Ready"},
-            {"from": "Ready", "to": "Addressed"},
-            {"from": "In Progress", "to": "Addressed"},
-        ],
-    }
-    modified_contract = {**real_contract, "families": modified_families}
-    contract_path = tmp_path / "status_contract.json"
-    contract_path.write_text(json.dumps(modified_contract), encoding="utf-8")
-
-    try:
-        _verify_lifecycle_projection_consistency(LIFECYCLE_POLICY_MANIFEST, status_contract_path=contract_path)
-        assert False, "Expected WorkflowLayerError for swapped CH grammar_mapping with adjusted transitions"
-    except WorkflowLayerError as exc:
-        assert (
-            "CH" in str(exc) or "association" in str(exc).lower() or "mapping" in str(exc).lower()
-        ), f"Expected CH association error; got: {exc}"
-
-
-def test_b1_swapped_mapping_deceives_lifecycle_validator(tmp_path: Path) -> None:
-    """Swapped SPEC grammar_mapping causes validator to wrongly accept a Draft SPEC for a Ready CH.
-
-    Demonstrates the vulnerability at the validator level and proves _verify_lifecycle_projection_consistency
-    catches the swapped contract before it can reach production.
-    """
-    import json
-
-    from lantern.artifacts.validator import _validate_ch_lifecycle_state_constraints
-    from lantern.workflow.loader import WorkflowLayerError, _verify_lifecycle_projection_consistency
-
-    governance_root = tmp_path / "governance"
-    _write_spec(governance_root, "SPEC-9001", "Draft")  # Draft, not Approved
-    _write_arch(governance_root, "ARCH-9001", "Approved")
-    _write_td(governance_root, "TD-9001", "Approved")
-
-    ch_header = {
-        "ch_id": "CH-9999",
-        "status": "Ready",
-        "inputs": {"specs": ["SPEC-9001"], "arch": ["ARCH-9001"]},
-        "test_definition_refs": ["TD-9001"],
-    }
-
-    real_contract = json.loads(STATUS_CONTRACT_PATH.read_text(encoding="utf-8"))
-
-    # With CORRECT projection: validator rejects Draft SPEC (Draft ≠ Approved)
-    correct_findings = _validate_ch_lifecycle_state_constraints(
-        ch_header, "CH-9999", governance_root=governance_root, contract=real_contract
-    )
-    assert correct_findings, "With correct mapping, Draft SPEC must be rejected for Ready CH"
-
-    # Build a swapped SPEC contract (canonical_statuses labels are the same; associations are swapped)
-    swapped_families = dict(real_contract["families"])
-    swapped_families["SPEC"] = {
-        **real_contract["families"]["SPEC"],
-        "grammar_mapping": {
-            "Draft": "lg:statuses/approved",  # swapped: Draft label now points to approved ID
-            "Approved": "lg:statuses/draft",  # swapped: Approved label now points to draft ID
-            "Superseded": "lg:statuses/superseded",
-        },
-    }
-    swapped_contract = {**real_contract, "families": swapped_families}
-
-    # With SWAPPED projection: validator wrongly accepts Draft SPEC (this is the vulnerability)
-    swapped_findings = _validate_ch_lifecycle_state_constraints(
-        ch_header, "CH-9999", governance_root=governance_root, contract=swapped_contract
-    )
-    assert not swapped_findings, (
-        "With swapped SPEC mapping, Draft SPEC is wrongly accepted — "
-        "this proves association-level parity is required"
-    )
-
-    # The parity check catches the swapped contract before it can be deployed
-    contract_path = tmp_path / "swapped_contract.json"
-    contract_path.write_text(json.dumps(swapped_contract), encoding="utf-8")
-    try:
-        _verify_lifecycle_projection_consistency(LIFECYCLE_POLICY_MANIFEST, status_contract_path=contract_path)
-        assert False, "Expected WorkflowLayerError for swapped SPEC grammar_mapping"
-    except WorkflowLayerError as exc:
-        assert (
-            "SPEC" in str(exc) or "association" in str(exc).lower() or "mapping" in str(exc).lower()
-        ), f"Expected SPEC association error; got: {exc}"
-
-
-def test_b1_swapped_ci_grammar_mapping_raises(tmp_path: Path) -> None:
-    """CI Selected/Verified grammar_mapping swapped with transitions adjusted consistently → WorkflowLayerError."""
-    import json
-
-    from lantern.workflow.loader import WorkflowLayerError, _verify_lifecycle_projection_consistency
-
-    real_contract = json.loads(STATUS_CONTRACT_PATH.read_text(encoding="utf-8"))
-    modified_families = dict(real_contract["families"])
-    modified_families["CI"] = {
-        **real_contract["families"]["CI"],
-        "grammar_mapping": {
-            "Draft": "lg:statuses/draft",
-            "Candidate": "lg:statuses/candidate",
-            "Selected": "lg:statuses/verified",  # swapped
-            "Rejected": "lg:statuses/rejected",
-            "Verified": "lg:statuses/selected",  # swapped
-        },
-        # Transitions adjusted so the swapped display-label pairs are self-consistent
-        "transitions": [
-            {"from": "Draft", "to": "Candidate"},
-            {"from": "Candidate", "to": "Verified"},  # was Selected
-            {"from": "Candidate", "to": "Rejected"},
-            {"from": "Verified", "to": "Selected"},  # was Selected→Verified
-        ],
-    }
-    modified_contract = {**real_contract, "families": modified_families}
-    contract_path = tmp_path / "status_contract.json"
-    contract_path.write_text(json.dumps(modified_contract), encoding="utf-8")
-
-    try:
-        _verify_lifecycle_projection_consistency(LIFECYCLE_POLICY_MANIFEST, status_contract_path=contract_path)
-        assert False, "Expected WorkflowLayerError for swapped CI grammar_mapping with adjusted transitions"
-    except WorkflowLayerError as exc:
-        assert (
-            "CI" in str(exc) or "association" in str(exc).lower() or "mapping" in str(exc).lower()
-        ), f"Expected CI association error; got: {exc}"

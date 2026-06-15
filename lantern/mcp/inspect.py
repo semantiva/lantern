@@ -17,11 +17,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from hashlib import sha256
 from pathlib import Path
 from typing import Any, Optional
 
-from lantern.artifacts.validator import DEFAULT_STATUS_CONTRACT_PATH, load_status_contract
+from lantern.artifacts.validator import derive_status_contract
 from lantern.artifacts.render_contracts import build_two_layer_contract
 from lantern.workflow.loader import DEFAULT_LIFECYCLE_POLICY_MANIFEST_PATH
 from lantern.mcp.catalog import (
@@ -83,9 +82,7 @@ class InspectWorkspaceResult:
 @dataclass(frozen=True)
 class InspectStatusContractResult:
     kind: str
-    projection_path: str
     authoritative_source_path: str
-    projection_sha256: str
     families: dict[str, Any]
     runtime_posture: dict[str, Any]
 
@@ -250,14 +247,11 @@ def _handle_workspace(
 
 
 def _handle_status_contract(runtime_posture: dict[str, Any]) -> InspectStatusContractResult:
-    payload = load_status_contract()
-    raw = DEFAULT_STATUS_CONTRACT_PATH.read_text(encoding="utf-8")
+    contract = derive_status_contract()
     return InspectStatusContractResult(
         kind="status_contract",
-        projection_path="lantern/workflow/definitions/artifact_status_contract.json",
-        authoritative_source_path=str(payload["generated_from"]["authoritative_path"]),
-        projection_sha256=sha256(raw.encode("utf-8")).hexdigest(),
-        families=dict(payload["families"]),
+        authoritative_source_path="lantern/workflow/definitions/lifecycle-policy/manifest.yaml",
+        families=dict(contract["families"]),
         runtime_posture=runtime_posture,
     )
 

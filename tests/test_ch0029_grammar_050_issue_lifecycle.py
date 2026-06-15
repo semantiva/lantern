@@ -16,7 +16,6 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 import yaml
@@ -24,7 +23,6 @@ import yaml
 PRODUCT_ROOT = Path(__file__).resolve().parents[1]
 LIFECYCLE_POLICY_DIR = PRODUCT_ROOT / "lantern" / "workflow" / "definitions" / "lifecycle-policy"
 LIFECYCLE_POLICY_MANIFEST = LIFECYCLE_POLICY_DIR / "manifest.yaml"
-STATUS_CONTRACT_PATH = PRODUCT_ROOT / "lantern" / "workflow" / "definitions" / "artifact_status_contract.json"
 
 ISSUE_STATUS_MAPPING = {
     "NEW": "lg:statuses/new",
@@ -82,8 +80,10 @@ def test_issue_lifecycle_declared_in_bundle_and_validates() -> None:
     assert "lg:artifacts/issue" in set(lc.artifact_families())
 
 
-def test_issue_status_contract_is_grammar_semantic_projection() -> None:
-    contract = json.loads(STATUS_CONTRACT_PATH.read_text(encoding="utf-8"))
+def test_issue_status_contract_is_grammar_semantic_derived() -> None:
+    from lantern.artifacts.validator import derive_status_contract
+
+    contract = derive_status_contract()
     issue = contract["families"]["IS"]
 
     assert issue["ownership"] == "grammar_semantic"
@@ -91,9 +91,3 @@ def test_issue_status_contract_is_grammar_semantic_projection() -> None:
     assert issue["grammar_mapping"] == ISSUE_STATUS_MAPPING
     assert {(t["from"], t["to"]) for t in issue["transitions"]} == ISSUE_TRANSITIONS
     assert issue["normal_path_policy"] == "reject_alias"
-
-
-def test_issue_lifecycle_projection_parity_is_enforced() -> None:
-    from lantern.workflow.loader import _verify_lifecycle_projection_consistency
-
-    _verify_lifecycle_projection_consistency(LIFECYCLE_POLICY_MANIFEST, status_contract_path=STATUS_CONTRACT_PATH)
