@@ -47,16 +47,10 @@ class WorkbenchDeclaration:
     lifecycle_placement: LifecyclePlacement
     artifacts_in_scope: Tuple[str, ...]
     intent_classes: Tuple[str, ...]
-    posture_constraints: Tuple[str, ...]
     workflow_surface: WorkflowSurface
-    instruction_resource: str
-    authoritative_guides: Tuple[str, ...]
-    administration_guides: Tuple[str, ...]
+    charter_ref: str
     entry_conditions: Tuple[str, ...]
     exit_conditions: Tuple[str, ...]
-    source: str
-    enabled: bool
-    governance_mode: GovernanceMode
     content_hash: str
 
 

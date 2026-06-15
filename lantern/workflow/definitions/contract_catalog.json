@@ -51,8 +51,7 @@
       "generated_from": [
         "lantern/workflow/definitions/workflows/default_full_governed_surface.yaml",
         "lantern/workflow/definitions/workbenches/ch_and_td_readiness.yaml",
-        "lantern/workflow/definitions/transaction_profiles.yaml",
-        "lantern/preservation/relocation_manifest.yaml"
+        "lantern/workflow/definitions/transaction_profiles.yaml"
       ]
     },
     "request_schema_ref": "schema.request.ch_and_td_readiness.v1",
@@ -191,8 +190,7 @@
       "generated_from": [
         "lantern/workflow/definitions/workflows/default_full_governed_surface.yaml",
         "lantern/workflow/definitions/workbenches/ci_authoring.yaml",
-        "lantern/workflow/definitions/transaction_profiles.yaml",
-        "lantern/preservation/relocation_manifest.yaml"
+        "lantern/workflow/definitions/transaction_profiles.yaml"
       ]
     },
     "request_schema_ref": "schema.request.ci_authoring.v1",
@@ -286,8 +284,7 @@
       "generated_from": [
         "lantern/workflow/definitions/workflows/default_full_governed_surface.yaml",
         "lantern/workflow/definitions/workbenches/ci_selection.yaml",
-        "lantern/workflow/definitions/transaction_profiles.yaml",
-        "lantern/preservation/relocation_manifest.yaml"
+        "lantern/workflow/definitions/transaction_profiles.yaml"
       ]
     },
     "request_schema_ref": "schema.request.ci_selection.v1",
@@ -416,8 +413,7 @@
       "generated_from": [
         "lantern/workflow/definitions/workflows/default_full_governed_surface.yaml",
         "lantern/workflow/definitions/workbenches/design_candidate_authoring.yaml",
-        "lantern/workflow/definitions/transaction_profiles.yaml",
-        "lantern/preservation/relocation_manifest.yaml"
+        "lantern/workflow/definitions/transaction_profiles.yaml"
       ]
     },
     "request_schema_ref": "schema.request.design_candidate_authoring.v1",
@@ -514,8 +510,7 @@
       "generated_from": [
         "lantern/workflow/definitions/workflows/default_full_governed_surface.yaml",
         "lantern/workflow/definitions/workbenches/design_selection.yaml",
-        "lantern/workflow/definitions/transaction_profiles.yaml",
-        "lantern/preservation/relocation_manifest.yaml"
+        "lantern/workflow/definitions/transaction_profiles.yaml"
       ]
     },
     "request_schema_ref": "schema.request.design_selection.v1",
@@ -584,8 +579,7 @@
       "generated_from": [
         "lantern/workflow/definitions/workflows/default_full_governed_surface.yaml",
         "lantern/workflow/definitions/workbenches/governance_onboarding.yaml",
-        "lantern/workflow/definitions/transaction_profiles.yaml",
-        "lantern/preservation/relocation_manifest.yaml"
+        "lantern/workflow/definitions/transaction_profiles.yaml"
       ]
     },
     "request_schema_ref": "schema.request.governance_onboarding.v1",
@@ -645,8 +639,7 @@
       "generated_from": [
         "lantern/workflow/definitions/workflows/default_full_governed_surface.yaml",
         "lantern/workflow/definitions/workbenches/issue_operations.yaml",
-        "lantern/workflow/definitions/transaction_profiles.yaml",
-        "lantern/preservation/relocation_manifest.yaml"
+        "lantern/workflow/definitions/transaction_profiles.yaml"
       ]
     },
     "request_schema_ref": "schema.request.issue_operations.v1",
@@ -775,8 +768,7 @@
       "generated_from": [
         "lantern/workflow/definitions/workflows/default_full_governed_surface.yaml",
         "lantern/workflow/definitions/workbenches/selected_ci_application.yaml",
-        "lantern/workflow/definitions/transaction_profiles.yaml",
-        "lantern/preservation/relocation_manifest.yaml"
+        "lantern/workflow/definitions/transaction_profiles.yaml"
       ]
     },
     "request_schema_ref": "schema.request.selected_ci_application.v1",
@@ -909,8 +901,7 @@
       "generated_from": [
         "lantern/workflow/definitions/workflows/default_full_governed_surface.yaml",
         "lantern/workflow/definitions/workbenches/upstream_intake_and_baselines.yaml",
-        "lantern/workflow/definitions/transaction_profiles.yaml",
-        "lantern/preservation/relocation_manifest.yaml"
+        "lantern/workflow/definitions/transaction_profiles.yaml"
       ]
     },
     "request_schema_ref": "schema.request.upstream_intake_and_baselines.v1",
@@ -1019,8 +1010,7 @@
       "generated_from": [
         "lantern/workflow/definitions/workflows/default_full_governed_surface.yaml",
         "lantern/workflow/definitions/workbenches/verification_and_closure.yaml",
-        "lantern/workflow/definitions/transaction_profiles.yaml",
-        "lantern/preservation/relocation_manifest.yaml"
+        "lantern/workflow/definitions/transaction_profiles.yaml"
       ]
     },
     "request_schema_ref": "schema.request.verification_and_closure.v1",

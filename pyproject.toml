@@ -52,14 +52,7 @@ where = ["."]
 
 [tool.setuptools.package-data]
 "lantern" = [
-	"administration_procedures/*.md",
 	"artifacts/schemas/*.json",
-	"authoring_contracts/*.md",
-	"preservation/*.md",
-	"preservation/*.yaml",
-	"resources/guides/*.md",
-	"resources/instructions/*.md",
-	"skills/packaged_default/*.json",
 	"skills/packaged_default/*.md",
 	"templates/*.md",
 	"workflow/definitions/*.json",

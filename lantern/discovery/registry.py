@@ -332,7 +332,6 @@ def build_discovery_registry(
     records.extend(_gate_records(governance_root))
     records.extend(_mode_records(workflow_layer))
     records.extend(_workbench_records(workflow_layer))
-    records.extend(_guide_records(product_root, workflow_layer))
     records.extend(_template_records(product_root, workflow_layer.catalog_workbenches, workflow_layer))
 
     return {
@@ -384,56 +383,17 @@ def _workbench_records(workflow_layer: Any) -> list[dict[str, Any]]:
                 "source_path": workbench.source_path,
                 "fields": {
                     "display_name": workbench.display_name,
-                    "instruction_resource": workbench.instruction_resource,
-                    "authoritative_guides": list(workbench.authoritative_guides),
-                    "administration_guides": list(workbench.administration_guides),
+                    "charter_ref": workbench.charter_ref,
                     "contract_refs": list(workbench.contract_refs),
                     "inspect_views": list(workbench.inspect_views),
                     "selected": workbench.workbench_id in selected_ids,
                     "catalog_source": workbench.catalog_source,
                 },
                 "workbench_id": workbench.workbench_id,
-                "instruction_resource": workbench.instruction_resource,
-                "authoritative_guides": list(workbench.authoritative_guides),
+                "charter_ref": workbench.charter_ref,
                 "mode_id": workflow_layer.selected_workflow_id if workbench.workbench_id in selected_ids else None,
                 "direct_refs": (),
                 "gate_names": tuple(sorted(_workbench_gate_names(workbench.lifecycle_placement))),
-            }
-        )
-    return records
-
-
-def _guide_records(product_root: Path, workflow_layer: Any) -> list[dict[str, Any]]:
-    workbench_by_id = {workbench.workbench_id: workbench for workbench in workflow_layer.catalog_workbenches}
-    records: list[dict[str, Any]] = []
-    for item in workflow_layer.resource_manifest:
-        roles = set(item.roles)
-        if not roles & {"authoritative_guides", "administration_guides"}:
-            continue
-        rel_path = item.path
-        body = (product_root / rel_path).read_text(encoding="utf-8")
-        workbench = workbench_by_id.get(item.workbench_id)
-        records.append(
-            {
-                "entity_kind": "guide",
-                "token": item.resource_id,
-                "logical_ref": item.resource_id,
-                "title": _resource_title(body, rel_path),
-                "status": None,
-                "heading_labels": tuple(_extract_headings(body)),
-                "source_path": rel_path,
-                "fields": {
-                    "kind": item.kind,
-                    "roles": list(item.roles),
-                    "content_hash": item.content_hash,
-                    "provenance_refs": list(item.provenance_refs),
-                },
-                "workbench_id": item.workbench_id,
-                "mode_id": workflow_layer.selected_workflow_id,
-                "direct_refs": (),
-                "gate_names": (
-                    tuple(sorted(_workbench_gate_names(workbench.lifecycle_placement))) if workbench else ()
-                ),
             }
         )
     return records

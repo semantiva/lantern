@@ -12,44 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""TD-0006 packaged thin-skill and discovery-manifest tests."""
+"""TD-0006 static operator skill surface tests (CH-0034: skill generator retired).
+
+SKILL.md is a hand-maintained static file. The generator.py and skill-manifest.json
+were removed in CH-0034 because SKILL.md contains no dynamic content.
+"""
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
-from typing import Any
 
-import yaml
-
-from lantern.skills.generator import (
-    PACKAGED_SKILL_MANIFEST_PATH,
-    PACKAGED_SKILL_MD_PATH,
-    assert_packaged_skill_surface_current,
-    build_packaged_skill_manifest,
-    build_packaged_skill_md,
-)
 from lantern.workflow.loader import load_workflow_layer
 
-
-def _contains_forbidden_path_key(value: Any) -> bool:
-    if isinstance(value, dict):
-        if "path" in value:
-            return True
-        return any(_contains_forbidden_path_key(item) for item in value.values())
-    if isinstance(value, list):
-        return any(_contains_forbidden_path_key(item) for item in value)
-    return False
-
-
-def _write_yaml(path: Path, payload: dict[str, object]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
+PRODUCT_ROOT = Path(__file__).resolve().parents[1]
+SKILL_MD_PATH = PRODUCT_ROOT / "lantern" / "skills" / "packaged_default" / "SKILL.md"
 
 
 def test_td0006_c01_packaged_skill_has_mandatory_header_and_routing_content() -> None:
-    layer = load_workflow_layer()
-    skill = build_packaged_skill_md(layer)
+    skill = SKILL_MD_PATH.read_text(encoding="utf-8")
 
     assert skill.startswith(
         "---\nname: lantern\ndescription: Use this skill when the task involves Lantern-governed workflow work."
@@ -62,13 +42,8 @@ def test_td0006_c01_packaged_skill_has_mandatory_header_and_routing_content() ->
     assert '`inspect(kind="catalog")`' in skill
     assert '`inspect(kind="workspace")`' in skill
     assert "## Universal discovery sequence" in skill
-    assert "## Workflow modes currently exposed" in skill
-    assert "## Minimal routing hints" in skill
     assert "## Immutable safety rules" in skill
     assert "## Operating posture" in skill
-
-    for mode_id in [item["mode_id"] for item in build_packaged_skill_manifest(layer)["workflow_modes"]]:
-        assert f"- `{mode_id}`" in skill
 
     for forbidden in (
         "Operator instruction resource for workbench",
@@ -80,91 +55,18 @@ def test_td0006_c01_packaged_skill_has_mandatory_header_and_routing_content() ->
         assert forbidden not in skill
 
 
-def test_td0006_c02_manifest_is_mode_first_and_path_free() -> None:
+def test_td0006_c02_skill_md_has_no_mode_or_workbench_projection() -> None:
+    """CH-0034: SKILL.md is static — no workbench/mode enumeration."""
     layer = load_workflow_layer()
-    manifest = build_packaged_skill_manifest(layer)
+    skill = SKILL_MD_PATH.read_text(encoding="utf-8")
 
-    assert manifest["skill_schema_version"] == "1"
-    assert manifest["workflow_release"]["workflow_layer_hash"]
-    assert manifest["workflow_release"]["contract_catalog_hash"]
-    assert manifest["workflow_release"]["resource_manifest_hash"]
-    assert manifest["workflow_modes"]
-    assert not _contains_forbidden_path_key(manifest)
-
-    for item in manifest["workflow_modes"]:
-        assert item["mode_id"]
-        assert item["entry_workbench_id"]
-        assert item["entry_contract_refs"]
-        assert item["resource_refs"]
-
-
-def test_td0006_c02_manifest_carries_template_refs_for_draftable_modes() -> None:
-    manifest = build_packaged_skill_manifest(load_workflow_layer())
-    assert any(
-        ref.startswith("resource.template.") for item in manifest["workflow_modes"] for ref in item["resource_refs"]
-    )
-    selected_ci_mode = next(
-        item for item in manifest["workflow_modes"] if item["entry_workbench_id"] == "selected_ci_application"
-    )
-    assert all(not ref.startswith("resource.template.") for ref in selected_ci_mode["resource_refs"])
+    for wb in layer.workbenches:
+        assert (
+            wb.workbench_id not in skill
+        ), f"SKILL.md enumerates workbench_id {wb.workbench_id!r}: must be static and workflow-agnostic"
 
 
 def test_td0006_c03_packaged_first_touch_route_is_mechanically_derivable() -> None:
-    layer = load_workflow_layer()
-    manifest = build_packaged_skill_manifest(layer)
-    workbench_ids = {workbench.workbench_id for workbench in layer.workbenches}
-    contract_lookup = {workbench.workbench_id: set(workbench.contract_refs) for workbench in layer.workbenches}
-
-    assert 'inspect(kind="catalog")' in build_packaged_skill_md(layer)
-    assert 'inspect(kind="workspace")' in build_packaged_skill_md(layer)
-
-    for mode in manifest["workflow_modes"]:
-        assert mode["entry_workbench_id"] in workbench_ids
-        assert set(mode["entry_contract_refs"]) == contract_lookup[mode["entry_workbench_id"]]
-
-
-def test_td0006_c06_committed_packaged_surface_matches_packaged_truth() -> None:
-    assert_packaged_skill_surface_current()
-
-
-def test_td0006_c07_packaged_manifest_matches_source_tree_routing() -> None:
-    layer = load_workflow_layer()
-    committed = json.loads(PACKAGED_SKILL_MANIFEST_PATH.read_text(encoding="utf-8"))
-    built = build_packaged_skill_manifest(layer)
-
-    assert committed == built
-    assert PACKAGED_SKILL_MD_PATH.read_text(encoding="utf-8") == build_packaged_skill_md(layer)
-
-
-def test_td0024_c11_packaged_skill_is_workflow_agnostic_when_active_workbench_set_matches(tmp_path: Path) -> None:
-    governance_root = tmp_path / "governance"
-    _write_yaml(
-        governance_root / "workflow" / "definitions" / "workflows" / "alternate_default_surface.yaml",
-        {
-            "workflow_id": "alternate_default_surface",
-            "display_name": "Alternate Default Surface",
-            "runtime_surface_classification": "partial_governed_surface",
-            "active_workbench_ids": [
-                "upstream_intake_and_baselines",
-                "ch_and_td_readiness",
-                "design_candidate_authoring",
-                "design_selection",
-                "ci_authoring",
-                "ci_selection",
-                "selected_ci_application",
-                "verification_and_closure",
-                "issue_operations",
-                "governance_onboarding",
-            ],
-        },
-    )
-
-    default_layer = load_workflow_layer()
-    alternate_layer = load_workflow_layer(
-        governance_root=governance_root,
-        workflow_id="alternate_default_surface",
-    )
-
-    assert default_layer.selected_workflow_id != alternate_layer.selected_workflow_id
-    assert build_packaged_skill_manifest(default_layer) == build_packaged_skill_manifest(alternate_layer)
-    assert build_packaged_skill_md(default_layer) == build_packaged_skill_md(alternate_layer)
+    skill = SKILL_MD_PATH.read_text(encoding="utf-8")
+    assert 'inspect(kind="catalog")' in skill
+    assert 'inspect(kind="workspace")' in skill

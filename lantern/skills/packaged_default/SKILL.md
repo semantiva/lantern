@@ -23,13 +23,13 @@ Use Lantern when the request is about any of the following:
 
 Typical examples:
 
-- “Prepare or assess a CH/TD for readiness”
-- “Work a design candidate or design selection step”
-- “Author or select a CI”
-- “Apply a selected CI and move toward verification/closure”
-- “Handle an issue through the governed workflow”
-- “Bootstrap or onboard a governed product into Lantern”
-- “Explain which Lantern workflow mode or workbench applies”
+- "Prepare or assess a CH/TD for readiness"
+- "Work a design candidate or design selection step"
+- "Author or select a CI"
+- "Apply a selected CI and move toward verification/closure"
+- "Handle an issue through the governed workflow"
+- "Bootstrap or onboard a governed product into Lantern"
+- "Explain which Lantern workflow mode or workbench applies"
 
 ## Do not use Lantern as
 
@@ -52,7 +52,7 @@ It helps you:
 - determine whether a governed workflow applies
 - identify the right workflow mode and entry workbench
 - inspect the authoritative contract for that workbench
-- consume live guides, instructions, and templates through MCP before any write
+- consume live Charter task cards, layer bodies, and templates through MCP before any write
 - stay on the fixed public tool surface
 
 ## First MCP move
@@ -71,37 +71,16 @@ These two calls establish the governed vocabulary and the active runtime/workspa
 
 1. `inspect(kind="catalog")`
 2. `inspect(kind="workspace")`
-3. read `skill-manifest.json`
-4. choose the most relevant workflow mode and entry workbench
-5. `orient(...)`
-6. `inspect(kind="contract", contract_ref="...")`
-7. consume the returned live `resource_packets`
-8. only then consider `draft`, `commit`, or `validate`
+3. `orient(...)` — use the active workbench from catalog to get the task card and charter routing
+4. `inspect(kind="contract", contract_ref="...")`
+5. consume the returned live `resource_packets` and `charter_layer_bodies`
+6. only then consider `draft`, `commit`, or `validate`
 
-## Workflow modes currently exposed
+## Routing
 
-Use the manifest to choose among these mode families:
+Workflow mode and workbench selection is driven by live MCP discovery. Call `inspect(kind="catalog")` to enumerate available workbenches and their contract refs, then use `orient(...)` to confirm the active workbench for the current lifecycle position.
 
-- `baseline_intake`
-- `change_readiness`
-- `design_candidate_authoring`
-- `design_selection`
-- `ci_authoring`
-- `ci_selection`
-- `selected_ci_application`
-- `verification_and_closure`
-- `issue_intake`
-- `bootstrap`
-
-When unsure, do not guess from names alone. Use the manifest entry workbench and contract refs, then confirm through `orient(...)` and `inspect(kind="contract", ...)`.
-
-## Minimal routing hints
-
-- If the user is preparing or assessing governed change work, start by checking `change_readiness`.
-- If the user is working from upstream baseline artifacts, check `baseline_intake`.
-- If the user is handling a reported problem or issue, check `issue_intake`.
-- If the user is onboarding or setting up governance, check `bootstrap`.
-- If the user is in the middle of design, CI, application, or closure work, use the corresponding mode from the manifest rather than inferring from repository layout.
+Do not enumerate modes from filenames or repository paths. Use `inspect(kind="catalog")` as the authoritative source.
 
 ## Operator invocation requirements (default full governed workflow only)
 
@@ -124,11 +103,11 @@ Before calling `orient(...)`, confirm that the operator has provided all of the 
 - Binding posture: committed product SHA or release ID, when the task involves product verification
 - Governing authoring contract: when the task creates `DC` or `CI` artifacts, state the locked contract ref explicitly
 
-**Authorization posture matters most at selection gates.** When working `design_selection` (GT-115) or `ci_selection` (GT-120): if the operator has not explicitly stated "administration authorized," treat the task as analysis-only and do not execute `commit` transactions. The workbench allows both postures; the operator's stated scope determines which applies.
+**Authorization posture matters most at selection gates.** When working GT-115 (design baseline selection) or GT-120 (CI selection): if the operator has not explicitly stated "administration authorized," treat the task as analysis-only and do not execute `commit` transactions. The workbench allows both postures; the operator's stated scope determines which applies.
 
 ## Immutable safety rules
 
-- Treat this skill and manifest as routing only; live MCP resources remain authoritative.
+- Treat this skill as routing only; live MCP resources remain authoritative.
 - Stay on the fixed public tool surface: `inspect`, `orient`, `draft`, `commit`, `validate`.
 - Do not rely on raw repository paths as the operator contract.
 - Do not require local skill regeneration or generated guide/template folders before source-tree discovery.
@@ -140,8 +119,8 @@ Before calling `orient(...)`, confirm that the operator has provided all of the 
 This skill is meant to create the right initial mindset:
 
 - first identify whether the request is governed by Lantern
-- then route to the correct mode/workbench
-- then read authoritative live packets
+- then route to the correct mode/workbench via `inspect(kind="catalog")` and `orient(...)`
+- then read authoritative live packets and Charter layer bodies
 - then act
 
 Lantern is strongest when used as governed routing and inspection, not as opportunistic repo search.

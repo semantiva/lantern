@@ -36,7 +36,7 @@ layers:
     template_refs:
       - lantern/templates/TEMPLATE__INITIATIVE.md
       - lantern/templates/CH_TEMPLATE.md
-      - lantern/templates/TD_TEMPLATE.md
+      - lantern/templates/TEMPLATE__TD.md
 
 context_slots:
   - slot_id: upstream_baseline_context

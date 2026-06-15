@@ -40,7 +40,7 @@ def main() -> None:
     args = parser.parse_args()
 
     import lantern
-    from lantern._compat import GRAMMAR_COMPAT_RANGE, check_grammar_compatibility, get_package_resource_path
+    from lantern._compat import GRAMMAR_COMPAT_RANGE, check_grammar_compatibility
     from lantern.cli.main import run_cli
 
     if args.expected_package_version and lantern.__version__ != args.expected_package_version:
@@ -49,10 +49,6 @@ def main() -> None:
     compat = check_grammar_compatibility()
     if compat["status"] != "ok":
         raise SystemExit(compat["message"])
-
-    manifest_path = get_package_resource_path("skills/packaged_default/skill-manifest.json")
-    if not manifest_path.exists():
-        raise SystemExit(f"Packaged-default skill manifest not found at {manifest_path}")
 
     with tempfile.TemporaryDirectory(prefix="lantern_installed_smoke_") as temp_root:
         root = Path(temp_root)
@@ -119,7 +115,6 @@ def main() -> None:
     print(f"Package version: {lantern.__version__}")
     print(f"Grammar compat range: {GRAMMAR_COMPAT_RANGE}")
     print(f"Grammar status: {compat['status']}")
-    print(f"Skill manifest: {manifest_path}")
 
 
 if __name__ == "__main__":

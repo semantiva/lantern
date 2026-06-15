@@ -21,11 +21,7 @@ from pathlib import Path
 import pytest
 
 from lantern.workflow.loader import (
-    DEFAULT_RESOURCE_MANIFEST_PATH,
     WorkflowLayerError,
-    _derive_resource_manifest,
-    _load_yaml,
-    _resource_entry_to_dict,
     load_workflow_layer,
     render_generated_artifacts,
 )
@@ -62,7 +58,6 @@ def _load_fixture_layer(fixture_root: Path, *, enforce_generated_artifacts: bool
         workflow_map_path=definitions_root / "workflow_map.md",
         workbench_resource_bindings_path=definitions_root / "workbench_resource_bindings.md",
         builtin_workflow_map_root=_generated_workflow_map_root(fixture_root),
-        relocation_manifest_path=fixture_root / "lantern" / "preservation" / "relocation_manifest.yaml",
         enforce_generated_artifacts=enforce_generated_artifacts,
     )
 
@@ -118,25 +113,9 @@ def test_contract_catalog_and_resource_manifest_cover_selected_workflow() -> Non
 
 def test_resource_manifest_is_empty_after_authority_field_retirement() -> None:
     layer = load_workflow_layer()
-    assert layer.resource_manifest == (), (
-        "resource_manifest must be empty: all legacy authority role fields retired in CH-0034"
-    )
-
-
-def test_recomputed_resource_manifest_matches_committed_projection() -> None:
-    layer = load_workflow_layer()
-    relocation_manifest = _load_yaml(
-        PRODUCT_ROOT / "lantern" / "preservation" / "relocation_manifest.yaml", "relocation manifest"
-    )
-    recomputed = _derive_resource_manifest(
-        relocation_manifest=relocation_manifest,
-        workbenches=layer.workbenches,
-        product_root=PRODUCT_ROOT,
-    )
-
-    assert [_resource_entry_to_dict(entry) for entry in recomputed] == json.loads(
-        DEFAULT_RESOURCE_MANIFEST_PATH.read_text(encoding="utf-8")
-    )
+    assert (
+        layer.resource_manifest == ()
+    ), "resource_manifest must be empty: all legacy authority role fields retired in CH-0034"
 
 
 def test_projection_files_include_default_workflow_map_named_by_workflow_id() -> None:
@@ -162,16 +141,3 @@ def test_projection_enforcement_is_explicit_for_fixture_copies(tmp_path: Path) -
 
     with pytest.raises(WorkflowLayerError, match="workbench_registry.yaml"):
         _load_fixture_layer(fixture_root, enforce_generated_artifacts=True)
-
-
-def test_relocation_manifest_no_longer_consulted_by_derive_resource_manifest() -> None:
-    layer = load_workflow_layer()
-    relocation_manifest = _load_yaml(
-        PRODUCT_ROOT / "lantern" / "preservation" / "relocation_manifest.yaml", "relocation manifest"
-    )
-    recomputed = _derive_resource_manifest(
-        relocation_manifest=relocation_manifest,
-        workbenches=layer.workbenches,
-        product_root=PRODUCT_ROOT,
-    )
-    assert recomputed == (), "resource manifest must be empty: legacy role entries retired in CH-0034"

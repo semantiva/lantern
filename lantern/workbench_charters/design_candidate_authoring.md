@@ -32,7 +32,7 @@ layers:
       - Redefine CH assessment criteria, SPEC requirements, or ARCH decisions
       - Set DC to Candidate while any required section contains TBD or placeholders
     template_refs:
-      - lantern/templates/DC_TEMPLATE.md
+      - lantern/templates/TEMPLATE__DC.md
 
 context_slots:
   - slot_id: ch_and_td_context

@@ -97,16 +97,10 @@
         "lifecycle_placement",
         "artifacts_in_scope",
         "intent_classes",
-        "posture_constraints",
         "workflow_surface",
-        "instruction_resource",
-        "authoritative_guides",
-        "administration_guides",
+        "charter_ref",
         "entry_conditions",
-        "exit_conditions",
-        "source",
-        "enabled",
-        "governance_mode"
+        "exit_conditions"
       ],
       "properties": {
         "workbench_id": { "type": "string", "minLength": 1 },
@@ -120,20 +114,8 @@
           "type": "array",
           "items": { "type": "string" }
         },
-        "posture_constraints": {
-          "type": "array",
-          "items": { "type": "string" }
-        },
         "workflow_surface": { "$ref": "#/definitions/workflow_surface" },
-        "instruction_resource": { "type": "string", "minLength": 1 },
-        "authoritative_guides": {
-          "type": "array",
-          "items": { "type": "string" }
-        },
-        "administration_guides": {
-          "type": "array",
-          "items": { "type": "string" }
-        },
+        "charter_ref": { "type": "string", "minLength": 1 },
         "entry_conditions": {
           "type": "array",
           "items": { "type": "string" }
@@ -141,12 +123,6 @@
         "exit_conditions": {
           "type": "array",
           "items": { "type": "string" }
-        },
-        "source": { "type": "string", "minLength": 1 },
-        "enabled": { "type": "boolean" },
-        "governance_mode": {
-          "type": "string",
-          "enum": ["full", "intervention"]
         }
       }
     }

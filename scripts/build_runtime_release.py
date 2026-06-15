@@ -19,9 +19,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
-import json
-import os
 import shutil
 import subprocess
 import sys
@@ -32,7 +29,6 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PACKAGED_DEFAULT_ROOT = REPO_ROOT / "lantern" / "skills" / "packaged_default"
 FIXTURE_SKILL_MD = PACKAGED_DEFAULT_ROOT / "SKILL.md"
-FIXTURE_MANIFEST = PACKAGED_DEFAULT_ROOT / "skill-manifest.json"
 EXCLUDE_DIRS = {
     ".git",
     ".mypy_cache",
@@ -46,10 +42,6 @@ EXCLUDE_DIRS = {
     "venv",
 }
 EXCLUDE_SUFFIXES = {".egg-info", ".pyc", ".pyd", ".pyo", ".tmp", ".temp"}
-
-
-def _sha256(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def _should_skip(path: Path) -> bool:
@@ -75,56 +67,15 @@ def _copy_repo(staging_root: Path) -> None:
             shutil.copy2(item, destination)
 
 
-def _pythonpath_for_staging(staging_root: Path) -> str:
-    entries = [str(staging_root)]
-    inherited = os.environ.get("PYTHONPATH", "")
-    cwd = Path.cwd().resolve()
-    for raw_entry in inherited.split(os.pathsep):
-        entry = raw_entry.strip()
-        if not entry:
-            continue
-        entry_path = Path(entry)
-        if not entry_path.is_absolute():
-            entry_path = cwd / entry_path
-        entries.append(str(entry_path.resolve()))
-    return os.pathsep.join(entries)
-
-
-def _regenerate_packaged_surface(staging_root: Path) -> tuple[Path, Path]:
-    env = os.environ.copy()
-    env["PYTHONPATH"] = _pythonpath_for_staging(staging_root)
-    result = subprocess.run(
-        [
-            sys.executable,
-            "-c",
-            "from lantern.skills.generator import write_packaged_skill_surface; write_packaged_skill_surface()",
-        ],
-        cwd=staging_root,
-        env=env,
-        check=False,
-    )
-    if result.returncode != 0:
-        raise SystemExit(f"Failed to regenerate the packaged skill surface in staging (exit {result.returncode})")
-
-    staged_root = staging_root / "lantern" / "skills" / "packaged_default"
-    return staged_root / "SKILL.md", staged_root / "skill-manifest.json"
-
-
-def _verify_staged_assets(staged_skill_md: Path, staged_manifest: Path) -> None:
+def _verify_staged_skill_md(staging_root: Path) -> None:
+    staged = staging_root / "lantern" / "skills" / "packaged_default" / "SKILL.md"
+    if not staged.exists():
+        raise SystemExit(f"Missing staged SKILL.md: {staged}")
     if not FIXTURE_SKILL_MD.exists():
-        raise SystemExit(f"Missing packaged skill fixture: {FIXTURE_SKILL_MD}")
-    if not FIXTURE_MANIFEST.exists():
-        raise SystemExit(f"Missing packaged manifest fixture: {FIXTURE_MANIFEST}")
-
-    if _sha256(staged_skill_md) != _sha256(FIXTURE_SKILL_MD):
-        raise SystemExit("Staged SKILL.md diverges from the governed source-tree fixture")
-
-    if json.loads(staged_manifest.read_text(encoding="utf-8")) != json.loads(
-        FIXTURE_MANIFEST.read_text(encoding="utf-8")
-    ):
-        raise SystemExit("Staged skill-manifest.json diverges from the governed source-tree fixture")
-
-    print("Staged operator assets verified against source-tree fixture.")
+        raise SystemExit(f"Missing source SKILL.md fixture: {FIXTURE_SKILL_MD}")
+    if staged.read_bytes() != FIXTURE_SKILL_MD.read_bytes():
+        raise SystemExit("Staged SKILL.md diverges from the source-tree fixture")
+    print("Staged SKILL.md verified against source-tree fixture.")
 
 
 def _build_distributions(staging_root: Path) -> None:
@@ -148,8 +99,7 @@ def main() -> None:
     print(f"Staging directory: {staging_root}")
     try:
         _copy_repo(staging_root)
-        staged_skill_md, staged_manifest = _regenerate_packaged_surface(staging_root)
-        _verify_staged_assets(staged_skill_md, staged_manifest)
+        _verify_staged_skill_md(staging_root)
         if args.verify_only:
             print("--verify-only selected; skipping build step.")
             return

@@ -88,8 +88,6 @@ def test_single_authority_no_projection_class_and_no_duplicate_documents() -> No
 
 # Row 3 — Semantic-authority check (REQ-GA-02)
 def test_semantic_authority_no_shadow_corpus_or_semantic_definitions() -> None:
-    preservation = PRODUCT_ROOT / "lantern" / "preservation"
-    assert sorted(preservation.glob("*.md")) == [], "preservation shadow-corpus markdown must be removed"
     forbidden_definition_headings = (
         "## Gate definitions",
         "## Status definitions",
@@ -140,9 +138,6 @@ def test_non_governed_content_absent_from_corpus() -> None:
         name = path.rsplit("/", 1)[-1]
         assert not name.startswith("MIGRATION__"), f"historical/migration document inside corpus: {path}"
         assert "POC_VALUE_EXTRACTION" not in name, f"historical document inside corpus: {path}"
-    preservation = PRODUCT_ROOT / "lantern" / "preservation"
-    assert not (preservation / "MIGRATION__TD_DC_DB_GT115_v0.1.0.md").exists()
-    assert not (preservation / "POC_VALUE_EXTRACTION_MAP.md").exists()
 
 
 # ── CH-0033 rows 7–9: Workbench Charter static checks ──────────────────────
@@ -236,7 +231,6 @@ _LEGACY_ROLE_TOKENS = {"instruction_resource", "authoritative_guides", "administ
 _SCHEMA_PATH = DEFINITIONS / "workbench_schema.yaml"
 _TRANSACTION_PROFILES_PATH = DEFINITIONS / "transaction_profiles.yaml"
 _SKILL_MD_PATH = PRODUCT_ROOT / "lantern" / "skills" / "packaged_default" / "SKILL.md"
-_SKILL_MANIFEST_PATH = PRODUCT_ROOT / "lantern" / "skills" / "packaged_default" / "skill-manifest.json"
 
 
 def _schema() -> dict[str, Any]:
@@ -255,23 +249,19 @@ def _transaction_profiles_text() -> str:
 def test_projection_role_absence_no_legacy_role_tokens_in_schema_or_workbenches() -> None:
     schema = _schema()
     allowed_roles = set(schema.get("allowed_resource_roles", []))
-    assert not allowed_roles & _LEGACY_ROLE_TOKENS, (
-        f"Schema still lists legacy roles: {allowed_roles & _LEGACY_ROLE_TOKENS}"
-    )
+    assert (
+        not allowed_roles & _LEGACY_ROLE_TOKENS
+    ), f"Schema still lists legacy roles: {allowed_roles & _LEGACY_ROLE_TOKENS}"
     removed = set(schema.get("removed_authority_fields", []))
-    assert _LEGACY_ROLE_TOKENS.issubset(removed), (
-        f"Legacy roles not in removed_authority_fields: {_LEGACY_ROLE_TOKENS - removed}"
-    )
+    assert _LEGACY_ROLE_TOKENS.issubset(
+        removed
+    ), f"Legacy roles not in removed_authority_fields: {_LEGACY_ROLE_TOKENS - removed}"
     for text in _workbench_yaml_texts():
         for token in _LEGACY_ROLE_TOKENS:
-            assert token not in text, (
-                f"Legacy role token {token!r} still present in a workbench YAML"
-            )
+            assert token not in text, f"Legacy role token {token!r} still present in a workbench YAML"
     profiles_text = _transaction_profiles_text()
     for token in _LEGACY_ROLE_TOKENS:
-        assert token not in profiles_text, (
-            f"Legacy role token {token!r} still present in transaction_profiles.yaml"
-        )
+        assert token not in profiles_text, f"Legacy role token {token!r} still present in transaction_profiles.yaml"
 
 
 # Row 11 — Class/role-alignment check
@@ -290,13 +280,11 @@ def test_workbench_no_coverage_restatement_legacy_coverage_fields_absent() -> No
     for defn in _workbench_definitions():
         wid = defn.get("workbench_id", "<unknown>")
         for field in forbidden_top_level:
-            assert field not in defn, (
-                f"{wid}: retired coverage field {field!r} still present as top-level YAML key"
-            )
+            assert field not in defn, f"{wid}: retired coverage field {field!r} still present as top-level YAML key"
         lp = defn.get("lifecycle_placement") or {}
-        assert "covered_gates" not in lp, (
-            f"{wid}: lifecycle_placement.covered_gates still declared in YAML (must come from Charter)"
-        )
+        assert (
+            "covered_gates" not in lp
+        ), f"{wid}: lifecycle_placement.covered_gates still declared in YAML (must come from Charter)"
 
 
 # Row 13 — Packaged-skill-no-projection check
@@ -304,20 +292,10 @@ def test_packaged_skill_no_projection_skill_md_is_static() -> None:
     assert _SKILL_MD_PATH.exists(), f"SKILL.md not found: {_SKILL_MD_PATH}"
     skill_text = _SKILL_MD_PATH.read_text(encoding="utf-8")
     workbench_id_tokens = [
-        defn.get("workbench_id", "")
-        for defn in _workbench_definitions()
-        if defn.get("workbench_id")
+        defn.get("workbench_id", "") for defn in _workbench_definitions() if defn.get("workbench_id")
     ]
     for wid in workbench_id_tokens:
-        assert wid not in skill_text, (
-            f"SKILL.md enumerates workbench_id {wid!r}: must be static and workflow-agnostic"
-        )
-
-    assert _SKILL_MANIFEST_PATH.exists(), f"skill-manifest.json not found: {_SKILL_MANIFEST_PATH}"
-    manifest = json.loads(_SKILL_MANIFEST_PATH.read_text(encoding="utf-8"))
-    assert "workflow_modes" not in manifest, (
-        "skill-manifest.json still carries workflow_modes: must be removed in CH-0034"
-    )
+        assert wid not in skill_text, f"SKILL.md enumerates workbench_id {wid!r}: must be static and workflow-agnostic"
 
 
 # Row 14 — Context-boundary check
@@ -334,9 +312,7 @@ def test_context_boundary_charter_bodies_do_not_assert_sequencing_authority() ->
         matches = sequencing_terms.findall(text)
         if matches:
             violations[path.name] = matches
-    assert violations == {}, (
-        f"Charter body asserts workflow sequencing authority (schema owns this): {violations}"
-    )
+    assert violations == {}, f"Charter body asserts workflow sequencing authority (schema owns this): {violations}"
 
 
 # Row 15 — Template-refs-resolution check

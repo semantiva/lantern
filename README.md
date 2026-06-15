@@ -98,11 +98,7 @@ python scripts/check_artifact_hygiene.py
 
 The build job also performs a clean-environment install smoke, license report generation, and CycloneDX SBOM generation. The tag used for publication must match `[project].version` in `pyproject.toml`.
 
-Lantern generates a committed package-default skill surface from the workflow layer. When workflow declarations change, regenerate the packaged surface:
-
-```bash
-python -c "from lantern.skills.generator import write_packaged_skill_surface; write_packaged_skill_surface()"
-```
+The packaged skill surface (`lantern/skills/packaged_default/SKILL.md`) is a static file maintained by hand. It contains no dynamic workflow content and requires no regeneration step.
 
 ## Contributor guide
 

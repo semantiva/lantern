@@ -47,14 +47,10 @@ def test_no_lantern_path_semantics_note_in_ev_templates() -> None:
     ), "GT-130 EV template still contains Lantern/... path-semantics disclaimer"
 
 
-def test_no_lantern_ci_selection_guide_pseudo_path_in_gt120_surface() -> None:
-    """AC-2: Lantern/change_increment_selection_guide pseudo-path must not appear in GT-120 procedure or EV template."""
-    gt120_proc = (ADMIN_PROCEDURES / "GT-120__CI_SELECTION_ADMINISTRATION.md").read_text(encoding="utf-8")
+def test_no_lantern_ci_selection_guide_pseudo_path_in_gt120_ev_template() -> None:
+    """AC-2: Lantern/change_increment_selection_guide pseudo-path must not appear in GT-120 EV template."""
     ev_gt120 = (TEMPLATES / "EV_TEMPLATE__GT120_SELECTION_REPORT.md").read_text(encoding="utf-8")
     pseudo_path = "Lantern/change_increment_selection_guide"
-    assert (
-        pseudo_path not in gt120_proc
-    ), "Lantern/change_increment_selection_guide pseudo-path found in GT-120 procedure"
     assert (
         pseudo_path not in ev_gt120
     ), "Lantern/change_increment_selection_guide pseudo-path found in GT-120 EV template"

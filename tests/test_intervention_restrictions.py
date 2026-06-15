@@ -65,9 +65,7 @@ def _make_intervention_posture_result() -> PostureResult:
 
 def test_c05_intervention_declared_posture_resolved_correctly(tmp_path: Path) -> None:
     cfg = tmp_path / "workflow" / "configuration"
-    for sub in ("instructions", "workbenches", "guides"):
-        (cfg / sub).mkdir(parents=True, exist_ok=True)
-    (cfg / "instructions" / "onboarding.md").write_text("# onboarding", encoding="utf-8")
+    cfg.mkdir(parents=True, exist_ok=True)
     main_yaml = {"configuration_version": "1", "declared_posture": "intervention_surface"}
     (cfg / "main.yaml").write_text(yaml.safe_dump(main_yaml), encoding="utf-8")
 
@@ -107,9 +105,7 @@ def test_c05_intervention_declared_posture_resolved_correctly(tmp_path: Path) ->
 
 def test_c05_intervention_workbench_with_closure_gate_raises(tmp_path: Path) -> None:
     cfg = tmp_path / "workflow" / "configuration"
-    for sub in ("instructions", "workbenches", "guides"):
-        (cfg / sub).mkdir(parents=True, exist_ok=True)
-    (cfg / "instructions" / "onboarding.md").write_text("# onboarding", encoding="utf-8")
+    cfg.mkdir(parents=True, exist_ok=True)
     main_yaml = {"configuration_version": "1", "declared_posture": "intervention_surface"}
     (cfg / "main.yaml").write_text(yaml.safe_dump(main_yaml), encoding="utf-8")
 

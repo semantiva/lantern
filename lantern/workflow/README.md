@@ -29,7 +29,7 @@ These files are still useful and still shipped, but they are generated from the 
 
 | File | Role |
 |---|---|
-| `definitions/workbench_registry.yaml` | Generated compatibility projection retained for unchanged preservation and topology consumers. |
+| `definitions/workbench_registry.yaml` | Generated compatibility projection for inspection and tooling consumers. |
 | `definitions/contract_catalog.json` | Generated machine-readable contract atlas for the selected workflow. |
 | `definitions/resource_manifest.json` | Generated resource manifest for the selected workflow. |
 | `definitions/workflow_map.md` | Generated human-readable summary for the selected workflow. |

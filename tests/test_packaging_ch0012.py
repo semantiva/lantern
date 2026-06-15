@@ -74,7 +74,6 @@ def test_packaged_default_assets_exist() -> None:
     from lantern._compat import get_package_resource_path
 
     assert get_package_resource_path("skills/packaged_default/SKILL.md").exists()
-    assert get_package_resource_path("skills/packaged_default/skill-manifest.json").exists()
 
 
 def test_build_verify_only_exits_cleanly() -> None:

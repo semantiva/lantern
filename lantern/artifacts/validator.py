@@ -27,7 +27,6 @@ from lantern.artifacts.renderers import parse_header_block
 from lantern.workflow.loader import (
     DEFAULT_CONTRACT_CATALOG_PATH,
     DEFAULT_REGISTRY_PATH,
-    DEFAULT_RELOCATION_MANIFEST_PATH,
     DEFAULT_RESOURCE_MANIFEST_PATH,
     DEFAULT_SCHEMA_PATH,
     DEFAULT_TRANSACTION_PROFILES_PATH,
@@ -631,7 +630,6 @@ def validate_workspace_readiness(
         "resource_manifest_path": DEFAULT_RESOURCE_MANIFEST_PATH,
         "workflow_map_path": DEFAULT_WORKFLOW_MAP_PATH,
         "workbench_resource_bindings_path": DEFAULT_WORKBENCH_BINDINGS_PATH,
-        "relocation_manifest_path": DEFAULT_RELOCATION_MANIFEST_PATH,
     }
     try:
         load_workflow_layer(
@@ -642,7 +640,6 @@ def validate_workspace_readiness(
             resource_manifest_path=loader_kwargs["resource_manifest_path"],
             workflow_map_path=loader_kwargs["workflow_map_path"],
             workbench_resource_bindings_path=loader_kwargs["workbench_resource_bindings_path"],
-            relocation_manifest_path=loader_kwargs["relocation_manifest_path"],
         )
     except WorkflowLayerError as exc:
         findings.extend(_map_workflow_layer_error(exc))

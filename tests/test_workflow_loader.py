@@ -47,9 +47,7 @@ REPO_LOCAL_TRIAGE_WORKBENCH = {
     "workbench_id": "repo_local_triage",
     "display_name": "Repo Local Triage",
     "lifecycle_placement": {"kind": "lifecycle-independent"},
-    "artifacts_in_scope": ["IS"],
     "intent_classes": ["repo_local_triage"],
-    "posture_constraints": ["repo_local_only"],
     "workflow_surface": {
         "allowed_transaction_kinds": ["inspect", "draft", "validate"],
         "draftable_artifact_families": ["IS"],
@@ -59,40 +57,26 @@ REPO_LOCAL_TRIAGE_WORKBENCH = {
             {
                 "transaction_kind": "inspect",
                 "response_envelope": "catalog",
-                "allowed_resource_roles": [
-                    "instruction_resource",
-                    "authoritative_guides",
-                    "artifact_templates",
-                ],
+                "allowed_resource_roles": ["artifact_templates", "operating_references"],
             },
             {
                 "transaction_kind": "inspect",
                 "response_envelope": "issues",
-                "allowed_resource_roles": [
-                    "instruction_resource",
-                    "authoritative_guides",
-                    "artifact_templates",
-                ],
+                "allowed_resource_roles": ["artifact_templates", "operating_references"],
             },
             {
                 "transaction_kind": "draft",
                 "response_envelope": "default",
-                "allowed_resource_roles": [
-                    "instruction_resource",
-                    "authoritative_guides",
-                    "administration_guides",
-                ],
+                "allowed_resource_roles": ["artifact_templates"],
             },
             {
                 "transaction_kind": "validate",
                 "response_envelope": "default",
-                "allowed_resource_roles": ["instruction_resource", "authoritative_guides"],
+                "allowed_resource_roles": ["artifact_templates"],
             },
         ],
     },
-    "instruction_resource": "lantern/resources/instructions/issue_operations.md",
-    "authoritative_guides": [],
-    "administration_guides": ["lantern/administration_procedures/ISSUE__INTAKE_TRIAGE_RESOLUTION.md"],
+    "charter_ref": "workbench_charters/repo_local_triage.md",
     "entry_conditions": ["repo local issue intake"],
     "exit_conditions": ["repo local issue resolved"],
 }
@@ -102,6 +86,39 @@ def _write_yaml(path: Path, payload: dict[str, object]) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
     return path
+
+
+def _write_repo_local_charter(path: Path, *, workbench_id: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        "```yaml\n"
+        "schema_id: lantern.operator.workbench_charter.v1\n"
+        f"charter_id: charter.{workbench_id}\n"
+        "title: Repo Local Triage Charter\n"
+        f"workbench_ref: {workbench_id}\n"
+        "gate_refs: []\n"
+        "artifact_families:\n"
+        "  - IS\n"
+        "layers:\n"
+        "  - layer: authoring\n"
+        "    label: issue triage\n"
+        "    transaction_moment: draft\n"
+        "    transaction_posture: analysis_only\n"
+        "    required_inputs:\n"
+        "      - active issue\n"
+        "    scope_boundary: Triage open issues.\n"
+        "    stop_condition: Issue triaged.\n"
+        "    deliverables:\n"
+        "      - triage outcome\n"
+        "    forbidden_actions: []\n"
+        "    template_refs: []\n"
+        "```\n"
+        "\n"
+        "# Repo Local Triage Charter\n"
+        "\n"
+        "Fixture charter for repo-local workflow tests.\n",
+        encoding="utf-8",
+    )
 
 
 def _copy_product_fixture(tmp_path: Path) -> Path:
@@ -144,7 +161,6 @@ def _load_fixture_layer(
         workflow_map_path=definitions_root / "workflow_map.md",
         workbench_resource_bindings_path=definitions_root / "workbench_resource_bindings.md",
         builtin_workflow_map_root=_generated_workflow_map_root(fixture_root),
-        relocation_manifest_path=fixture_root / "lantern" / "preservation" / "relocation_manifest.yaml",
         enforce_generated_artifacts=enforce_generated_artifacts,
     )
 
@@ -213,15 +229,18 @@ def _write_repo_local_catalog(
 ) -> tuple[Path, Path]:
     workflow_root = workflow_folder or governance_root / "workflow" / "definitions" / "workflows"
     workbench_root = workbench_folder or governance_root / "workflow" / "definitions" / "workbenches"
+    charter_ref = f"workbench_charters/{workbench_name}.md"
     workbench_payload = dict(REPO_LOCAL_TRIAGE_WORKBENCH)
     workbench_payload["workbench_id"] = workbench_name
     workbench_payload["display_name"] = display_name
+    workbench_payload["charter_ref"] = charter_ref
     workflow_payload = {
         "workflow_id": workflow_name,
         "display_name": workflow_name.replace("_", " ").title(),
         "runtime_surface_classification": "partial_governed_surface",
         "active_workbench_ids": list(workflow_ids or (workbench_name,)),
     }
+    _write_repo_local_charter(governance_root / charter_ref, workbench_id=workbench_name)
     workbench_path = _write_yaml(workbench_root / f"{workbench_name}.yaml", workbench_payload)
     workflow_path = _write_yaml(workflow_root / f"{workflow_name}.yaml", workflow_payload)
     return workbench_path, workflow_path
@@ -333,6 +352,8 @@ def test_td0024_c04_collision_rejection(
     if workbench_payload is not None:
         payload = dict(REPO_LOCAL_TRIAGE_WORKBENCH)
         payload.update(workbench_payload)
+        charter_ref = str(payload.get("charter_ref", "workbench_charters/repo_local_triage.md"))
+        _write_repo_local_charter(governance_root / charter_ref, workbench_id=str(payload["workbench_id"]))
         _write_yaml(
             governance_root / "workflow" / "definitions" / "workbenches" / f"{payload['workbench_id']}.yaml",
             payload,
@@ -384,6 +405,10 @@ def test_td0024_c09_workbench_file_presence_does_not_activate_it(tmp_path: Path)
     fixture_root = _copy_product_fixture(tmp_path)
     governance_root = tmp_path / "governance"
     governance_root.mkdir()
+    _write_repo_local_charter(
+        governance_root / "workbench_charters" / "repo_local_triage.md",
+        workbench_id="repo_local_triage",
+    )
     _write_yaml(
         governance_root / "workflow" / "definitions" / "workbenches" / "repo_local_triage.yaml",
         REPO_LOCAL_TRIAGE_WORKBENCH,

@@ -38,12 +38,10 @@ _CATEGORY_ORDER = (
 
 _REQUIRED_PACKAGED_ASSETS = (
     "skills/packaged_default/SKILL.md",
-    "skills/packaged_default/skill-manifest.json",
     "workflow/definitions/workbench_schema.yaml",
     "workflow/definitions/workflow_schema.yaml",
     "workflow/definitions/workflows/default_full_governed_surface.yaml",
     "workflow/definitions/transaction_profiles.yaml",
-    "preservation/relocation_manifest.yaml",
 )
 
 

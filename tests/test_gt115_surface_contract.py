@@ -22,29 +22,12 @@ from pathlib import Path
 PRODUCT_ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_selection_guide_uses_live_ch_fields() -> None:
-    content = (PRODUCT_ROOT / "lantern/authoring_contracts/design_candidate_selection_guide.md").read_text(
-        encoding="utf-8"
-    )
-    assert "constraints.must_not_change" not in content
-    assert "constraints.out_of_scope" not in content
-    assert "allowed_change_surface" in content
-    assert "lantern" + "-" + "governance" not in content
-    assert "`INDEX.md` at the governance repo root" in content
-
-
-def test_gt115_procedure_and_templates_use_live_conventions() -> None:
-    procedure = (PRODUCT_ROOT / "lantern/administration_procedures/GT-115__DESIGN_BASELINE_SELECTION.md").read_text(
-        encoding="utf-8"
-    )
+def test_gt115_templates_use_live_conventions() -> None:
     ev_template = (PRODUCT_ROOT / "lantern/templates/EV_TEMPLATE__GT115_SELECTION_REPORT.md").read_text(
         encoding="utf-8"
     )
     dec_template = (PRODUCT_ROOT / "lantern/templates/DEC_TEMPLATE__GT115_SELECTION.md").read_text(encoding="utf-8")
 
-    assert "Lantern/change/INDEX.md" not in procedure
-    assert "lantern" + "-" + "governance" not in procedure
-    assert "`INDEX.md` at the governance repo root" in procedure
     assert "applies_to_initiative" in ev_template
     assert 'gate_id: "GT-115"' in ev_template
     assert 'title: "GT-115 selection report for CH-####"' in ev_template

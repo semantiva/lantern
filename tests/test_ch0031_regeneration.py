@@ -25,7 +25,6 @@ from typing import Any
 
 import pytest
 
-from lantern.skills.generator import build_packaged_skill_manifest, build_packaged_skill_md
 from lantern.workflow.loader import (
     WorkflowLayerError,
     load_workflow_layer,
@@ -55,10 +54,6 @@ def _generated_workflow_map_root(fixture_root: Path) -> Path:
     return fixture_root / "lantern" / "workflow" / "generated" / "workflow_maps"
 
 
-def _skill_root(fixture_root: Path) -> Path:
-    return fixture_root / "lantern" / "skills" / "packaged_default"
-
-
 def _load_fixture_layer(fixture_root: Path, *, enforce_generated_artifacts: bool = False):
     defs = _definitions_root(fixture_root)
     return load_workflow_layer(
@@ -73,7 +68,6 @@ def _load_fixture_layer(fixture_root: Path, *, enforce_generated_artifacts: bool
         workflow_map_path=defs / "workflow_map.md",
         workbench_resource_bindings_path=defs / "workbench_resource_bindings.md",
         builtin_workflow_map_root=_generated_workflow_map_root(fixture_root),
-        relocation_manifest_path=fixture_root / "lantern" / "preservation" / "relocation_manifest.yaml",
         enforce_generated_artifacts=enforce_generated_artifacts,
     )
 
@@ -81,7 +75,6 @@ def _load_fixture_layer(fixture_root: Path, *, enforce_generated_artifacts: bool
 def _regenerate_in_fixture(fixture_root: Path) -> None:
     defs = _definitions_root(fixture_root)
     wm_root = _generated_workflow_map_root(fixture_root)
-    sr = _skill_root(fixture_root)
     layer = _load_fixture_layer(fixture_root)
     write_committed_projections(
         workflow_layer=layer,
@@ -91,9 +84,6 @@ def _regenerate_in_fixture(fixture_root: Path) -> None:
         workflow_map_path=defs / "workflow_map.md",
         workbench_resource_bindings_path=defs / "workbench_resource_bindings.md",
         builtin_workflow_map_root=wm_root,
-        skill_md_path=sr / "SKILL.md",
-        skill_manifest_path=sr / "skill-manifest.json",
-        write_skill=True,
     )
 
 
@@ -107,7 +97,6 @@ def test_documented_command_runs_successfully() -> None:
     layer = load_workflow_layer()
     defs = PRODUCT_ROOT / "lantern" / "workflow" / "definitions"
     wm_root = PRODUCT_ROOT / "lantern" / "workflow" / "generated" / "workflow_maps"
-    skill_root = PRODUCT_ROOT / "lantern" / "skills" / "packaged_default"
     snapshot_paths = [
         defs / "workbench_registry.yaml",
         defs / "contract_catalog.json",
@@ -115,8 +104,6 @@ def test_documented_command_runs_successfully() -> None:
         defs / "workflow_map.md",
         defs / "workbench_resource_bindings.md",
         wm_root / f"{layer.selected_workflow_id}.md",
-        skill_root / "SKILL.md",
-        skill_root / "skill-manifest.json",
     ]
     before = {p: p.read_bytes() for p in snapshot_paths}
 
@@ -149,7 +136,6 @@ def test_td0031_c02_regeneration_is_idempotent_on_unchanged_tree(tmp_path: Path)
     fixture_root = _copy_product_fixture(tmp_path)
     defs = _definitions_root(fixture_root)
     wm_root = _generated_workflow_map_root(fixture_root)
-    sr = _skill_root(fixture_root)
 
     target_paths = [
         defs / "workbench_registry.yaml",
@@ -158,8 +144,6 @@ def test_td0031_c02_regeneration_is_idempotent_on_unchanged_tree(tmp_path: Path)
         defs / "workflow_map.md",
         defs / "workbench_resource_bindings.md",
         wm_root / "default_full_governed_surface.md",
-        sr / "SKILL.md",
-        sr / "skill-manifest.json",
     ]
     before = {p: p.read_bytes() for p in target_paths}
     _regenerate_in_fixture(fixture_root)
@@ -188,11 +172,10 @@ def test_td0031_c03_stale_projections_are_recovered(tmp_path: Path) -> None:
 
 def test_td0031_c04_regeneration_output_equals_loader_derivation(tmp_path: Path) -> None:
     """The command only writes; its output is byte-identical to the loader's
-    in-memory derivation for the same inputs, including the skill surface."""
+    in-memory derivation for the same inputs."""
     fixture_root = _copy_product_fixture(tmp_path)
     defs = _definitions_root(fixture_root)
     wm_root = _generated_workflow_map_root(fixture_root)
-    sr = _skill_root(fixture_root)
 
     layer = _load_fixture_layer(fixture_root)
     generated = render_generated_artifacts(
@@ -204,8 +187,6 @@ def test_td0031_c04_regeneration_output_equals_loader_derivation(tmp_path: Path)
         contract_catalog=layer.contract_catalog,
         resource_manifest=layer.resource_manifest,
     )
-    expected_skill_md = build_packaged_skill_md(layer)
-    expected_skill_manifest = build_packaged_skill_manifest(layer)
 
     write_committed_projections(
         workflow_layer=layer,
@@ -215,9 +196,6 @@ def test_td0031_c04_regeneration_output_equals_loader_derivation(tmp_path: Path)
         workflow_map_path=defs / "workflow_map.md",
         workbench_resource_bindings_path=defs / "workbench_resource_bindings.md",
         builtin_workflow_map_root=wm_root,
-        skill_md_path=sr / "SKILL.md",
-        skill_manifest_path=sr / "skill-manifest.json",
-        write_skill=True,
     )
 
     assert (defs / "workbench_registry.yaml").read_text(encoding="utf-8") == generated.compatibility_registry_text
@@ -234,5 +212,3 @@ def test_td0031_c04_regeneration_output_equals_loader_derivation(tmp_path: Path)
     assert (wm_root / f"{layer.selected_workflow_id}.md").read_text(
         encoding="utf-8"
     ) == generated.built_in_workflow_map_text
-    assert (sr / "SKILL.md").read_text(encoding="utf-8") == expected_skill_md
-    assert json.loads((sr / "skill-manifest.json").read_text(encoding="utf-8")) == expected_skill_manifest

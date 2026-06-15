@@ -32,7 +32,7 @@ layers:
       - Leave allowed_change_surface entries without concrete drop-in coverage
       - Use aspirational or non-binary verification signals
     template_refs:
-      - lantern/templates/CI_TEMPLATE.md
+      - lantern/templates/TEMPLATE__CI.md
 
 context_slots:
   - slot_id: design_baseline_context

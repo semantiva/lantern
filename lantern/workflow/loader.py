@@ -57,8 +57,6 @@ DEFAULT_CONTRACT_CATALOG_PATH = DEFAULT_DEFINITIONS_ROOT / "contract_catalog.jso
 DEFAULT_RESOURCE_MANIFEST_PATH = DEFAULT_DEFINITIONS_ROOT / "resource_manifest.json"
 DEFAULT_WORKFLOW_MAP_PATH = DEFAULT_DEFINITIONS_ROOT / "workflow_map.md"
 DEFAULT_WORKBENCH_BINDINGS_PATH = DEFAULT_DEFINITIONS_ROOT / "workbench_resource_bindings.md"
-DEFAULT_RELOCATION_MANIFEST_PATH = Path(__file__).resolve().parents[1] / "preservation" / "relocation_manifest.yaml"
-
 _ALLOWED_RESOURCE_ROLES = {
     "artifact_templates",
     "operating_references",
@@ -82,7 +80,6 @@ _RESOURCE_KIND_BY_PREFIX = {
     "lantern/administration_procedures/": "administration_guide",
     "lantern/authoring_contracts/": "authoring_contract",
     "lantern/templates/": "template",
-    "lantern/preservation/": "preservation_doc",
 }
 
 
@@ -398,13 +395,7 @@ def _validate_grammar_gate_compatibility(
             grammar.gate_dependencies(entity_id)
 
 
-def _derive_resource_manifest(
-    *,
-    relocation_manifest: Mapping[str, Any],
-    workbenches: tuple[WorkflowWorkbench, ...],
-    product_root: Path,
-) -> tuple[ResourceManifestEntry, ...]:
-    del relocation_manifest, workbenches, product_root
+def _derive_resource_manifest() -> tuple[ResourceManifestEntry, ...]:
     return ()
 
 
@@ -585,11 +576,6 @@ class WorkflowWorkbench:
     catalog_source: str
     content_hash: str
     charter_ref: str
-    # Legacy authority fields — retired in CH-0034; kept optional for caller compatibility.
-    posture_constraints: tuple[str, ...] = ()
-    instruction_resource: str = ""
-    authoritative_guides: tuple[str, ...] = ()
-    administration_guides: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -665,7 +651,6 @@ def load_workflow_layer(
     workflow_map_path: str | Path | None = None,
     workbench_resource_bindings_path: str | Path | None = None,
     builtin_workflow_map_root: str | Path | None = None,
-    relocation_manifest_path: str | Path | None = None,
     lifecycle_policy_manifest_path: str | Path | None = None,
     enforce_generated_artifacts: bool = False,
 ) -> WorkflowLayer:
@@ -705,7 +690,6 @@ def load_workflow_layer(
     transaction_profiles_file = Path(
         transaction_profiles_path or built_in_workbench_root.parent / "transaction_profiles.yaml"
     ).resolve()
-    relocation_manifest_file = Path(relocation_manifest_path or DEFAULT_RELOCATION_MANIFEST_PATH).resolve()
     registry_file = Path(registry_path or built_in_workbench_root.parent / "workbench_registry.yaml").resolve()
     contract_catalog_file = Path(
         contract_catalog_path or built_in_workbench_root.parent / "contract_catalog.json"
@@ -724,7 +708,6 @@ def load_workflow_layer(
     workbench_schema_payload = _load_yaml(workbench_schema_file, "workbench schema")
     workflow_schema_payload = _load_yaml(workflow_schema_file, "workflow schema")
     transaction_profiles_payload = _load_yaml(transaction_profiles_file, "transaction profiles")
-    relocation_manifest = _load_yaml(relocation_manifest_file, "relocation manifest")
 
     transaction_profiles = _load_transaction_profiles(transaction_profiles_payload)
     transaction_profile_map = {profile.transaction_kind: profile for profile in transaction_profiles}
@@ -771,11 +754,7 @@ def load_workflow_layer(
         _validate_required_artifact_family_coverage(active_workbenches)
     _validate_grammar_gate_compatibility(grammar, active_workbenches, grammar_version)
 
-    resource_manifest = _derive_resource_manifest(
-        relocation_manifest=relocation_manifest,
-        workbenches=active_workbenches,
-        product_root=product_root,
-    )
+    resource_manifest = _derive_resource_manifest()
     contract_catalog = _build_contract_catalog(
         workbenches=active_workbenches,
         transaction_profiles=transaction_profile_map,
@@ -1133,17 +1112,14 @@ def _parse_workbench_definition(
     if not charter_ref:
         raise WorkflowLayerError(f"{workbench_id} missing required field: charter_ref")
     if anchor_root is None:
-        raise WorkflowLayerError(
-            f"{workbench_id} cannot resolve charter_ref: anchor_root is required"
-        )
+        raise WorkflowLayerError(f"{workbench_id} cannot resolve charter_ref: anchor_root is required")
     charter_path = anchor_root / charter_ref
     try:
-        from lantern.workflow.charter import CharterLoadError, load_charter as _load_charter
+        from lantern.workflow.charter import load_charter as _load_charter
+
         charter = _load_charter(charter_path)
     except Exception as exc:
-        raise WorkflowLayerError(
-            f"{workbench_id} charter_ref {charter_ref!r} failed to load: {exc}"
-        ) from exc
+        raise WorkflowLayerError(f"{workbench_id} charter_ref {charter_ref!r} failed to load: {exc}") from exc
 
     artifacts_in_scope = tuple(charter.artifact_families)
     if lifecycle_placement.kind == "covered_gates":
@@ -1151,9 +1127,7 @@ def _parse_workbench_definition(
             raise WorkflowLayerError(
                 f"{workbench_id} has lifecycle_placement.kind=covered_gates but Charter.gate_refs is empty"
             )
-        lifecycle_placement = LifecyclePlacement(
-            kind="covered_gates", covered_gates=tuple(charter.gate_refs)
-        )
+        lifecycle_placement = LifecyclePlacement(kind="covered_gates", covered_gates=tuple(charter.gate_refs))
 
     canonical_payload = json.dumps(_to_plain_data(payload), sort_keys=True, separators=(",", ":"))
     return WorkflowWorkbench(
@@ -1349,7 +1323,6 @@ def _build_contract_catalog(
                 selected_workflow.source_path,
                 workbench.source_path,
                 "lantern/workflow/definitions/transaction_profiles.yaml",
-                "lantern/preservation/relocation_manifest.yaml",
             ],
             "catalog_source": workbench.catalog_source,
         }
@@ -1361,15 +1334,7 @@ def _build_contract_catalog(
                 family_binding=workbench.artifacts_in_scope,
                 gate_binding=tuple(gate_binding),
                 workbench_refs=(workbench.workbench_id,),
-                guide_refs=tuple(
-                    ref
-                    for ref in (
-                        workbench.instruction_resource,
-                        *workbench.administration_guides,
-                        *workbench.authoritative_guides,
-                    )
-                    if ref
-                ),
+                guide_refs=(),
                 response_surface_bindings=workbench.response_surface_bindings,
                 compatibility=compatibility,
                 provenance=provenance,

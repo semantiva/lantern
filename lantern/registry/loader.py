@@ -94,13 +94,6 @@ def _validate_workflow_references(payload: Mapping[str, Any]) -> None:
     errors: list[str] = []
     for entry in payload.get("workbenches", []):
         workbench_id = str(entry.get("workbench_id", "<unknown-workbench>"))
-        _append_resource_ref_error(errors, workbench_id, "instruction_resource", entry.get("instruction_resource"))
-        _append_resource_ref_list_errors(
-            errors, workbench_id, "authoritative_guides", entry.get("authoritative_guides", [])
-        )
-        _append_resource_ref_list_errors(
-            errors, workbench_id, "administration_guides", entry.get("administration_guides", [])
-        )
         workflow_surface = entry.get("workflow_surface", {})
         _append_contract_ref_errors(errors, workbench_id, workflow_surface.get("contract_refs", []))
     if errors:
@@ -244,16 +237,10 @@ def _build_workbench(entry: Mapping[str, Any]) -> WorkbenchDeclaration:
         lifecycle_placement=lifecycle,
         artifacts_in_scope=_as_tuple(entry["artifacts_in_scope"]),
         intent_classes=_as_tuple(entry["intent_classes"]),
-        posture_constraints=_as_tuple(entry["posture_constraints"]),
         workflow_surface=workflow_surface,
-        instruction_resource=entry["instruction_resource"],
-        authoritative_guides=_as_tuple(entry["authoritative_guides"]),
-        administration_guides=_as_tuple(entry["administration_guides"]),
+        charter_ref=entry["charter_ref"],
         entry_conditions=_as_tuple(entry["entry_conditions"]),
         exit_conditions=_as_tuple(entry["exit_conditions"]),
-        source=entry["source"],
-        enabled=bool(entry["enabled"]),
-        governance_mode=entry["governance_mode"],
         content_hash=_compute_content_hash(entry),
     )
 

@@ -163,8 +163,6 @@ def test_c02_contract_response_keeps_server_and_workflow_layers_distinct(workflo
     assert isinstance(result, InspectContractResult)
     assert result.server_owned_contract["change_surface_preflight"] is True
     assert result.workflow_owned_contract["contract_ref"] == "contract.selected_ci_application.v1"
-    assert result.workflow_owned_contract["resource_refs"]
-    assert result.resource_packets
     assert result.server_owned_contract != result.workflow_owned_contract
 
 
@@ -314,7 +312,6 @@ def test_c08_orient_resources_limited_to_allowed_roles(workflow_layer) -> None:
             get_allowed_roles_for_transaction(workbench, "orient")
             or get_allowed_roles_for_transaction(workbench, "inspect")
         )
-        allowed.discard("administration_guides")
         for resource in wb_entry.get("resources", []):
             for role in resource["roles"]:
                 assert role in allowed
@@ -457,9 +454,9 @@ def test_server_registers_fixed_five_tool_names() -> None:
 
 
 def test_td0009_c06_gt130_docs_require_expectation_to_delivery_review() -> None:
-    admin = (
-        PRODUCT_ROOT / "lantern" / "administration_procedures" / "GT-130__INTEGRATION_VERIFICATION_ADMINISTRATION.md"
-    ).read_text(encoding="utf-8")
+    charter = (PRODUCT_ROOT / "lantern" / "workbench_charters" / "verification_and_closure.md").read_text(
+        encoding="utf-8"
+    )
     for anchor in (
         "initiative objective",
         "roadmap role",
@@ -468,7 +465,7 @@ def test_td0009_c06_gt130_docs_require_expectation_to_delivery_review() -> None:
         "clean-state",
         "reproducibility",
     ):
-        assert anchor in admin.lower()
+        assert anchor in charter.lower()
 
 
 def test_td0009_c07_readme_documents_manual_install_and_native_smoke_path() -> None:
@@ -482,16 +479,14 @@ def test_td0009_c07_readme_documents_manual_install_and_native_smoke_path() -> N
 def test_td0011_c03_bootstrap_docs_forbid_runtime_vendoring_and_define_minimal_product_surface() -> None:
     readme = (PRODUCT_ROOT / "README.md").read_text(encoding="utf-8")
     template = (PRODUCT_ROOT / "lantern" / "templates" / "TEMPLATE__PRODUCT_REPO_AGENTS.md").read_text(encoding="utf-8")
-    onboarding = (PRODUCT_ROOT / "lantern" / "resources" / "instructions" / "governance_onboarding.md").read_text(
-        encoding="utf-8"
-    )
+    charter = (PRODUCT_ROOT / "lantern" / "workbench_charters" / "governance_onboarding.md").read_text(encoding="utf-8")
 
     assert "must **not** vendor or copy a `lantern/` runtime tree" in readme
     assert "Minimal tracked bootstrap surface" in readme
     assert "tools/run-lantern-mcp.sh" in readme
     assert ".vscode/mcp.json" in readme
     assert "Do **not** vendor or copy the Lantern runtime" in template
-    assert "Do not instruct operators to vendor or copy the Lantern runtime" in onboarding
+    assert "Do not instruct operators to vendor or copy the Lantern runtime" in charter
 
 
 def _write_subset_workflow(governance_root: Path, *, workflow_id: str = "change_readiness_only") -> None:

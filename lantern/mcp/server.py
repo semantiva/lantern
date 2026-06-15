@@ -58,7 +58,6 @@ from lantern.mcp.validate import handle_validate
 from lantern.mcp.transactions import configure_posture_result as _configure_posture_result
 from lantern.workflow.loader import WorkflowLayer, load_effective_layer, load_workflow_layer
 from lantern.workflow.merger import (
-    ConfigurationMerger,
     EffectiveLayer,
     PostureResult,
     PostureValidator,
@@ -129,12 +128,6 @@ def _run_startup_sequence(
         effective_layer=effective_layer,
         workflow_layer=workflow_layer,
         status_contract=status_contract,
-    )
-
-    merger = ConfigurationMerger()
-    merger.validate_guide_consistency(
-        effective_layer=effective_layer,
-        workflow_layer=workflow_layer,
     )
 
     return effective_layer, posture_result

@@ -71,7 +71,7 @@ layers:
     template_refs:
       - lantern/templates/EV_TEMPLATE__GT115_SELECTION_REPORT.md
       - lantern/templates/DEC_TEMPLATE__GT115_SELECTION.md
-      - lantern/templates/DB_TEMPLATE.md
+      - lantern/templates/TEMPLATE__DB.md
 
 context_slots:
   - slot_id: candidate_authoring_context

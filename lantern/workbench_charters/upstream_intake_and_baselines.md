@@ -37,8 +37,8 @@ layers:
       - Embed acceptance criteria inside ARCH
       - Embed architectural decisions inside SPEC
     template_refs:
-      - lantern/templates/SPEC_TEMPLATE.md
-      - lantern/templates/ARCH_TEMPLATE.md
+      - lantern/templates/TEMPLATE__SPEC.md
+      - lantern/templates/TEMPLATE__ARCH.md
 
   - layer: validation
     label: DIP/SPEC/ARCH coherence review

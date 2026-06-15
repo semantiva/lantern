@@ -19,7 +19,7 @@ Covers:
   C02 - Coverage resolution: workbench.artifacts_in_scope comes from Charter.
   C03 - Charter coverage: charter_ref is required on every workbench.
   C04 - Role retirement: resource_manifest is empty; no legacy role entries.
-  C05 - Schema enforcement: six §5 mechanical checks pass (verified in test_arch0002).
+  C05 - Schema enforcement: §5 checks — no transitional allowance, guidance dirs empty.
   C06 - Behavioral equivalence: orient still delivers task card per active workbench.
 """
 
@@ -75,6 +75,7 @@ _GT110_ACTIVE = {
 
 def _import_yaml():
     import yaml
+
     return yaml
 
 
@@ -160,12 +161,12 @@ def test_c03_charter_ref_not_in_optional_fields_and_required_fields_contain_it()
 
     schema_path = PRODUCT_ROOT / "lantern" / "workflow" / "definitions" / "workbench_schema.yaml"
     schema = yaml.safe_load(schema_path.read_text(encoding="utf-8")) or {}
-    assert "charter_ref" in schema.get("required_workbench_fields", []), (
-        "charter_ref must be in required_workbench_fields"
-    )
-    assert "charter_ref" not in (schema.get("optional_workbench_fields") or []), (
-        "charter_ref must not be in optional_workbench_fields"
-    )
+    assert "charter_ref" in schema.get(
+        "required_workbench_fields", []
+    ), "charter_ref must be in required_workbench_fields"
+    assert "charter_ref" not in (
+        schema.get("optional_workbench_fields") or []
+    ), "charter_ref must not be in optional_workbench_fields"
 
 
 # ── C04: Resource manifest is empty ──────────────────────────────────────────
@@ -175,9 +176,9 @@ def test_c04_resource_manifest_is_empty() -> None:
     from lantern.workflow.loader import load_workflow_layer
 
     layer = load_workflow_layer()
-    assert layer.resource_manifest == (), (
-        "resource_manifest must be empty: all legacy authority role fields retired in CH-0034"
-    )
+    assert (
+        layer.resource_manifest == ()
+    ), "resource_manifest must be empty: all legacy authority role fields retired in CH-0034"
 
 
 def test_c04_no_legacy_role_in_workbench_response_surface_bindings() -> None:
@@ -191,6 +192,30 @@ def test_c04_no_legacy_role_in_workbench_response_surface_bindings() -> None:
                 f"{wid}: binding {binding.get('transaction_kind')!r}/{binding.get('response_envelope')!r} "
                 f"still declares legacy roles: {roles & legacy_roles}"
             )
+
+
+# ── C05: §5 mechanical checks — no transitional allowance, guidance dirs empty ──
+
+
+def test_c05_no_deferred_membrane_gap_allowlist_in_static_checks() -> None:
+    """TD-0034-C05: no transitional-duplicate allowance or exception survives."""
+    static_checks = PRODUCT_ROOT / "tests" / "test_arch0002_static_checks.py"
+    assert "DEFERRED_MEMBRANE_GAP" not in static_checks.read_text(
+        encoding="utf-8"
+    ), "DEFERRED_MEMBRANE_GAP allowlist must be removed from test_arch0002_static_checks.py"
+
+
+def test_c05_guidance_directories_are_empty() -> None:
+    """TD-0034-C05: all 29 corpus files deleted — guidance directories must be empty."""
+    guidance_dirs = (
+        "lantern/authoring_contracts",
+        "lantern/administration_procedures",
+        "lantern/resources/instructions",
+    )
+    for directory in guidance_dirs:
+        dir_path = PRODUCT_ROOT / directory
+        remaining = list(dir_path.glob("*.md")) if dir_path.exists() else []
+        assert not remaining, f"guidance directory {directory} still contains files: {[p.name for p in remaining]}"
 
 
 # ── C06: Behavioral equivalence — orient still delivers task card ─────────────
@@ -230,7 +255,7 @@ def test_c06_orient_task_card_has_source_pointer_and_layers(_workflow_layer) -> 
         if tc is None:
             continue
         sp = tc.get("source_pointer", {})
-        assert sp.get("schema_id") == CHARTER_SCHEMA_ID, (
-            f"{wb['workbench_id']}: task_card.source_pointer.schema_id mismatch"
-        )
+        assert (
+            sp.get("schema_id") == CHARTER_SCHEMA_ID
+        ), f"{wb['workbench_id']}: task_card.source_pointer.schema_id mismatch"
         assert tc.get("layers"), f"{wb['workbench_id']}: task_card.layers is absent or empty"

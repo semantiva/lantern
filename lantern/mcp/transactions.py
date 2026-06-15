@@ -726,8 +726,7 @@ class TransactionEngine:
             "post_application_state": "awaiting_gt130",
             "next_step": {
                 "workbench_id": workbench.workbench_id,
-                "instruction_resource": workbench.instruction_resource,
-                "guide_refs": list(workbench.authoritative_guides + workbench.administration_guides),
+                "charter_ref": workbench.charter_ref,
             },
         }
 

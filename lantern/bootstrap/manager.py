@@ -79,7 +79,6 @@ def plan_bootstrap(*, product_root: Path, governance_root: Path) -> BootstrapPla
                     "product_root": str(product_root),
                 },
                 "workflow_modes": [],
-                "workbench_overrides": [],
             },
             sort_keys=False,
         ),

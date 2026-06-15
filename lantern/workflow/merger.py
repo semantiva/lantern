@@ -16,7 +16,7 @@
 
 This module owns the three-phase merge chain, declared-posture validation,
 intervention restriction enforcement, and runtime-posture audit labeling.
-It does not generate skill projections (see lantern/skills/generator.py).
+It does not touch the static skill surface (SKILL.md is hand-maintained, CH-0034).
 """
 
 from __future__ import annotations
@@ -44,9 +44,6 @@ class InterventionRestrictionError(RuntimeError):
 # Three valid posture values sourced from workbench_schema.yaml runtime_surface_classification_values
 _VALID_POSTURES = frozenset({"full_governed_surface", "partial_governed_surface", "intervention_surface"})
 
-# Required authored subfolders under workflow/configuration/
-_REQUIRED_AUTHORED_SUBFOLDERS = ("instructions", "workbenches", "guides")
-
 # Required gates for full_governed_surface sourced from workbench_schema.yaml required_full_governed_gates
 _REQUIRED_FULL_GOVERNED_GATES = frozenset({"GT-030", "GT-050", "GT-060", "GT-110", "GT-115", "GT-120", "GT-130"})
 
@@ -54,12 +51,6 @@ _REQUIRED_FULL_GOVERNED_GATES = frozenset({"GT-030", "GT-050", "GT-060", "GT-110
 _INTERVENTION_FORBIDDEN_TRANSACTION_KINDS = frozenset(
     {"claim_governed_closure", "advance_status_to_terminal", "write_binding_record", "emit_gate_evidence"}
 )
-
-
-@dataclass(frozen=True)
-class WorkbenchOverride:
-    workbench_id: str
-    file: str
 
 
 @dataclass(frozen=True)
@@ -75,7 +66,6 @@ class ConfigurationSurface:
     configuration_version: str
     declared_posture: str
     workflow_modes: tuple[WorkflowMode, ...]
-    workbench_overrides: tuple[WorkbenchOverride, ...]
     main_yaml_hash: str
     authoritative_refs: dict[str, str]
 
@@ -114,7 +104,6 @@ class EffectiveLayer:
     baseline_surface_classification: str
     effective_surface_classification: str
     posture_result: PostureResult
-    merged_workbench_overrides: dict[str, dict[str, Any]]
     merged_modes: tuple[WorkflowMode, ...]
     configuration_surface: ConfigurationSurface | None
     selected_workflow_id: str | None = None
@@ -155,52 +144,6 @@ class ConfigurationLoader:
                 f"got {declared_posture!r} at {main_yaml_path}"
             )
 
-        # Required authored subfolders
-        for subfolder_name in _REQUIRED_AUTHORED_SUBFOLDERS:
-            subfolder = folder / subfolder_name
-            if not subfolder.is_dir():
-                raise ConfigurationLoadError(f"Configuration folder is missing required subfolder: {subfolder}")
-
-        # Workbench overrides
-        overrides_raw = raw.get("workbench_overrides") or []
-        overrides: list[WorkbenchOverride] = []
-        seen_workbench_ids: set[str] = set()
-        for item in overrides_raw:
-            wid = str(item.get("workbench_id", "")).strip()
-            wfile = str(item.get("file", "")).strip()
-            if not wid:
-                raise ConfigurationLoadError(f"workbench_overrides entry in {main_yaml_path} is missing workbench_id")
-            if not wfile:
-                raise ConfigurationLoadError(f"workbench_overrides entry {wid!r} in {main_yaml_path} is missing file")
-            if wid in seen_workbench_ids:
-                raise ConfigurationLoadError(
-                    f"Duplicate workbench_id {wid!r} in workbench_overrides at {main_yaml_path}"
-                )
-            seen_workbench_ids.add(wid)
-            override_path = folder / wfile
-            if not override_path.exists():
-                raise ConfigurationLoadError(
-                    f"workbench_overrides {wid!r} declares file {wfile!r} " f"which does not exist at {override_path}"
-                )
-            try:
-                override_raw: dict[str, Any] = yaml.safe_load(override_path.read_text(encoding="utf-8")) or {}
-            except yaml.YAMLError as exc:
-                raise ConfigurationLoadError(
-                    f"workbench_overrides {wid!r} file {override_path} parse error: {exc}"
-                ) from exc
-            instruction_resource = str(override_raw.get("instruction_resource", "")).strip()
-            if not instruction_resource:
-                raise ConfigurationLoadError(
-                    f"workbench_overrides {wid!r} at {override_path} is missing instruction_resource"
-                )
-            instruction_path = folder / instruction_resource
-            if not instruction_path.exists():
-                raise ConfigurationLoadError(
-                    f"workbench_overrides {wid!r} instruction_resource {instruction_resource!r} "
-                    f"does not exist at {instruction_path}"
-                )
-            overrides.append(WorkbenchOverride(workbench_id=wid, file=wfile))
-
         # Workflow modes
         modes_raw = raw.get("workflow_modes") or []
         modes: list[WorkflowMode] = []
@@ -228,7 +171,6 @@ class ConfigurationLoader:
             configuration_version=str(raw.get("configuration_version", "1")),
             declared_posture=declared_posture,
             workflow_modes=tuple(modes),
-            workbench_overrides=tuple(overrides),
             main_yaml_hash=main_yaml_hash,
             authoritative_refs=authoritative_refs,
         )
@@ -289,7 +231,6 @@ class ConfigurationMerger:
                 baseline_surface_classification=baseline_surface_classification,
                 effective_surface_classification=effective_classification,
                 posture_result=posture_result,
-                merged_workbench_overrides={},
                 merged_modes=(),
                 configuration_surface=None,
                 selected_workflow_id=selected_workflow_id,
@@ -300,16 +241,10 @@ class ConfigurationMerger:
                 workbench_root=workbench_root,
             )
 
-        merged_overrides: dict[str, dict[str, Any]] = {}
         merged_modes: list[WorkflowMode] = []
 
         # Phase 2
         if configuration_surface is not None:
-            for override in configuration_surface.workbench_overrides:
-                override_path = configuration_surface.folder / override.file
-                merged_overrides[override.workbench_id] = (
-                    yaml.safe_load(override_path.read_text(encoding="utf-8")) or {}
-                )
             merged_modes = list(configuration_surface.workflow_modes)
 
         # Phase 3
@@ -325,18 +260,6 @@ class ConfigurationMerger:
                     f"differs from product-governance configuration declared_posture "
                     f"{configuration_surface.declared_posture!r}; they must match when both are present."
                 )
-            phase2_override_ids = set(merged_overrides.keys())
-            for override in launcher_overlay_surface.workbench_overrides:
-                if phase2_override_ids and override.workbench_id not in phase2_override_ids:
-                    raise PostureValidationError(
-                        f"Launcher overlay adds workbench_id {override.workbench_id!r} which is not "
-                        f"present in the Phase 2 product-governance configuration surface. "
-                        f"Launcher overlays may not widen the governed workbench scope."
-                    )
-                override_path = launcher_overlay_surface.folder / override.file
-                merged_overrides[override.workbench_id] = (
-                    yaml.safe_load(override_path.read_text(encoding="utf-8")) or {}
-                )
             if launcher_overlay_surface.workflow_modes:
                 merged_modes = list(launcher_overlay_surface.workflow_modes)
             launcher_overlay_folder = str(launcher_overlay_surface.folder)
@@ -349,10 +272,6 @@ class ConfigurationMerger:
             else baseline_surface_classification
         )
 
-        bounded_scope_markers = tuple(
-            o.workbench_id for o in (configuration_surface.workbench_overrides if configuration_surface else ())
-        )
-
         provenance = MergeProvenance(
             baseline_version=baseline_version,
             configuration_folder=(str(configuration_surface.folder) if configuration_surface else None),
@@ -363,7 +282,7 @@ class ConfigurationMerger:
 
         posture_result = PostureResult(
             classification=effective_classification,
-            bounded_scope_markers=bounded_scope_markers,
+            bounded_scope_markers=(),
             restricted_capabilities=(),
             provenance=provenance,
         )
@@ -372,56 +291,9 @@ class ConfigurationMerger:
             baseline_surface_classification=baseline_surface_classification,
             effective_surface_classification=effective_classification,
             posture_result=posture_result,
-            merged_workbench_overrides=merged_overrides,
             merged_modes=tuple(merged_modes),
             configuration_surface=configuration_surface,
-            active_workbench_ids=tuple(
-                o.workbench_id for o in (configuration_surface.workbench_overrides if configuration_surface else ())
-            ),
         )
-
-    def validate_guide_consistency(
-        self,
-        *,
-        effective_layer: EffectiveLayer,
-        workflow_layer: Any,
-    ) -> None:
-        """Assert guide refs are identical across mode declarations and workbench declarations.
-
-        Only checks modes against built-in (non-overridden) workbenches; overridden workbenches
-        are full replacement declarations and are internally self-consistent by construction.
-
-        Raises ConfigurationLoadError naming the diverging surface, mode_id, and refs.
-        """
-        if effective_layer.selected_workflow_id is not None:
-            return
-
-        overridden_ids = set(effective_layer.merged_workbench_overrides.keys())
-        for mode in effective_layer.merged_modes:
-            entry_wb_id = mode.entry_workbench
-            if entry_wb_id in overridden_ids:
-                # Overridden workbench is a full replacement; trust its internal guide declarations
-                continue
-            try:
-                workbench = workflow_layer.get_workbench(entry_wb_id)
-            except KeyError:
-                raise ConfigurationLoadError(
-                    f"Guide consistency failure for mode {mode.mode_id!r}: "
-                    f"entry_workbench {entry_wb_id!r} is not present in the built-in workbench set "
-                    f"and is not declared as a workbench_override."
-                )
-            if not mode.guide_refs:
-                # No guide_refs declared in mode — no consistency assertion needed
-                continue
-            workbench_guides = set(workbench.authoritative_guides)
-            mode_guides = set(mode.guide_refs)
-            if mode_guides != workbench_guides:
-                raise ConfigurationLoadError(
-                    f"Guide consistency failure for mode {mode.mode_id!r}: "
-                    f"main.yaml guide_refs={sorted(mode_guides)} but "
-                    f"workbench {entry_wb_id!r} authoritative_guides={sorted(workbench_guides)}. "
-                    f"The entry workbench must expose the same guide refs declared for its mode."
-                )
 
 
 class PostureValidator:
@@ -502,17 +374,9 @@ class PostureValidator:
         effective_layer: EffectiveLayer,
         provenance: MergeProvenance,
     ) -> PostureResult:
-        bounded_scope_markers = effective_layer.active_workbench_ids or tuple(
-            o.workbench_id
-            for o in (
-                effective_layer.configuration_surface.workbench_overrides
-                if effective_layer.configuration_surface
-                else ()
-            )
-        )
         return PostureResult(
             classification="partial_governed_surface",
-            bounded_scope_markers=bounded_scope_markers,
+            bounded_scope_markers=effective_layer.active_workbench_ids,
             restricted_capabilities=(),
             provenance=provenance,
         )

@@ -36,7 +36,7 @@ layers:
       - Use aspirational or placeholder validation targets
     template_refs:
       - lantern/templates/CH_TEMPLATE.md
-      - lantern/templates/TD_TEMPLATE.md
+      - lantern/templates/TEMPLATE__TD.md
 
   - layer: administrative
     label: GT-110 entry gate administration

@@ -349,7 +349,6 @@ def test_c05_custom_charter_source_pointer_fields_are_correct(tmp_path: Path) ->
     assert sp["workbench_ref"] == "custom_test_workbench"
 
 
-
 # ── C07: draft delivers Charter authoring-layer body ─────────────────────────
 
 
