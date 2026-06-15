@@ -323,7 +323,6 @@ def build_discovery_registry(
         workflow_id=workflow_id,
         workflow_folder=workflow_folder,
         workbench_folder=workbench_folder,
-        enforce_generated_artifacts=False,
     )
 
     records: list[dict[str, Any]] = []
@@ -359,7 +358,6 @@ def _mode_records(workflow_layer: Any) -> list[dict[str, Any]]:
                 "selected": workflow.workflow_id == selected_workflow_id,
             },
             "entry_workbench": workflow.active_workbench_ids[0],
-            "guide_refs": [],
             "mode_id": workflow.workflow_id,
             "direct_refs": (),
             "gate_names": (),

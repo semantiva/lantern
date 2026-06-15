@@ -60,7 +60,7 @@ def test_runtime_accepts_grammar_050() -> None:
     assert result["installed_package_version"].startswith("0.5.")
     assert result["installed_model_version"].startswith("0.5.")
 
-    wl = load_workflow_layer(enforce_generated_artifacts=True)
+    wl = load_workflow_layer()
     assert wl.grammar_version.startswith("0.5.")
     assert wl.grammar_package_version.startswith("0.5.")
 

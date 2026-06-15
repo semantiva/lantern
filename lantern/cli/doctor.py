@@ -276,7 +276,6 @@ def _probe_configuration(
             workflow_id=workflow_id,
             workflow_folder=workflow_folder,
             workbench_folder=workbench_folder,
-            enforce_generated_artifacts=False,
         )
     except WorkflowLayerError as exc:
         findings.append(
@@ -421,27 +420,6 @@ def _probe_discovery(
     workflow_folder: Path | None = None,
     workbench_folder: Path | None = None,
 ) -> dict[str, Any]:
-    strict_status = "ok"
-    try:
-        load_workflow_layer(
-            governance_root=governance_root,
-            workflow_id=workflow_id,
-            workflow_folder=workflow_folder,
-            workbench_folder=workbench_folder,
-            enforce_generated_artifacts=True,
-        )
-    except WorkflowLayerError as exc:
-        strict_status = "stale_generated_artifacts"
-        findings.append(
-            _finding(
-                category="discovery_availability",
-                classification="advisory",
-                subject="workflow.generated_artifacts",
-                message=str(exc),
-                remediation="Refresh the committed workflow projections before relying on packaged release parity.",
-            )
-        )
-
     try:
         registry = build_discovery_registry(
             product_root=product_root,
@@ -460,12 +438,11 @@ def _probe_discovery(
                 remediation="Repair the workflow or governance inputs so flat discovery can be derived.",
             )
         )
-        return {"status": "blocked", "record_count": 0, "strict_status": strict_status}
+        return {"status": "blocked", "record_count": 0}
 
     return {
         "status": "ok",
         "record_count": len(registry["records"]),
-        "strict_status": strict_status,
     }
 
 

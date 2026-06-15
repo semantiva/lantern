@@ -14,7 +14,6 @@
 
 from __future__ import annotations
 
-import json
 import shutil
 from pathlib import Path
 
@@ -25,7 +24,6 @@ from lantern.workflow.loader import (
     DEFAULT_WORKFLOW_ID,
     WorkflowLayerError,
     load_workflow_layer,
-    render_generated_artifacts,
 )
 
 
@@ -131,10 +129,6 @@ def _definitions_root(fixture_root: Path) -> Path:
     return fixture_root / "lantern" / "workflow" / "definitions"
 
 
-def _generated_workflow_map_root(fixture_root: Path) -> Path:
-    return fixture_root / "lantern" / "workflow" / "generated" / "workflow_maps"
-
-
 def _load_fixture_layer(
     fixture_root: Path,
     *,
@@ -142,7 +136,6 @@ def _load_fixture_layer(
     workflow_id: str | None = None,
     workflow_folder: Path | None = None,
     workbench_folder: Path | None = None,
-    enforce_generated_artifacts: bool = False,
 ):
     definitions_root = _definitions_root(fixture_root)
     return load_workflow_layer(
@@ -155,65 +148,6 @@ def _load_fixture_layer(
         schema_path=definitions_root / "workbench_schema.yaml",
         workflow_schema_path=definitions_root / "workflow_schema.yaml",
         transaction_profiles_path=definitions_root / "transaction_profiles.yaml",
-        registry_path=definitions_root / "workbench_registry.yaml",
-        contract_catalog_path=definitions_root / "contract_catalog.json",
-        resource_manifest_path=definitions_root / "resource_manifest.json",
-        workflow_map_path=definitions_root / "workflow_map.md",
-        workbench_resource_bindings_path=definitions_root / "workbench_resource_bindings.md",
-        builtin_workflow_map_root=_generated_workflow_map_root(fixture_root),
-        enforce_generated_artifacts=enforce_generated_artifacts,
-    )
-
-
-def _refresh_fixture_projections(
-    fixture_root: Path,
-    *,
-    governance_root: Path | None = None,
-    workflow_id: str | None = None,
-    workflow_folder: Path | None = None,
-    workbench_folder: Path | None = None,
-) -> None:
-    definitions_root = _definitions_root(fixture_root)
-    workflow_map_root = _generated_workflow_map_root(fixture_root)
-    workflow_map_root.mkdir(parents=True, exist_ok=True)
-
-    layer = _load_fixture_layer(
-        fixture_root,
-        governance_root=governance_root,
-        workflow_id=workflow_id,
-        workflow_folder=workflow_folder,
-        workbench_folder=workbench_folder,
-        enforce_generated_artifacts=False,
-    )
-    generated = render_generated_artifacts(
-        workflow_id=layer.selected_workflow_id,
-        workflow_display_name=layer.selected_workflow_display_name,
-        runtime_surface_classification=layer.runtime_surface_classification,
-        workbenches=layer.workbenches,
-        transaction_profiles=layer.transaction_profiles,
-        contract_catalog=layer.contract_catalog,
-        resource_manifest=layer.resource_manifest,
-    )
-    (definitions_root / "workbench_registry.yaml").write_text(
-        generated.compatibility_registry_text,
-        encoding="utf-8",
-    )
-    (definitions_root / "contract_catalog.json").write_text(
-        json.dumps(generated.contract_catalog_payload, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
-    (definitions_root / "resource_manifest.json").write_text(
-        json.dumps(generated.resource_manifest_payload, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
-    (definitions_root / "workflow_map.md").write_text(generated.workflow_map_text, encoding="utf-8")
-    (definitions_root / "workbench_resource_bindings.md").write_text(
-        generated.workbench_resource_bindings_text,
-        encoding="utf-8",
-    )
-    (workflow_map_root / f"{layer.selected_workflow_id}.md").write_text(
-        generated.built_in_workflow_map_text,
-        encoding="utf-8",
     )
 
 
@@ -418,17 +352,3 @@ def test_td0024_c09_workbench_file_presence_does_not_activate_it(tmp_path: Path)
 
     assert "repo_local_triage" not in {workbench.workbench_id for workbench in layer.workbenches}
     assert "repo_local_triage" in {workbench.workbench_id for workbench in layer.catalog_workbenches}
-
-
-def test_generated_projections_are_optional_by_default_and_enforceable_explicitly(tmp_path: Path) -> None:
-    fixture_root = _copy_product_fixture(tmp_path)
-    _refresh_fixture_projections(fixture_root)
-    definitions_root = _definitions_root(fixture_root)
-    workflow_map_path = definitions_root / "workflow_map.md"
-    workflow_map_path.write_text(workflow_map_path.read_text(encoding="utf-8") + "\nSTALE\n", encoding="utf-8")
-
-    layer = _load_fixture_layer(fixture_root, enforce_generated_artifacts=False)
-    assert layer.workbenches
-
-    with pytest.raises(WorkflowLayerError, match="workflow_map.md"):
-        _load_fixture_layer(fixture_root, enforce_generated_artifacts=True)

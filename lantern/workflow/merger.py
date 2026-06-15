@@ -57,7 +57,6 @@ _INTERVENTION_FORBIDDEN_TRANSACTION_KINDS = frozenset(
 class WorkflowMode:
     mode_id: str
     entry_workbench: str
-    guide_refs: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -151,7 +150,6 @@ class ConfigurationLoader:
         for item in modes_raw:
             mode_id = str(item.get("mode_id", "")).strip()
             entry_workbench = str(item.get("entry_workbench", "")).strip()
-            guide_refs = tuple(str(g).strip() for g in (item.get("guide_refs") or []) if str(g).strip())
             if not mode_id:
                 raise ConfigurationLoadError(f"workflow_modes entry in {main_yaml_path} is missing mode_id")
             if mode_id in seen_mode_ids:
@@ -161,7 +159,7 @@ class ConfigurationLoader:
                 raise ConfigurationLoadError(
                     f"workflow_modes {mode_id!r} in {main_yaml_path} is missing entry_workbench"
                 )
-            modes.append(WorkflowMode(mode_id=mode_id, entry_workbench=entry_workbench, guide_refs=guide_refs))
+            modes.append(WorkflowMode(mode_id=mode_id, entry_workbench=entry_workbench))
 
         main_yaml_hash = _sha256_path(main_yaml_path)
         authoritative_refs = {str(k): str(v) for k, v in (raw.get("authoritative_refs") or {}).items()}

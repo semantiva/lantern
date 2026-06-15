@@ -41,7 +41,7 @@ def test_tc001_runtime_accepts_current_grammar() -> None:
 
     result = check_grammar_compatibility()
     assert result["status"] == "ok", result
-    wl = load_workflow_layer(enforce_generated_artifacts=True)
+    wl = load_workflow_layer()
     assert wl.grammar_version.startswith("0.5.")
     assert wl.grammar_package_version.startswith("0.5.")
 
@@ -467,7 +467,7 @@ def test_tc014_lifecycle_projection_divergence_is_rejected(tmp_path: Path) -> No
     ch_path.write_text(yaml.dump(ch_data), encoding="utf-8")
 
     try:
-        load_workflow_layer(lifecycle_policy_manifest_path=dst / "manifest.yaml", enforce_generated_artifacts=True)
+        load_workflow_layer(lifecycle_policy_manifest_path=dst / "manifest.yaml")
         assert False, "Expected WorkflowLayerError for lifecycle projection divergence"
     except Exception as exc:
         assert "divergence" in str(exc).lower() or "CH" in str(exc), f"Expected divergence error; got: {exc}"
@@ -526,14 +526,14 @@ def test_tc012_gt060_maps_to_arch_readiness() -> None:
 def test_tc013_generated_artifacts_pass_enforcement() -> None:
     from lantern.workflow import load_workflow_layer
 
-    wl = load_workflow_layer(enforce_generated_artifacts=True)
+    wl = load_workflow_layer()
     assert wl.grammar_version.startswith("0.5.")
 
 
 def test_tc013_contract_catalog_records_current_grammar() -> None:
     from lantern.workflow import load_workflow_layer
 
-    wl = load_workflow_layer(enforce_generated_artifacts=False)
+    wl = load_workflow_layer()
     for entry in wl.contract_catalog:
         compat = entry.compatibility
         grammar_version = compat.get("grammar_version", "")
@@ -690,7 +690,7 @@ def test_tc014_lifecycle_transition_divergence_is_rejected(tmp_path: Path) -> No
     ch_path.write_text(yaml.dump(ch_data), encoding="utf-8")
 
     try:
-        load_workflow_layer(lifecycle_policy_manifest_path=dst / "manifest.yaml", enforce_generated_artifacts=True)
+        load_workflow_layer(lifecycle_policy_manifest_path=dst / "manifest.yaml")
         assert False, "Expected WorkflowLayerError for lifecycle transition projection divergence"
     except Exception as exc:
         assert "transition" in str(exc).lower() or "CH" in str(exc), f"Expected transition divergence error; got: {exc}"

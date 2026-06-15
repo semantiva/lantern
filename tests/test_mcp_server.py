@@ -434,18 +434,17 @@ def test_c11_workflow_readme_contains_all_required_anchors() -> None:
         "workbenches/",
         "workflows/default_full_governed_surface.yaml",
         "workflow_schema.yaml",
-        "generated/workflow_maps/default_full_governed_surface.md",
-        "workbench_registry.yaml",
-        "workflow_map.md",
+        "transaction_profiles.yaml",
+        "workbench_schema.yaml",
     ):
         assert anchor in content
 
 
-def test_c11_workflow_readme_has_authored_generated_boundary_text() -> None:
+def test_c11_workflow_readme_has_authored_in_memory_model_text() -> None:
     workflow_readme = PRODUCT_ROOT / "lantern" / "workflow" / "README.md"
     content = workflow_readme.read_text(encoding="utf-8").lower()
     assert "authored" in content
-    assert "generated" in content
+    assert "in memory" in content
 
 
 def test_server_registers_fixed_five_tool_names() -> None:
@@ -511,7 +510,6 @@ def test_td0024_catalog_and_orient_surface_only_selected_subset(tmp_path: Path) 
     workflow_layer = load_workflow_layer(
         governance_root=governance_root,
         workflow_id="change_readiness_only",
-        enforce_generated_artifacts=False,
     )
 
     catalog = handle_inspect(kind="catalog", workflow_layer=workflow_layer)

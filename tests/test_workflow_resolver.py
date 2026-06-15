@@ -270,7 +270,6 @@ def test_td0024_repo_local_subset_excludes_omitted_builtins(tmp_path: Path) -> N
     workflow_layer = load_workflow_layer(
         governance_root=governance_root,
         workflow_id="change_readiness_only",
-        enforce_generated_artifacts=False,
     )
 
     result = resolve_active_workbenches(
@@ -296,7 +295,6 @@ def test_td0024_subset_keeps_omitted_builtins_inactive_between_gates(tmp_path: P
     workflow_layer = load_workflow_layer(
         governance_root=governance_root,
         workflow_id="change_readiness_only",
-        enforce_generated_artifacts=False,
     )
 
     result = resolve_active_workbenches(

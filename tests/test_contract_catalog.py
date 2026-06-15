@@ -14,86 +14,7 @@
 
 from __future__ import annotations
 
-import json
-import shutil
-from pathlib import Path
-
-import pytest
-
-from lantern.workflow.loader import (
-    WorkflowLayerError,
-    load_workflow_layer,
-    render_generated_artifacts,
-)
-
-
-PRODUCT_ROOT = Path(__file__).resolve().parents[1]
-
-
-def _copy_product_fixture(tmp_path: Path) -> Path:
-    fixture_root = tmp_path / "product_fixture"
-    shutil.copytree(PRODUCT_ROOT / "lantern", fixture_root / "lantern", dirs_exist_ok=True)
-    return fixture_root
-
-
-def _definitions_root(fixture_root: Path) -> Path:
-    return fixture_root / "lantern" / "workflow" / "definitions"
-
-
-def _generated_workflow_map_root(fixture_root: Path) -> Path:
-    return fixture_root / "lantern" / "workflow" / "generated" / "workflow_maps"
-
-
-def _load_fixture_layer(fixture_root: Path, *, enforce_generated_artifacts: bool = False):
-    definitions_root = _definitions_root(fixture_root)
-    return load_workflow_layer(
-        workbench_catalog_root=definitions_root / "workbenches",
-        workflow_catalog_root=definitions_root / "workflows",
-        schema_path=definitions_root / "workbench_schema.yaml",
-        workflow_schema_path=definitions_root / "workflow_schema.yaml",
-        transaction_profiles_path=definitions_root / "transaction_profiles.yaml",
-        registry_path=definitions_root / "workbench_registry.yaml",
-        contract_catalog_path=definitions_root / "contract_catalog.json",
-        resource_manifest_path=definitions_root / "resource_manifest.json",
-        workflow_map_path=definitions_root / "workflow_map.md",
-        workbench_resource_bindings_path=definitions_root / "workbench_resource_bindings.md",
-        builtin_workflow_map_root=_generated_workflow_map_root(fixture_root),
-        enforce_generated_artifacts=enforce_generated_artifacts,
-    )
-
-
-def _refresh_fixture_projections(fixture_root: Path) -> None:
-    definitions_root = _definitions_root(fixture_root)
-    workflow_map_root = _generated_workflow_map_root(fixture_root)
-    workflow_map_root.mkdir(parents=True, exist_ok=True)
-    layer = _load_fixture_layer(fixture_root, enforce_generated_artifacts=False)
-    generated = render_generated_artifacts(
-        workflow_id=layer.selected_workflow_id,
-        workflow_display_name=layer.selected_workflow_display_name,
-        runtime_surface_classification=layer.runtime_surface_classification,
-        workbenches=layer.workbenches,
-        transaction_profiles=layer.transaction_profiles,
-        contract_catalog=layer.contract_catalog,
-        resource_manifest=layer.resource_manifest,
-    )
-    (definitions_root / "workbench_registry.yaml").write_text(generated.compatibility_registry_text, encoding="utf-8")
-    (definitions_root / "contract_catalog.json").write_text(
-        json.dumps(generated.contract_catalog_payload, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
-    (definitions_root / "resource_manifest.json").write_text(
-        json.dumps(generated.resource_manifest_payload, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
-    (definitions_root / "workflow_map.md").write_text(generated.workflow_map_text, encoding="utf-8")
-    (definitions_root / "workbench_resource_bindings.md").write_text(
-        generated.workbench_resource_bindings_text,
-        encoding="utf-8",
-    )
-    (workflow_map_root / f"{layer.selected_workflow_id}.md").write_text(
-        generated.built_in_workflow_map_text,
-        encoding="utf-8",
-    )
+from lantern.workflow.loader import load_workflow_layer
 
 
 def test_contract_catalog_and_resource_manifest_cover_selected_workflow() -> None:
@@ -116,28 +37,3 @@ def test_resource_manifest_is_empty_after_authority_field_retirement() -> None:
     assert (
         layer.resource_manifest == ()
     ), "resource_manifest must be empty: all legacy authority role fields retired in CH-0034"
-
-
-def test_projection_files_include_default_workflow_map_named_by_workflow_id() -> None:
-    workflow_map_path = (
-        PRODUCT_ROOT / "lantern" / "workflow" / "generated" / "workflow_maps" / "default_full_governed_surface.md"
-    )
-    legacy_registry_path = PRODUCT_ROOT / "lantern" / "workflow" / "definitions" / "workbench_registry.yaml"
-
-    assert workflow_map_path.exists()
-    assert "default_full_governed_surface" in workflow_map_path.read_text(encoding="utf-8")
-    assert legacy_registry_path.exists()
-    assert "Generated compatibility projection" in legacy_registry_path.read_text(encoding="utf-8")
-
-
-def test_projection_enforcement_is_explicit_for_fixture_copies(tmp_path: Path) -> None:
-    fixture_root = _copy_product_fixture(tmp_path)
-    _refresh_fixture_projections(fixture_root)
-    definitions_root = _definitions_root(fixture_root)
-    registry_path = definitions_root / "workbench_registry.yaml"
-    registry_path.write_text(registry_path.read_text(encoding="utf-8") + "\n# stale\n", encoding="utf-8")
-
-    assert _load_fixture_layer(fixture_root, enforce_generated_artifacts=False).workbenches
-
-    with pytest.raises(WorkflowLayerError, match="workbench_registry.yaml"):
-        _load_fixture_layer(fixture_root, enforce_generated_artifacts=True)

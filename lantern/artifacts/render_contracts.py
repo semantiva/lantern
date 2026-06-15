@@ -134,7 +134,6 @@ def build_two_layer_contract(entry: ContractCatalogEntry) -> dict[str, Any]:
             "family_binding": list(entry.family_binding),
             "gate_binding": list(entry.gate_binding),
             "workbench_refs": list(entry.workbench_refs),
-            "guide_refs": list(entry.guide_refs),
             "response_surface_bindings": [
                 {
                     "transaction_kind": binding.transaction_kind,

@@ -34,7 +34,6 @@ from .models import (
 )
 
 DEFAULT_DEFINITIONS_ROOT = Path(__file__).resolve().parents[1] / "workflow" / "definitions"
-DEFAULT_REGISTRY_PATH = DEFAULT_DEFINITIONS_ROOT / "workbench_registry.yaml"
 DEFAULT_SCHEMA_YAML_PATH = DEFAULT_DEFINITIONS_ROOT / "workbench_schema.yaml"
 DEFAULT_SCHEMA_JSON_PATH = Path(__file__).resolve().parents[1] / "artifacts" / "schemas" / "workbench_schema.json"
 
@@ -52,27 +51,6 @@ _FOUNDATION_WORKFLOW_SURFACE_FIELDS = frozenset(
         "inspect_views",
     }
 )
-
-
-def load_workbench_registry(
-    *,
-    registry_path: str | Path | None = None,
-    schema_yaml_path: str | Path | None = None,
-    schema_json_path: str | Path | None = None,
-) -> WorkbenchRegistry:
-    registry_file = Path(registry_path or DEFAULT_REGISTRY_PATH)
-    schema_yaml_file = Path(schema_yaml_path or DEFAULT_SCHEMA_YAML_PATH)
-    schema_json_file = Path(schema_json_path or DEFAULT_SCHEMA_JSON_PATH)
-
-    registry_payload = _load_yaml(registry_file)
-    schema_metadata = _load_yaml(schema_yaml_file)
-    schema_payload = json.loads(schema_json_file.read_text(encoding="utf-8"))
-
-    return _build_projected_workbench_registry(
-        registry_payload=registry_payload,
-        schema_metadata=schema_metadata,
-        schema_payload=schema_payload,
-    )
 
 
 def validate_gate_coverage(payload: Mapping[str, Any], *, required_gates: Sequence[str]) -> None:

@@ -50,7 +50,6 @@ class ContractResponse:
     workbench_refs: tuple[str, ...]
     family_binding: tuple[str, ...]
     gate_binding: tuple[str, ...]
-    guide_refs: tuple[str, ...]
     response_surface_bindings: tuple[dict[str, Any], ...]
     compatibility: Mapping[str, Any]
     provenance: Mapping[str, Any]
@@ -76,7 +75,6 @@ def build_contract_response(workflow_layer: WorkflowLayer, contract_ref: str) ->
                 workbench_refs=entry.workbench_refs,
                 family_binding=entry.family_binding,
                 gate_binding=entry.gate_binding,
-                guide_refs=entry.guide_refs,
                 response_surface_bindings=tuple(
                     {
                         "transaction_kind": b.transaction_kind,

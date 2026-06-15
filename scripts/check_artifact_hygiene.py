@@ -38,8 +38,6 @@ FORBIDDEN_PATTERNS = [
 FORBIDDEN_SUFFIXES = [".pyc", ".pyo", ".pyd", ".tmp", ".temp"]
 REQUIRED_WHEEL_PATHS = [
     "lantern/skills/packaged_default/SKILL.md",
-    "lantern/workflow/definitions/workbench_registry.yaml",
-    "lantern/workflow/definitions/resource_manifest.json",
     "lantern/artifacts/schemas/workbench_schema.json",
 ]
 

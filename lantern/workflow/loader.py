@@ -50,13 +50,8 @@ else:
     _GRAMMAR_IMPORT_ERROR = None
 
 DEFAULT_DEFINITIONS_ROOT = Path(__file__).resolve().parent / "definitions"
-DEFAULT_REGISTRY_PATH = DEFAULT_DEFINITIONS_ROOT / "workbench_registry.yaml"
 DEFAULT_SCHEMA_PATH = DEFAULT_DEFINITIONS_ROOT / "workbench_schema.yaml"
 DEFAULT_TRANSACTION_PROFILES_PATH = DEFAULT_DEFINITIONS_ROOT / "transaction_profiles.yaml"
-DEFAULT_CONTRACT_CATALOG_PATH = DEFAULT_DEFINITIONS_ROOT / "contract_catalog.json"
-DEFAULT_RESOURCE_MANIFEST_PATH = DEFAULT_DEFINITIONS_ROOT / "resource_manifest.json"
-DEFAULT_WORKFLOW_MAP_PATH = DEFAULT_DEFINITIONS_ROOT / "workflow_map.md"
-DEFAULT_WORKBENCH_BINDINGS_PATH = DEFAULT_DEFINITIONS_ROOT / "workbench_resource_bindings.md"
 _ALLOWED_RESOURCE_ROLES = {
     "artifact_templates",
     "operating_references",
@@ -73,13 +68,6 @@ _PRIMARY_TRANSACTION_KIND = {
     "verification_and_closure": "commit",
     "issue_operations": "commit",
     "governance_onboarding": "draft",
-}
-_RESOURCE_KIND_BY_PREFIX = {
-    "lantern/resources/instructions/": "instruction",
-    "lantern/resources/guides/": "authoritative_guide",
-    "lantern/administration_procedures/": "administration_guide",
-    "lantern/authoring_contracts/": "authoring_contract",
-    "lantern/templates/": "template",
 }
 
 
@@ -111,7 +99,6 @@ class ContractCatalogEntry:
     family_binding: tuple[str, ...]
     gate_binding: tuple[str, ...]
     workbench_refs: tuple[str, ...]
-    guide_refs: tuple[str, ...]
     response_surface_bindings: tuple[ResponseSurfaceBinding, ...]
     compatibility: Mapping[str, Any]
     provenance: Mapping[str, Any]
@@ -399,31 +386,6 @@ def _derive_resource_manifest() -> tuple[ResourceManifestEntry, ...]:
     return ()
 
 
-def _assert_committed_json_matches(path: Path, expected_payload: Any, label: str) -> None:
-    expected_text = _canonical_json(expected_payload)
-    if not path.exists():
-        raise WorkflowLayerError(f"Missing generated artifact {label}: {path}")
-    actual_payload = json.loads(path.read_text(encoding="utf-8"))
-    actual_text = _canonical_json(actual_payload)
-    if actual_text != expected_text:
-        raise WorkflowLayerError(f"Committed {label} is stale relative to authored workflow inputs: {path}")
-
-
-def _assert_committed_text_matches(path: Path, expected_text: str, label: str) -> None:
-    if not path.exists():
-        raise WorkflowLayerError(f"Missing generated artifact {label}: {path}")
-    actual = path.read_text(encoding="utf-8")
-    if actual != expected_text:
-        raise WorkflowLayerError(f"Committed {label} is stale relative to authored workflow inputs: {path}")
-
-
-def _resource_kind_for_path(rel_path: str) -> str:
-    for prefix, kind in _RESOURCE_KIND_BY_PREFIX.items():
-        if rel_path.startswith(prefix):
-            return kind
-    raise WorkflowLayerError(f"Unsupported workflow resource path: {rel_path!r}")
-
-
 def _resource_id(kind: str, workbench_id: str, role: str, rel_path: str) -> str:
     name = _sanitize_identifier(f"{workbench_id}_{role}_{Path(rel_path).stem}")
     return f"resource.{kind}.{name}"
@@ -442,75 +404,12 @@ def _grammar_gate_entity_id(gate_id: str) -> str:
     return f"lg:gates/{gate_id.lower().replace('-', '_')}"
 
 
-def _product_root(registry_file: Path) -> Path:
-    return registry_file.resolve().parents[3]
-
-
-def _format_lifecycle(placement: Any) -> str:
-    if placement.kind == "covered_gates":
-        return f"covered_gates: {', '.join(placement.covered_gates)}"
-    if placement.kind == "lifecycle_span":
-        return f"lifecycle_span: {placement.start_gate} -> {placement.end_gate}"
-    return placement.kind
-
-
-def _extract_markdown_yaml_header(content: str, rel_path: str) -> Mapping[str, Any]:
-    if not content.startswith("```yaml\n"):
-        raise WorkflowLayerError(f"Guide {rel_path!r} must start with a fenced yaml provenance block")
-    _, _, remainder = content.partition("```yaml\n")
-    header_text, sep, _ = remainder.partition("\n```")
-    if not sep:
-        raise WorkflowLayerError(f"Guide {rel_path!r} has an unterminated fenced yaml provenance block")
-    return yaml.safe_load(header_text) or {}
-
-
-def _contract_entry_to_dict(entry: ContractCatalogEntry) -> dict[str, Any]:
-    return {
-        "contract_ref": entry.contract_ref,
-        "request_schema_ref": entry.request_schema_ref,
-        "transaction_kind": entry.transaction_kind,
-        "family_binding": list(entry.family_binding),
-        "gate_binding": list(entry.gate_binding),
-        "workbench_refs": list(entry.workbench_refs),
-        "guide_refs": list(entry.guide_refs),
-        "response_surface_bindings": [
-            {
-                "transaction_kind": binding.transaction_kind,
-                "response_envelope": binding.response_envelope,
-                "allowed_resource_roles": list(binding.allowed_resource_roles),
-            }
-            for binding in entry.response_surface_bindings
-        ],
-        "compatibility": dict(entry.compatibility),
-        "provenance": dict(entry.provenance),
-    }
-
-
-def _resource_entry_to_dict(entry: ResourceManifestEntry) -> dict[str, Any]:
-    return {
-        "resource_id": entry.resource_id,
-        "kind": entry.kind,
-        "workbench_id": entry.workbench_id,
-        "path": entry.path,
-        "content_hash": entry.content_hash,
-        "review_status": entry.review_status,
-        "provenance_type": entry.provenance_type,
-        "provenance_refs": [dict(item) for item in entry.provenance_refs],
-        "roles": list(entry.roles),
-        "projection_trace": dict(entry.projection_trace),
-    }
-
-
 def _to_plain_data(value: Any) -> Any:
     if isinstance(value, Mapping):
         return {str(k): _to_plain_data(v) for k, v in value.items()}
     if isinstance(value, (tuple, list)):
         return [_to_plain_data(v) for v in value]
     return value
-
-
-def _canonical_json(payload: Any) -> str:
-    return json.dumps(payload, indent=2, sort_keys=True) + "\n"
 
 
 def _sha256_text(text: str) -> str:
@@ -536,7 +435,6 @@ DEFAULT_WORKFLOW_ID = "default_full_governed_surface"
 DEFAULT_WORKBENCH_CATALOG_ROOT = DEFAULT_DEFINITIONS_ROOT / "workbenches"
 DEFAULT_WORKFLOW_CATALOG_ROOT = DEFAULT_DEFINITIONS_ROOT / "workflows"
 DEFAULT_WORKFLOW_SCHEMA_PATH = DEFAULT_DEFINITIONS_ROOT / "workflow_schema.yaml"
-DEFAULT_BUILTIN_WORKFLOW_MAP_ROOT = Path(__file__).resolve().parent / "generated" / "workflow_maps"
 
 
 @dataclass(frozen=True)
@@ -624,16 +522,6 @@ class WorkflowLayer:
         raise KeyError(workflow_id)
 
 
-@dataclass(frozen=True)
-class GeneratedArtifacts:
-    compatibility_registry_text: str
-    contract_catalog_payload: list[dict[str, Any]]
-    resource_manifest_payload: list[dict[str, Any]]
-    workflow_map_text: str
-    workbench_resource_bindings_text: str
-    built_in_workflow_map_text: str
-
-
 def load_workflow_layer(
     *,
     governance_root: str | Path | None = None,
@@ -645,14 +533,7 @@ def load_workflow_layer(
     schema_path: str | Path | None = None,
     workflow_schema_path: str | Path | None = None,
     transaction_profiles_path: str | Path | None = None,
-    registry_path: str | Path | None = None,
-    contract_catalog_path: str | Path | None = None,
-    resource_manifest_path: str | Path | None = None,
-    workflow_map_path: str | Path | None = None,
-    workbench_resource_bindings_path: str | Path | None = None,
-    builtin_workflow_map_root: str | Path | None = None,
     lifecycle_policy_manifest_path: str | Path | None = None,
-    enforce_generated_artifacts: bool = False,
 ) -> WorkflowLayer:
     grammar = _load_grammar()
     _validate_lifecycle_bundle(
@@ -689,20 +570,6 @@ def load_workflow_layer(
     ).resolve()
     transaction_profiles_file = Path(
         transaction_profiles_path or built_in_workbench_root.parent / "transaction_profiles.yaml"
-    ).resolve()
-    registry_file = Path(registry_path or built_in_workbench_root.parent / "workbench_registry.yaml").resolve()
-    contract_catalog_file = Path(
-        contract_catalog_path or built_in_workbench_root.parent / "contract_catalog.json"
-    ).resolve()
-    resource_manifest_file = Path(
-        resource_manifest_path or built_in_workbench_root.parent / "resource_manifest.json"
-    ).resolve()
-    workflow_map_file = Path(workflow_map_path or built_in_workbench_root.parent / "workflow_map.md").resolve()
-    workbench_bindings_file = Path(
-        workbench_resource_bindings_path or built_in_workbench_root.parent / "workbench_resource_bindings.md"
-    ).resolve()
-    builtin_workflow_map_root_path = Path(
-        builtin_workflow_map_root or built_in_workflow_root.parents[1] / "generated" / "workflow_maps"
     ).resolve()
 
     workbench_schema_payload = _load_yaml(workbench_schema_file, "workbench schema")
@@ -764,37 +631,6 @@ def load_workflow_layer(
         selected_workflow=selected_workflow,
     )
 
-    generated = render_generated_artifacts(
-        workflow_id=selected_workflow.workflow_id,
-        workflow_display_name=selected_workflow.display_name,
-        runtime_surface_classification=selected_workflow.runtime_surface_classification,
-        workbenches=active_workbenches,
-        transaction_profiles=transaction_profiles,
-        contract_catalog=contract_catalog,
-        resource_manifest=resource_manifest,
-    )
-
-    if enforce_generated_artifacts and selected_workflow.workflow_id == DEFAULT_WORKFLOW_ID:
-        _assert_committed_text_matches(registry_file, generated.compatibility_registry_text, "workbench_registry.yaml")
-        _assert_committed_json_matches(
-            contract_catalog_file, generated.contract_catalog_payload, "contract_catalog.json"
-        )
-        _assert_committed_json_matches(
-            resource_manifest_file, generated.resource_manifest_payload, "resource_manifest.json"
-        )
-        _assert_committed_text_matches(workflow_map_file, generated.workflow_map_text, "workflow_map.md")
-        _assert_committed_text_matches(
-            workbench_bindings_file,
-            generated.workbench_resource_bindings_text,
-            "workbench_resource_bindings.md",
-        )
-        builtin_workflow_map_file = builtin_workflow_map_root_path / f"{selected_workflow.workflow_id}.md"
-        _assert_committed_text_matches(
-            builtin_workflow_map_file,
-            generated.built_in_workflow_map_text,
-            f"{selected_workflow.workflow_id}.md",
-        )
-
     return WorkflowLayer(
         runtime_surface_classification=selected_workflow.runtime_surface_classification,
         selected_workflow_id=selected_workflow.workflow_id,
@@ -816,86 +652,6 @@ def load_workflow_layer(
         resource_manifest=resource_manifest,
         grammar_version=grammar_version,
         grammar_package_version=grammar_package_version,
-    )
-
-
-def render_generated_artifacts(
-    *,
-    workflow_id: str,
-    workflow_display_name: str,
-    runtime_surface_classification: str,
-    workbenches: tuple[WorkflowWorkbench, ...],
-    transaction_profiles: tuple[TransactionProfile, ...],
-    contract_catalog: tuple[ContractCatalogEntry, ...],
-    resource_manifest: tuple[ResourceManifestEntry, ...],
-) -> GeneratedArtifacts:
-    del transaction_profiles
-
-    contract_payload = [_contract_entry_to_dict(entry) for entry in contract_catalog]
-    resource_payload = [_resource_entry_to_dict(entry) for entry in resource_manifest]
-    registry_payload = {
-        "runtime_surface_classification": runtime_surface_classification,
-        "workbenches": [_workbench_to_projection_dict(workbench) for workbench in workbenches],
-    }
-
-    workflow_map_lines = [
-        "# Workflow map",
-        "",
-        f"Workflow ID: `{workflow_id}`",
-        f"Display name: `{workflow_display_name}`",
-        f"Runtime surface classification: `{runtime_surface_classification}`",
-        "",
-        "| Workbench | Lifecycle placement | Transactions | Inspect views | Artifact families |",
-        "|---|---|---|---|---|",
-    ]
-    for workbench in workbenches:
-        workflow_map_lines.append(
-            "| {wb} | {placement} | {tx} | {views} | {families} |".format(
-                wb=workbench.workbench_id,
-                placement=_format_lifecycle(workbench.lifecycle_placement),
-                tx=", ".join(workbench.allowed_transaction_kinds),
-                views=", ".join(workbench.inspect_views) or "-",
-                families=", ".join(workbench.artifacts_in_scope),
-            )
-        )
-    workflow_map_text = "\n".join(workflow_map_lines) + "\n"
-
-    resource_lookup: dict[tuple[str, str], list[str]] = {}
-    for entry in resource_manifest:
-        for role in entry.roles:
-            resource_lookup.setdefault((entry.workbench_id, role), []).append(entry.resource_id)
-
-    bindings_lines = [
-        "# Workbench resource bindings",
-        "",
-        f"Workflow ID: `{workflow_id}`",
-        "",
-        "| Workbench | Charter ref | Manifest resource ids |",
-        "|---|---|---|",
-    ]
-    for workbench in workbenches:
-        manifest_ids: list[str] = []
-        for role in ("artifact_templates", "operating_references"):
-            manifest_ids.extend(resource_lookup.get((workbench.workbench_id, role), []))
-        bindings_lines.append(
-            "| {wb} | {charter} | {manifest_ids} |".format(
-                wb=workbench.workbench_id,
-                charter=workbench.charter_ref,
-                manifest_ids="<br>".join(sorted(manifest_ids)),
-            )
-        )
-    workbench_resource_bindings_text = "\n".join(bindings_lines) + "\n"
-
-    compatibility_registry_text = _render_compatibility_registry_text(registry_payload)
-    built_in_workflow_map_text = workflow_map_text.replace("# Workflow map", f"# Workflow map: {workflow_id}", 1)
-
-    return GeneratedArtifacts(
-        compatibility_registry_text=compatibility_registry_text,
-        contract_catalog_payload=contract_payload,
-        resource_manifest_payload=resource_payload,
-        workflow_map_text=workflow_map_text,
-        workbench_resource_bindings_text=workbench_resource_bindings_text,
-        built_in_workflow_map_text=built_in_workflow_map_text,
     )
 
 
@@ -1334,7 +1090,6 @@ def _build_contract_catalog(
                 family_binding=workbench.artifacts_in_scope,
                 gate_binding=tuple(gate_binding),
                 workbench_refs=(workbench.workbench_id,),
-                guide_refs=(),
                 response_surface_bindings=workbench.response_surface_bindings,
                 compatibility=compatibility,
                 provenance=provenance,
@@ -1351,50 +1106,6 @@ def _primary_transaction_kind(workbench: WorkflowWorkbench) -> str:
         if candidate in workbench.allowed_transaction_kinds:
             return candidate
     raise WorkflowLayerError(f"{workbench.workbench_id} does not declare any transaction kinds")
-
-
-def _render_compatibility_registry_text(payload: Mapping[str, Any]) -> str:
-    comment = "# Generated compatibility projection. Do not use this file as runtime authority.\n"
-    return comment + yaml.safe_dump(payload, sort_keys=False)
-
-
-def _workbench_to_projection_dict(workbench: WorkflowWorkbench) -> dict[str, Any]:
-    return {
-        "workbench_id": workbench.workbench_id,
-        "display_name": workbench.display_name,
-        "lifecycle_placement": _lifecycle_to_dict(workbench.lifecycle_placement),
-        "artifacts_in_scope": list(workbench.artifacts_in_scope),
-        "intent_classes": list(workbench.intent_classes),
-        "charter_ref": workbench.charter_ref,
-        "workflow_surface": {
-            "allowed_transaction_kinds": list(workbench.allowed_transaction_kinds),
-            "draftable_artifact_families": list(workbench.draftable_artifact_families),
-            "contract_refs": list(workbench.contract_refs),
-            "inspect_views": list(workbench.inspect_views),
-            "response_surface_bindings": [
-                {
-                    "transaction_kind": binding.transaction_kind,
-                    "response_envelope": binding.response_envelope,
-                    "allowed_resource_roles": list(binding.allowed_resource_roles),
-                }
-                for binding in workbench.response_surface_bindings
-            ],
-        },
-        "entry_conditions": list(workbench.entry_conditions),
-        "exit_conditions": list(workbench.exit_conditions),
-    }
-
-
-def _lifecycle_to_dict(placement: LifecyclePlacement) -> dict[str, Any]:
-    if placement.kind == "covered_gates":
-        return {"kind": placement.kind, "covered_gates": list(placement.covered_gates)}
-    if placement.kind == "lifecycle_span":
-        return {
-            "kind": placement.kind,
-            "start_gate": placement.start_gate,
-            "end_gate": placement.end_gate,
-        }
-    return {"kind": placement.kind}
 
 
 def _path_label(path: Path, anchor_root: Path | None) -> str:

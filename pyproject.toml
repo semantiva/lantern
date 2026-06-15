@@ -61,7 +61,6 @@ where = ["."]
 	"workflow/definitions/lifecycle-policy/*.yaml",
 	"workflow/definitions/workbenches/*.yaml",
 	"workflow/definitions/workflows/*.yaml",
-	"workflow/generated/workflow_maps/*.md",
 ]
 
 [tool.pytest.ini_options]

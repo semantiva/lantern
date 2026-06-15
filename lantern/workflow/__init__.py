@@ -23,7 +23,6 @@ from .loader import (
     WorkflowLayerError,
     WorkflowWorkbench,
     load_workflow_layer,
-    render_generated_artifacts,
 )
 
 __all__ = [
@@ -35,5 +34,4 @@ __all__ = [
     "WorkflowLayerError",
     "WorkflowWorkbench",
     "load_workflow_layer",
-    "render_generated_artifacts",
 ]

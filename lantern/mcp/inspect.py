@@ -205,7 +205,6 @@ def _handle_contract(
         )
     )
     workflow_owned_contract = dict(layers["workflow_owned_contract"])
-    workflow_owned_contract.pop("guide_refs", None)
     workflow_owned_contract["resource_refs"] = list(resource_refs)
     return InspectContractResult(
         kind="contract",

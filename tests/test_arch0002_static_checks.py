@@ -14,18 +14,22 @@
 
 """ARCH-0002 §5 static enforcement checks for the operator guidance corpus.
 
-CI-level corpus checks (not runtime logic) installed by CH-0030 (rows 1–6),
+CI-level corpus checks (not runtime logic) installed by
 CH-0033 (rows 7–9: Charter-header, Charter-binding, task-card-derivation), and
 CH-0034 (rows 10–15: projection-role-absence, class/role-alignment,
 workbench-no-coverage-restatement, packaged-skill-no-projection, context-boundary,
 template-refs-resolution).
 Each check realizes one row of ARCH-0002 §5 and enforces the SPEC-0005
 requirements.
+
+Rows 1–6 (CH-0030 corpus checks) are retired: the legacy guidance corpus
+(resources/instructions, authoring_contracts, administration_procedures) was deleted
+in CH-0034, and the resource manifest no longer exists. Those checks now pass
+vacuously; they are removed here to avoid dead test weight.
 """
 
 from __future__ import annotations
 
-import json
 import re
 from pathlib import Path
 from typing import Any
@@ -34,110 +38,8 @@ import yaml
 
 PRODUCT_ROOT = Path(__file__).resolve().parents[1]
 DEFINITIONS = PRODUCT_ROOT / "lantern" / "workflow" / "definitions"
-MANIFEST = DEFINITIONS / "resource_manifest.json"
 WORKBENCHES_DIR = DEFINITIONS / "workbenches"
 CHARTERS_DIR = PRODUCT_ROOT / "lantern" / "workbench_charters"
-
-# Guidance classes that are delivered as resource-manifest entries.
-GUIDANCE_DIRS = (
-    "lantern/authoring_contracts",
-    "lantern/administration_procedures",
-    "lantern/resources/instructions",
-)
-
-ARCH0002_OPERATOR_KINDS = {"instruction", "authoring_contract", "administration_guide"}
-
-
-def _manifest() -> list[dict]:
-    return json.loads(MANIFEST.read_text(encoding="utf-8"))
-
-
-def _manifest_paths() -> set[str]:
-    return {entry["path"] for entry in _manifest()}
-
-
-def _guidance_files() -> set[str]:
-    files: set[str] = set()
-    for directory in GUIDANCE_DIRS:
-        for path in (PRODUCT_ROOT / directory).glob("*.md"):
-            files.add(f"lantern/{path.relative_to(PRODUCT_ROOT / 'lantern').as_posix()}")
-    return files
-
-
-# Row 1 — Membrane check (REQ-GS-01)
-def test_membrane_check_all_guidance_files_are_reachable() -> None:
-    manifest = _manifest_paths()
-    unreachable = sorted(_guidance_files() - manifest)
-    assert unreachable == [], f"present-but-unreachable guidance files: {unreachable}"
-
-
-# Row 2 — Single-authority check (REQ-GA-01, REQ-GA-03)
-def test_single_authority_no_projection_class_and_no_duplicate_documents() -> None:
-    import hashlib
-
-    kinds = {entry["kind"] for entry in _manifest()}
-    assert "authoritative_guide" not in kinds, "projection layer (authoritative_guide kind) must be removed"
-    # A document may serve multiple workbenches, but no two distinct governed
-    # documents may carry identical content (that would duplicate authority).
-    seen: dict[str, str] = {}
-    for path in _guidance_files():
-        digest = hashlib.sha256((PRODUCT_ROOT / path).read_bytes()).hexdigest()
-        assert digest not in seen, f"duplicate-authority documents: {path} == {seen[digest]}"
-        seen[digest] = path
-
-
-# Row 3 — Semantic-authority check (REQ-GA-02)
-def test_semantic_authority_no_shadow_corpus_or_semantic_definitions() -> None:
-    forbidden_definition_headings = (
-        "## Gate definitions",
-        "## Status definitions",
-        "## Canonical statuses",
-        "## Artifact families (normative)",
-    )
-    for path in _guidance_files():
-        text = (PRODUCT_ROOT / path).read_text(encoding="utf-8")
-        for heading in forbidden_definition_headings:
-            assert heading not in text, f"{path} redefines grammar-owned semantics: {heading!r}"
-
-
-# Row 4 — Audience/class declaration check (REQ-GA-04, REQ-GA-05)
-def test_audience_class_each_resource_resolves_to_one_kind() -> None:
-    by_path: dict[str, set[str]] = {}
-    for entry in _manifest():
-        by_path.setdefault(entry["path"], set()).add(entry["kind"])
-    ambiguous = {path: kinds for path, kinds in by_path.items() if len(kinds) != 1}
-    assert ambiguous == {}, f"resources without a single declared class: {ambiguous}"
-    assert {entry["kind"] for entry in _manifest()} <= ARCH0002_OPERATOR_KINDS
-
-
-# Row 5 — Reference-resolution check (REQ-GS-04)
-def test_reference_resolution_no_dangling_corpus_references() -> None:
-    manifest = _manifest_paths()
-    ref_pattern = re.compile(r"lantern/[A-Za-z0-9_./-]+\.md")
-    # Bare guides/ references (deleted layer); catches backtick-quoted and plain forms.
-    bare_guides_pattern = re.compile(r"`?guides/[A-Za-z0-9_./-]+\.md`?")
-    dangling: dict[str, list[str]] = {}
-    bare_guides: dict[str, list[str]] = {}
-    for path in _guidance_files():
-        text = (PRODUCT_ROOT / path).read_text(encoding="utf-8")
-        for ref in set(ref_pattern.findall(text)):
-            if ref in manifest:
-                continue
-            if (PRODUCT_ROOT / ref).exists():
-                continue  # delivery-reachable peer (e.g., a template present on disk)
-            dangling.setdefault(path, []).append(ref)
-        for match in set(bare_guides_pattern.findall(text)):
-            bare_guides.setdefault(path, []).append(match)
-    assert dangling == {}, f"references that resolve to no delivery-reachable target: {dangling}"
-    assert bare_guides == {}, f"bare guides/ references to deleted layer: {bare_guides}"
-
-
-# Row 6 — Non-governed-content check (REQ-GS-02, REQ-GS-03)
-def test_non_governed_content_absent_from_corpus() -> None:
-    for path in _manifest_paths():
-        name = path.rsplit("/", 1)[-1]
-        assert not name.startswith("MIGRATION__"), f"historical/migration document inside corpus: {path}"
-        assert "POC_VALUE_EXTRACTION" not in name, f"historical document inside corpus: {path}"
 
 
 # ── CH-0033 rows 7–9: Workbench Charter static checks ──────────────────────

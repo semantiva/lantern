@@ -23,7 +23,8 @@ from typing import Optional
 import yaml
 
 from lantern.artifacts.validator import validate_workspace_readiness
-from lantern.workflow.loader import DEFAULT_REGISTRY_PATH
+
+_DEFAULT_WORKFLOW_DIR = Path(__file__).resolve().parents[1] / "workflow" / "definitions" / "workflows"
 
 
 @dataclass(frozen=True)
@@ -69,7 +70,7 @@ def resolve_topology(
             prefix = f"{artifact_id}: " if artifact_id else ""
             issues.append(prefix + finding["message"])
 
-    runtime_surface = _read_runtime_surface(DEFAULT_REGISTRY_PATH)
+    runtime_surface = _read_runtime_surface()
     consistency = "valid" if not issues else ("missing_governance" if resolved_governance is None else "degraded")
 
     return TopologyPosture(
@@ -82,14 +83,15 @@ def resolve_topology(
     )
 
 
-def _read_runtime_surface(registry_path: Path) -> str:
-    if not registry_path.exists():
-        return "unknown"
+def _read_runtime_surface() -> str:
     try:
-        payload = yaml.safe_load(registry_path.read_text(encoding="utf-8"))
-        return str(payload.get("runtime_surface_classification", "unknown"))
+        for path in _DEFAULT_WORKFLOW_DIR.glob("*.yaml"):
+            payload = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+            if payload.get("workflow_id") == "default_full_governed_surface":
+                return str(payload.get("runtime_surface_classification", "unknown"))
     except Exception:
-        return "unknown"
+        pass
+    return "unknown"
 
 
 def resolve_configuration_surface(

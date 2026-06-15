@@ -25,13 +25,8 @@ from typing import Any
 
 from lantern.artifacts.renderers import parse_header_block
 from lantern.workflow.loader import (
-    DEFAULT_CONTRACT_CATALOG_PATH,
-    DEFAULT_REGISTRY_PATH,
-    DEFAULT_RESOURCE_MANIFEST_PATH,
     DEFAULT_SCHEMA_PATH,
     DEFAULT_TRANSACTION_PROFILES_PATH,
-    DEFAULT_WORKBENCH_BINDINGS_PATH,
-    DEFAULT_WORKFLOW_MAP_PATH,
     WorkflowWorkbench,
 )
 
@@ -622,24 +617,10 @@ def validate_workspace_readiness(
             )
         )
 
-    loader_kwargs = {
-        "registry_path": DEFAULT_REGISTRY_PATH,
-        "schema_path": DEFAULT_SCHEMA_PATH,
-        "transaction_profiles_path": DEFAULT_TRANSACTION_PROFILES_PATH,
-        "contract_catalog_path": DEFAULT_CONTRACT_CATALOG_PATH,
-        "resource_manifest_path": DEFAULT_RESOURCE_MANIFEST_PATH,
-        "workflow_map_path": DEFAULT_WORKFLOW_MAP_PATH,
-        "workbench_resource_bindings_path": DEFAULT_WORKBENCH_BINDINGS_PATH,
-    }
     try:
         load_workflow_layer(
-            registry_path=loader_kwargs["registry_path"],
-            schema_path=loader_kwargs["schema_path"],
-            transaction_profiles_path=loader_kwargs["transaction_profiles_path"],
-            contract_catalog_path=loader_kwargs["contract_catalog_path"],
-            resource_manifest_path=loader_kwargs["resource_manifest_path"],
-            workflow_map_path=loader_kwargs["workflow_map_path"],
-            workbench_resource_bindings_path=loader_kwargs["workbench_resource_bindings_path"],
+            schema_path=DEFAULT_SCHEMA_PATH,
+            transaction_profiles_path=DEFAULT_TRANSACTION_PROFILES_PATH,
         )
     except WorkflowLayerError as exc:
         findings.extend(_map_workflow_layer_error(exc))
