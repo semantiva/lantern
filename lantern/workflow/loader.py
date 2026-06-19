@@ -115,7 +115,7 @@ class ResourceManifestEntry:
     provenance_type: str
     provenance_refs: tuple[Mapping[str, Any], ...]
     roles: tuple[str, ...]
-    projection_trace: Mapping[str, Any]
+    derivation_trace: Mapping[str, Any]
 
 
 def _load_grammar():

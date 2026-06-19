@@ -26,8 +26,18 @@ python -m mypy lantern/
 echo "[7/8] Running pylint..."
 python -m pylint --fail-under=7.5 lantern/
 
-echo "[8/8] Verifying packaged surface and test suite..."
+echo "[8/9] Verifying packaged surface and test suite..."
 python scripts/build_runtime_release.py --verify-only
 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest tests/ -q
+
+echo "[9/9] Checking workflow documentation is not stale..."
+tmpdir=$(mktemp -d)
+trap "rm -rf $tmpdir" EXIT
+python -m lantern.cli export-workflow --destination "$tmpdir"
+if ! diff -q "$tmpdir/default_full_governed_surface.md" "docs/default_full_governed_surface.md" > /dev/null 2>&1; then
+    echo "✗ docs/default_full_governed_surface.md is stale."
+    echo "  Run: python -m lantern.cli export-workflow --destination docs/"
+    exit 1
+fi
 
 echo "✓ All pre-commit checks passed"

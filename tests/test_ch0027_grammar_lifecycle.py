@@ -449,7 +449,7 @@ def test_tc011_inspect_lifecycle_policy_returns_ch_state_constraints() -> None:
 # ── TC-014 addendum: lifecycle bundle mutation is rejected by bundle validator ──
 
 
-def test_tc014_lifecycle_projection_divergence_is_rejected(tmp_path: Path) -> None:
+def test_tc014_lifecycle_bundle_divergence_is_rejected(tmp_path: Path) -> None:
     import shutil
     import yaml
 
@@ -522,7 +522,7 @@ def test_tc012_gt060_maps_to_arch_readiness() -> None:
     assert "lg:artifacts/spec" not in inputs, f"GT-060 must not require SPEC input, got: {inputs}"
 
 
-# ── TC-013: Generated projections pass enforced-artifact validation ────────────
+# ── TC-013: Derived runtime views pass enforced-artifact validation ────────────
 
 
 def test_tc013_generated_artifacts_pass_enforcement() -> None:
@@ -669,7 +669,7 @@ def test_b3_invalid_ch_status_rejected_by_validate_artifact_file(tmp_path: Path)
     ), f"Expected status_contract finding for inadmissible status 'Selected'; anchors={anchors}"
 
 
-# ── B4: Lifecycle transition projection parity enforcement ────────────────────
+# ── B4: Lifecycle transition bundle parity enforcement ───────────────────────
 
 
 def test_tc014_lifecycle_transition_divergence_is_rejected(tmp_path: Path) -> None:
@@ -693,7 +693,7 @@ def test_tc014_lifecycle_transition_divergence_is_rejected(tmp_path: Path) -> No
 
     try:
         load_workflow_layer(lifecycle_policy_manifest_path=dst / "manifest.yaml")
-        assert False, "Expected WorkflowLayerError for lifecycle transition projection divergence"
+        assert False, "Expected WorkflowLayerError for lifecycle bundle transition divergence"
     except Exception as exc:
         assert "transition" in str(exc).lower() or "CH" in str(exc), f"Expected transition divergence error; got: {exc}"
 

@@ -169,16 +169,16 @@ def test_c03_charter_ref_not_in_optional_fields_and_required_fields_contain_it()
     ), "charter_ref must not be in optional_workbench_fields"
 
 
-# ── C04: Resource manifest is empty ──────────────────────────────────────────
+# ── C04: No legacy resource entries; operating_references slot reserved for CH-0035 ──
 
 
-def test_c04_resource_manifest_is_empty() -> None:
+def test_ch0034_leaves_no_legacy_resource_entries_and_no_operating_references_yet() -> None:
     from lantern.workflow.loader import load_workflow_layer
 
     layer = load_workflow_layer()
     assert (
         layer.resource_manifest == ()
-    ), "resource_manifest must be empty: all legacy authority role fields retired in CH-0034"
+    ), "CH-0034 must leave no legacy guide-resource entries and must not populate operating_references; CH-0035 owns operating-reference document binding."
 
 
 def test_c04_no_legacy_role_in_workbench_response_surface_bindings() -> None:

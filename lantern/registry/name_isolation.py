@@ -16,10 +16,48 @@
 
 from __future__ import annotations
 
+import re
+from dataclasses import dataclass
 from pathlib import Path
 
-from .loader import scan_forbidden_names
-from .models import NameViolation
+_TEXT_EXTENSIONS = {".py", ".yaml", ".yml", ".json", ".md", ".txt", ".toml", ".ini", ".cfg", ".rst", ".sh"}
+_SKIP_DIRS = {".git", ".pytest_cache", "__pycache__", ".mypy_cache", ".ruff_cache", ".venv", "venv"}
+_FORBIDDEN_NAME_PATTERN = re.compile(
+    "(?i)(?:" + "tier" + r"[-_ ]?" + "h|_" + "tier" + "_" + "h|" + "lantern" + "-" + "governance" + ")"
+)
+
+
+@dataclass(frozen=True)
+class NameViolation:
+    path: str
+    line_number: int
+    line_text: str
+
+
+def scan_forbidden_names(root: str | Path) -> list[NameViolation]:
+    root_path = Path(root)
+    violations: list[NameViolation] = []
+    for path in sorted(root_path.rglob("*")):
+        if not path.is_file():
+            continue
+        if any(part in _SKIP_DIRS for part in path.parts):
+            continue
+        if path.suffix and path.suffix.lower() not in _TEXT_EXTENSIONS:
+            continue
+        try:
+            text = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            text = path.read_text(encoding="utf-8", errors="replace")
+        for line_number, line in enumerate(text.splitlines(), start=1):
+            if _FORBIDDEN_NAME_PATTERN.search(line):
+                violations.append(
+                    NameViolation(
+                        path=str(path.relative_to(root_path)),
+                        line_number=line_number,
+                        line_text=line.strip(),
+                    )
+                )
+    return violations
 
 
 def assert_name_isolation(root: str | Path) -> None:

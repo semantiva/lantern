@@ -1211,10 +1211,6 @@ def _map_workflow_layer_error(exc: Exception) -> list[ValidationFinding]:
     message = str(exc)
     if message.startswith("lantern_grammar"):
         return [_finding("workspace.grammar", message, anchor="workspace.readiness")]
-    if message.startswith("Missing generated artifact ") or message.startswith("Committed "):
-        _, _, raw_path = message.partition(": ")
-        target = raw_path.strip() if raw_path else "lantern/workflow/definitions"
-        return [_finding(_runtime_relative_path(target), message, anchor="workspace.generated_artifacts")]
     if message.startswith("Missing workflow registry") or message.startswith("Missing workflow schema"):
         _, _, raw_path = message.partition(": ")
         return [_finding(_runtime_relative_path(raw_path.strip()), message, anchor="workspace.readiness")]

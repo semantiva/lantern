@@ -32,8 +32,8 @@ def test_contract_catalog_and_resource_manifest_cover_selected_workflow() -> Non
         assert entry.compatibility["selected_workflow_id"] == layer.selected_workflow_id
 
 
-def test_resource_manifest_is_empty_after_authority_field_retirement() -> None:
+def test_operating_references_slot_is_unpopulated_until_ch0035() -> None:
     layer = load_workflow_layer()
     assert (
         layer.resource_manifest == ()
-    ), "resource_manifest must be empty: all legacy authority role fields retired in CH-0034"
+    ), "CH-0034 must leave no legacy guide-resource entries and must not populate operating_references; CH-0035 owns operating-reference document binding."

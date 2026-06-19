@@ -84,6 +84,32 @@ def build_parser() -> argparse.ArgumentParser:
     show.add_argument("--workbench-folder", type=Path)
     show.add_argument("--json", action="store_true", dest="json_output")
 
+    export_workflow = subparsers.add_parser(
+        "export-workflow",
+        help="Export a human-readable workflow map markdown file",
+    )
+    export_workflow.add_argument(
+        "--destination",
+        type=Path,
+        required=True,
+        metavar="PATH",
+        help="Directory to write the workflow map into. Created if absent.",
+    )
+    export_workflow.add_argument(
+        "--workflow-id",
+        metavar="ID",
+        help="Workflow to export. Default: default_full_governed_surface.",
+    )
+    export_workflow.add_argument(
+        "--governance-root",
+        type=Path,
+        metavar="PATH",
+        help=(
+            "Governance repository root. Adds repo-local workbench and workflow definitions "
+            "from <governance-root>/workflow/definitions/."
+        ),
+    )
+
     return parser
 
 
@@ -224,6 +250,22 @@ def run_cli(
             )
             _write_payload(payload, stdout=stdout, json_output=args.json_output)
             return 0
+
+        if args.command == "export-workflow":
+            from lantern.workflow.loader import load_workflow_layer
+            from lantern.workflow.render import render_workflow_map
+
+            layer = load_workflow_layer(
+                workflow_id=args.workflow_id,
+                governance_root=args.governance_root,
+            )
+            destination = Path(args.destination)
+            destination.mkdir(parents=True, exist_ok=True)
+            output_path = destination / f"{layer.selected_workflow_id}.md"
+            output_path.write_text(render_workflow_map(layer), encoding="utf-8")
+            stdout.write(f"Written: {output_path}\n")
+            return 0
+
     except ContextResolutionError as exc:
         stderr.write(f"{exc}\n")
         return 2
