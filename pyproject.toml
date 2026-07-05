@@ -52,6 +52,7 @@ where = ["."]
 
 [tool.setuptools.package-data]
 "lantern" = [
+	"lifecycle/bundle/*.yaml",
 	"skills/packaged_default/*.md",
 	"templates/*.md",
 	"workflow/definitions/*.md",

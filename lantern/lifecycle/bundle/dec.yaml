@@ -1,0 +1,22 @@
+# Decision records are ordinary governed artifacts and closable. Every cited
+# evidence record must be approved (the per-gate "at least one approved
+# evidence record" half of the interim rule is gate-derived from the grammar's
+# outcome-locked gate entities).
+id: lg:artifacts/dec
+statuses:
+  - {id: lg:statuses/draft,      label: Draft}
+  - {id: lg:statuses/approved,   label: Approved}
+  - {id: lg:statuses/superseded, label: Superseded}
+
+transitions:
+  - {from: lg:statuses/draft,    to: lg:statuses/approved}
+  - {from: lg:statuses/approved, to: lg:statuses/superseded}
+
+state_constraints:
+  - status: lg:statuses/approved
+    rules:
+      evidence:
+        related_family_id: lg:artifacts/ev
+        constraints:
+          - statuses: [lg:statuses/approved]
+            cardinality: {all: true}

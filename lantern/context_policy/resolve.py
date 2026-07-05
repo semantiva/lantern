@@ -25,7 +25,9 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from .model import BLOCKED_SCHEMA_ID, CONTRACT_SCHEMA_ID, PolicyCorpus
+from lantern.outcomes import blocked_outcome
+
+from .model import CONTRACT_SCHEMA_ID, PolicyCorpus
 from .views import human_template, task_card, validation_rules
 
 REASON_UNCOVERED = "uncovered_pattern"
@@ -72,12 +74,7 @@ def resolve(corpus: PolicyCorpus, family: str, from_status: str, to_status: str)
         label = f"{family}: {from_status} -> {to_status}"
         reasons.append({"code": REASON_UNCOVERED, "detail": f"no context-policy unit covers pattern ({label})"})
 
-    return {
-        "schema_id": BLOCKED_SCHEMA_ID,
-        "blocked": True,
-        "pattern": pattern_payload,
-        "reasons": reasons,
-    }
+    return blocked_outcome(pattern=pattern_payload, reasons=reasons)
 
 
 def resolve_bytes(corpus: PolicyCorpus, family: str, from_status: str, to_status: str) -> bytes:

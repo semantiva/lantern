@@ -1,0 +1,45 @@
+# Increments are built against approved baselines: a change increment at
+# approved or verified cites exactly one ready/addressed change intent and
+# exactly one approved design baseline (interim workspace rule 2).
+id: lg:artifacts/ci
+statuses:
+  - {id: lg:statuses/draft,      label: Draft}
+  - {id: lg:statuses/candidate,  label: Candidate}
+  - {id: lg:statuses/approved,   label: Approved}
+  - {id: lg:statuses/verified,   label: Verified}
+  - {id: lg:statuses/rejected,   label: Rejected}
+  - {id: lg:statuses/superseded, label: Superseded}
+
+transitions:
+  - {from: lg:statuses/draft,     to: lg:statuses/candidate}
+  - {from: lg:statuses/candidate, to: lg:statuses/approved}
+  - {from: lg:statuses/candidate, to: lg:statuses/rejected}
+  - {from: lg:statuses/approved,  to: lg:statuses/verified}
+  - {from: lg:statuses/approved,  to: lg:statuses/rejected}
+  - {from: lg:statuses/approved,  to: lg:statuses/superseded}
+
+state_constraints:
+  - status: lg:statuses/approved
+    rules:
+      change_intent:
+        related_family_id: lg:artifacts/ch
+        constraints:
+          - statuses: [lg:statuses/ready, lg:statuses/addressed]
+            cardinality: {exact: 1}
+      design_baseline:
+        related_family_id: lg:artifacts/db
+        constraints:
+          - statuses: [lg:statuses/approved]
+            cardinality: {exact: 1}
+  - status: lg:statuses/verified
+    rules:
+      change_intent:
+        related_family_id: lg:artifacts/ch
+        constraints:
+          - statuses: [lg:statuses/ready, lg:statuses/addressed]
+            cardinality: {exact: 1}
+      design_baseline:
+        related_family_id: lg:artifacts/db
+        constraints:
+          - statuses: [lg:statuses/approved]
+            cardinality: {exact: 1}

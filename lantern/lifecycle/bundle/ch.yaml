@@ -1,0 +1,66 @@
+# Cross-artifact constraints carry the governance workspace's interim policy
+# unchanged in force: readiness rests on approved upstream baselines including
+# at least one test definition; the success terminal requires a verified
+# change increment.
+id: lg:artifacts/ch
+statuses:
+  - {id: lg:statuses/draft,      label: Draft}
+  - {id: lg:statuses/proposed,   label: Proposed}
+  - {id: lg:statuses/ready,      label: Ready}
+  - {id: lg:statuses/addressed,  label: Addressed}
+  - {id: lg:statuses/rejected,   label: Rejected}
+  - {id: lg:statuses/superseded, label: Superseded}
+
+transitions:
+  - {from: lg:statuses/draft,    to: lg:statuses/proposed}
+  - {from: lg:statuses/proposed, to: lg:statuses/ready}
+  - {from: lg:statuses/proposed, to: lg:statuses/rejected}
+  - {from: lg:statuses/proposed, to: lg:statuses/superseded}
+  - {from: lg:statuses/ready,    to: lg:statuses/addressed}
+  - {from: lg:statuses/ready,    to: lg:statuses/rejected}
+  - {from: lg:statuses/ready,    to: lg:statuses/superseded}
+
+state_constraints:
+  - status: lg:statuses/ready
+    rules:
+      upstream_tds:
+        related_family_id: lg:artifacts/td
+        constraints:
+          - statuses: [lg:statuses/approved]
+            cardinality: {min: 1}
+          - statuses: [lg:statuses/approved]
+            cardinality: {all: true}
+      upstream_specs:
+        related_family_id: lg:artifacts/spec
+        constraints:
+          - statuses: [lg:statuses/approved]
+            cardinality: {all: true}
+      upstream_archs:
+        related_family_id: lg:artifacts/arch
+        constraints:
+          - statuses: [lg:statuses/approved]
+            cardinality: {all: true}
+  - status: lg:statuses/addressed
+    rules:
+      upstream_tds:
+        related_family_id: lg:artifacts/td
+        constraints:
+          - statuses: [lg:statuses/approved]
+            cardinality: {min: 1}
+          - statuses: [lg:statuses/approved]
+            cardinality: {all: true}
+      upstream_specs:
+        related_family_id: lg:artifacts/spec
+        constraints:
+          - statuses: [lg:statuses/approved]
+            cardinality: {all: true}
+      upstream_archs:
+        related_family_id: lg:artifacts/arch
+        constraints:
+          - statuses: [lg:statuses/approved]
+            cardinality: {all: true}
+      related_cis:
+        related_family_id: lg:artifacts/ci
+        constraints:
+          - statuses: [lg:statuses/verified]
+            cardinality: {min: 1}

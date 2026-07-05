@@ -1,0 +1,11 @@
+id: lg:artifacts/initiative
+statuses:
+  - {id: lg:statuses/draft,       label: Draft}
+  - {id: lg:statuses/in_progress, label: In Progress}
+  - {id: lg:statuses/concluded,   label: Concluded}
+
+transitions:
+  - {from: lg:statuses/draft,       to: lg:statuses/in_progress}
+  - {from: lg:statuses/in_progress, to: lg:statuses/concluded}
+
+state_constraints: []

@@ -1,0 +1,18 @@
+# Lifecycle bundle for the ten Grammar 1.0.0 artifact families.
+# Authored in the grammar's published lifecycle-declaration format and loaded
+# through the grammar's Lifecycle API. Governed by CH-0002 / DB-0002 / CI-0002
+# in the Lantern governance workspace.
+schema_version: "1.0"
+grammar_compatibility:
+  min_model_version: "1.0.0"
+families:
+  - initiative.yaml
+  - spec.yaml
+  - arch.yaml
+  - db.yaml
+  - td.yaml
+  - ch.yaml
+  - ci.yaml
+  - issue.yaml
+  - dec.yaml
+  - ev.yaml

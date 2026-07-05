@@ -24,10 +24,13 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Mapping
 
+from lantern.outcomes import BLOCKED_OUTCOME_SCHEMA_ID
+
 UNIT_SCHEMA_ID = "lantern.context_policy.unit.v1"
 GROUPING_SCHEMA_ID = "lantern.context_policy.grouping.v1"
 CONTRACT_SCHEMA_ID = "lantern.context_policy.contract.v1"
-BLOCKED_SCHEMA_ID = "lantern.context_policy.blocked.v1"
+# The blocked payload is the standard shared across the resolution surface.
+BLOCKED_SCHEMA_ID = BLOCKED_OUTCOME_SCHEMA_ID
 VIEW_HUMAN_TEMPLATE_SCHEMA_ID = "lantern.context_policy.view.human_template.v1"
 VIEW_VALIDATION_RULES_SCHEMA_ID = "lantern.context_policy.view.validation_rules.v1"
 VIEW_TASK_CARD_SCHEMA_ID = "lantern.context_policy.view.task_card.v1"

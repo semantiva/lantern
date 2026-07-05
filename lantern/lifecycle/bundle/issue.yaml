@@ -1,0 +1,23 @@
+id: lg:artifacts/issue
+statuses:
+  - {id: lg:statuses/new,        label: New}
+  - {id: lg:statuses/needs_info, label: Needs Info}
+  - {id: lg:statuses/accepted,   label: Accepted}
+  - {id: lg:statuses/deferred,   label: Deferred}
+  - {id: lg:statuses/resolved,   label: Resolved}
+  - {id: lg:statuses/rejected,   label: Rejected}
+
+transitions:
+  - {from: lg:statuses/new,        to: lg:statuses/needs_info}
+  - {from: lg:statuses/new,        to: lg:statuses/accepted}
+  - {from: lg:statuses/new,        to: lg:statuses/deferred}
+  - {from: lg:statuses/new,        to: lg:statuses/rejected}
+  - {from: lg:statuses/needs_info, to: lg:statuses/accepted}
+  - {from: lg:statuses/needs_info, to: lg:statuses/deferred}
+  - {from: lg:statuses/needs_info, to: lg:statuses/rejected}
+  - {from: lg:statuses/accepted,   to: lg:statuses/resolved}
+  - {from: lg:statuses/accepted,   to: lg:statuses/deferred}
+  - {from: lg:statuses/deferred,   to: lg:statuses/accepted}
+  - {from: lg:statuses/deferred,   to: lg:statuses/rejected}
+
+state_constraints: []
